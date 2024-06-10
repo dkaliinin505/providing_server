@@ -88,8 +88,9 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
         "sed -i 's/127\\.0\\.0\\.1.*localhost/127.0.0.1     bold-silence.localdomain bold-silence localhost/' /etc/hosts")
     run_command("hostname bold-silence")
     run_command("ln -sf /usr/share/zoneinfo/UTC /etc/localtime")
-    password = run_command("mkpasswd -m sha-512 GMfEBKFCfPOTTWOfS7X3").strip()
-    run_command(f"usermod --password {password} super_forge")
+    if not user_exists("super_forge"):
+        password = run_command("mkpasswd -m sha-512 GMfEBKFCfPOTTWOfS7X3").strip()
+        run_command(f"usermod --password {password} super_forge")
 
     if not os.path.exists("/home/super_forge/.ssh"):
         os.makedirs("/home/super_forge/.ssh")
