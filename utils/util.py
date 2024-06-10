@@ -135,5 +135,7 @@ def activate_virtualenv(env_name="providing_env"):
 
 def install_requirements(requirements_file, env_name="providing_env"):
     pip_path = os.path.join(env_name, 'bin', 'pip')
-    run_command(f"{pip_path} install cython")
+
+    run_command(f"{pip_path} install --upgrade setuptools wheel cython")
+    run_command(f"{pip_path} install pyyaml")
     run_command(f"{pip_path} install -r {requirements_file}")
