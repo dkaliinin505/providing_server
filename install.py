@@ -169,6 +169,9 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
     print("Creating provisioned file")
     open('/root/.superforge-provisioned', 'w').close()
 
+    run_command('chown -R super_forge:super_forge /home/ubuntu/providing_server')
+    run_command('chmod -R 755 /home/ubuntu/providing_server')
+
     print("Creating systemd service")
 
     service_name = 'providingServer'
