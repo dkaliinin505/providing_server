@@ -88,6 +88,15 @@ def provision_ping(server_id, status):
         raise Exception(f"Failed to send status: {response.text}")
 
 
+def install_python_venv():
+    try:
+        run_command("sudo apt-get update")
+        run_command("sudo apt-get install -y python3-venv")
+    except Exception as e:
+        print(f"Failed to install python3-venv: {e}")
+        raise
+
+
 def create_virtualenv(env_name="providing_env"):
     if not os.path.exists(env_name):
         print(f"Creating virtual environment: {env_name}")
@@ -103,20 +112,17 @@ def create_virtualenv(env_name="providing_env"):
                 print(f"Failed to create virtual environment again: {e}")
                 raise
 
-def install_python_venv():
-    try:
-        run_command("sudo apt-get update")
-        run_command("sudo apt-get install -y python3-venv")
-    except Exception as e:
-        print(f"Failed to install python3-venv: {e}")
-        raise
 
-def activate_virtualenv(env_name="myenv"):
-    activate_script = os.path.join(env_name, 'bin', 'activate_this.py')
-    with open(activate_script) as f:
-        exec(f.read(), dict(__file__=activate_script))
+def activate_virtualenv(env_name="providing_env"):
+    activate_script = os.path.join(env_name, 'bin', 'activate')
+    if not os.path.exists(activate_script):
+        raise Exception(f"Activation script not found: {activate_script}")
+
+    # Activate virtual environment
+    activate_command = f"source {activate_script}"
+    exec(activate_command, dict(__file__=activate_script))
 
 
-def install_requirements(requirements_file, env_name="myenv"):
+def install_requirements(requirements_file, env_name="providing_env"):
     pip_path = os.path.join(env_name, 'bin', 'pip')
     run_command(f"{pip_path} install -r {requirements_file}")
