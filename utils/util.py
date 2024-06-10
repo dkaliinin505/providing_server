@@ -128,7 +128,9 @@ def activate_virtualenv(env_name="providing_env"):
         raise Exception(f"Activation script not found: {activate_script}")
 
     # Activate virtual environment
-    exec(open(activate_script).read(), {'__file__': activate_script})
+    print(f"Activating virtual environment: {activate_script}")
+    command = f". {activate_script}"
+    subprocess.run(command, shell=True, executable="/bin/bash")
 
 
 def install_requirements(requirements_file, env_name="providing_env"):
