@@ -78,7 +78,9 @@ WantedBy=multi-user.target
 
 def check_service_exists(service_name):
     result = subprocess.run(['systemctl', 'status', service_name], capture_output=True, text=True)
-    return "Loaded: not-found" not in result.stdout
+    if result.returncode != 0:
+        return False
+    return True
 
 
 def provision_ping(server_id, status):
