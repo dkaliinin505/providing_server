@@ -32,9 +32,7 @@ def ensure_package_installed(package_name):
     except ModuleNotFoundError:
         print(f"{package_name} not found. Installing {package_name}...")
         if package_name == 'pip':
-            run_command("sudo apt-get update")
-            run_command("sudo apt-get install -y python3-pip")
-            run_command(f"{sys.executable} -m pip install --upgrade pip")
+            run_command(f"{sys.executable} -m ensurepip --upgrade")
         else:
             run_command(f"{sys.executable} -m pip install {package_name}")
             # Ensure the installed package is in sys.path
@@ -88,3 +86,20 @@ def provision_ping(server_id, status):
     response = requests.post(url, data=data, verify=False)
     if response.status_code != 200:
         raise Exception(f"Failed to send status: {response.text}")
+
+
+def create_virtualenv(env_name="myenv"):
+    if not os.path.exists(env_name):
+        print(f"Creating virtual environment: {env_name}")
+        run_command(f"python3 -m venv {env_name}")
+
+
+def activate_virtualenv(env_name="myenv"):
+    activate_script = os.path.join(env_name, 'bin', 'activate_this.py')
+    with open(activate_script) as f:
+        exec(f.read(), dict(__file__=activate_script))
+
+
+def install_requirements(requirements_file, env_name="myenv"):
+    pip_path = os.path.join(env_name, 'bin', 'pip')
+    run_command(f"{pip_path} install -r {requirements_file}")

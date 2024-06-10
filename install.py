@@ -1,5 +1,7 @@
-import subprocess, os
-from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, check_service_exists
+import os
+
+from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
+    check_service_exists, create_virtualenv, activate_virtualenv, install_requirements
 
 # Ensure pip is installed
 ensure_package_installed('pip')
@@ -183,7 +185,13 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 
 
 if __name__ == "__main__":
+    env_name = "provoding_env"
+    requirements_file = "requirements.txt"
+
     try:
+        create_virtualenv(env_name)
+        activate_virtualenv(env_name)
+        install_requirements(requirements_file, env_name)
         setup_server(1, "123456", " ", " ", 1)
         print("Setup complete. The service is running.")
     except Exception as e:
