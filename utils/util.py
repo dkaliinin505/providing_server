@@ -1,4 +1,5 @@
 import subprocess, json, os, sys, importlib
+import venv
 
 
 def run_command(command, return_json=False):
@@ -101,26 +102,33 @@ def create_virtualenv(env_name="providing_env"):
     if not os.path.exists(env_name):
         print(f"Creating virtual environment: {env_name}")
         try:
-            run_command(f"python3 -m venv {env_name}")
+            venv.create(env_name, with_pip=True)
+            if os.path.exists(env_name):
+                print(f"Virtual environment {env_name} created successfully.")
+            else:
+                print(f"Failed to create virtual environment {env_name}.")
         except Exception as e:
             print(f"Failed to create virtual environment: {e}")
             print("Trying to install python3-venv and retry...")
             install_python_venv()
             try:
-                run_command(f"python3 -m venv {env_name}")
+                venv.create(env_name, with_pip=True)
+                if os.path.exists(env_name):
+                    print(f"Virtual environment {env_name} created successfully after installing python3-venv.")
+                else:
+                    print(f"Failed to create virtual environment {env_name} after installing python3-venv.")
             except Exception as e:
                 print(f"Failed to create virtual environment again: {e}")
                 raise
 
 
 def activate_virtualenv(env_name="providing_env"):
-    activate_script = os.path.join(env_name, 'bin', 'activate')
+    activate_script = os.path.join(env_name, 'bin', 'activate_this.py')
     if not os.path.exists(activate_script):
         raise Exception(f"Activation script not found: {activate_script}")
 
     # Activate virtual environment
-    activate_command = f"source {activate_script}"
-    exec(activate_command, dict(__file__=activate_script))
+    exec(open(activate_script).read(), {'__file__': activate_script})
 
 
 def install_requirements(requirements_file, env_name="providing_env"):
