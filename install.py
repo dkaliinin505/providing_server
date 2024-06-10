@@ -75,12 +75,12 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
     if not mkpasswd_installed:
         raise Exception("Failed to install base dependencies.")
 
-    print('Installing Python packages')
-    run_command("pip3 install httpie")
-    run_command("pip3 install awscli awscli-plugin-endpoint")
-    run_command("pip3 install Flask --ignore-installed")
-    run_command("pip3 install marshmallow")
-    run_command("pip3 install python-dotenv")
+    # print('Installing Python packages')
+    # run_command("pip3 install httpie")
+    # run_command("pip3 install awscli awscli-plugin-endpoint")
+    # run_command("pip3 install Flask --ignore-installed")
+    # run_command("pip3 install marshmallow")
+    # run_command("pip3 install python-dotenv")
 
     print('Setting hostname, timezone, and sudo password')
     run_command('echo "bold-silence" > /etc/hostname')
