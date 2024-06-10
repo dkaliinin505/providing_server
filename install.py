@@ -176,13 +176,16 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 
     service_name = 'providingServer'
     current_directory = os.path.abspath(os.path.dirname(__file__))
+    print('env_name:', env_name)
 
     # Using current directory to find the script
+    env_path = os.path.join(current_directory, env_name)
     service_script_path = os.path.join(current_directory, "app/wsgi.py")
+
     print(f"Service script path: {service_script_path}")
 
     if not check_service_exists(service_name):
-        create_systemd_service(service_name, service_script_path)
+        create_systemd_service(service_name, env_path, service_script_path)
     else:
         print(f"Service {service_name} already exists.")
 

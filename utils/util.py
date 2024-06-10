@@ -53,7 +53,7 @@ def user_exists(username):
         return False
 
 
-def create_systemd_service(service_name, script_path):
+def create_systemd_service(service_name, env_path, script_path):
     service_file = f"/etc/systemd/system/{service_name}.service"
     with open(service_file, "w") as f:
         f.write(f"""
@@ -64,8 +64,8 @@ After=network.target
 [Service]
 User=super_forge
 Group=super_forge
-WorkingDirectory=/home/super_forge
-ExecStart=/usr/bin/python3 {script_path}
+WorkingDirectory={os.path.abspath(os.path.dirname(__file__))}
+ExecStart={env_path}/bin/python {script_path}
 Restart=always
 
 [Install]
