@@ -185,7 +185,7 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 
 
 if __name__ == "__main__":
-    env_name = "provoding_env"
+    env_name = "providing_env"
     requirements_file = "requirements.txt"
 
     try:

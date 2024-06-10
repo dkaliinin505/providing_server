@@ -88,11 +88,28 @@ def provision_ping(server_id, status):
         raise Exception(f"Failed to send status: {response.text}")
 
 
-def create_virtualenv(env_name="myenv"):
+def create_virtualenv(env_name="providing_env"):
     if not os.path.exists(env_name):
         print(f"Creating virtual environment: {env_name}")
-        run_command(f"python3 -m venv {env_name}")
+        try:
+            run_command(f"python3 -m venv {env_name}")
+        except Exception as e:
+            print(f"Failed to create virtual environment: {e}")
+            print("Trying to install python3-venv and retry...")
+            install_python_venv()
+            try:
+                run_command(f"python3 -m venv {env_name}")
+            except Exception as e:
+                print(f"Failed to create virtual environment again: {e}")
+                raise
 
+def install_python_venv():
+    try:
+        run_command("sudo apt-get update")
+        run_command("sudo apt-get install -y python3-venv")
+    except Exception as e:
+        print(f"Failed to install python3-venv: {e}")
+        raise
 
 def activate_virtualenv(env_name="myenv"):
     activate_script = os.path.join(env_name, 'bin', 'activate_this.py')
