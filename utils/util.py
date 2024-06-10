@@ -137,4 +137,12 @@ def install_requirements(requirements_file, env_name="providing_env"):
     pip_path = os.path.join(env_name, 'bin', 'pip')
     run_command(f"{pip_path} install --upgrade setuptools wheel cython")
     run_command(f"{pip_path} install pyyaml")
-    run_command(f"{pip_path} install -r {requirements_file}")
+
+    with open(requirements_file, 'r') as req_file:
+        for line in req_file:
+            package = line.strip()
+            if package and not package.startswith('#'):
+                try:
+                    run_command(f"{pip_path} install {package}")
+                except Exception as e:
+                    print(f"Failed to install {package}: {e}")
