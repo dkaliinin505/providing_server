@@ -123,7 +123,7 @@ def create_virtualenv(env_name="providing_env"):
 
 
 def activate_virtualenv(env_name="providing_env"):
-    activate_script = os.path.join(env_name, 'bin', 'activate_this.py')
+    activate_script = os.path.join(env_name, 'bin', 'activate')
     if not os.path.exists(activate_script):
         raise Exception(f"Activation script not found: {activate_script}")
 
