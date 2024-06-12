@@ -32,12 +32,17 @@ class MySQLCommand(Command):
 
         # Add MySQL APT Repository
         run_command("apt-get install -y gnupg")
-        run_command("wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
+        run_command("wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
         run_command(
             'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
 
         # Update package lists
-        run_command("apt-get update")
+        try:
+            run_command("apt-get update")
+        except Exception as e:
+            print("Failed to update package lists. Attempting to fix missing keys.")
+            run_command("apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C")
+            run_command("apt-get update")
 
         # Install MySQL
         run_command("DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server")
