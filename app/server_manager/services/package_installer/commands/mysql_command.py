@@ -31,11 +31,12 @@ class MySQLCommand(Command):
             f'debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password {db_password}"')
 
         # Add MySQL APT Repository
-        run_command("apt-get update")
         run_command("apt-get install -y gnupg")
         run_command("wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
         run_command(
             'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
+
+        # Update package lists
         run_command("apt-get update")
 
         # Install MySQL
