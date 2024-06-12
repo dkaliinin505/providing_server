@@ -35,9 +35,12 @@ class MySQLCommand(Command):
         # Add MySQL APT Repository
         run_command("apt-get update")
         run_command("apt-get install -y gnupg")
-        run_command("wget --quiet -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
+        run_command("mkdir -p /etc/apt/keyrings")
         run_command(
-            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
+            "wget --quiet -O /etc/apt/keyrings/mysql-archive-keyring.gpg https://repo.mysql.com/RPM-GPG-KEY-mysql-2022")
+        release_codename = run_command("lsb_release -cs")
+        run_command(
+            f'echo "deb [signed-by=/etc/apt/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ {release_codename} mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
         run_command("apt-get update")
 
         # Install MySQL
