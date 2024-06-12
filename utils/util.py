@@ -2,18 +2,22 @@ import subprocess, json, os, sys, importlib
 import venv
 
 
-def run_command(command, return_json=False):
+def run_command(command, return_json=False, raise_exception=True):
     print(f"Running command: {command}")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
     if result.returncode != 0:
         error_message = f"Command failed: {command}\n{result.stderr}"
 
         if return_json:
             return json.dumps({'error': error_message}), 400
         else:
-            raise Exception(error_message)
+            if raise_exception:
+                raise Exception(error_message)
+            else:
+                print(error_message)
+                return None
     print(f"Command output: {result.stdout}")
-    return result.stdout
+    return result.stdout.strip()
 
 
 def install_package(package_name):
@@ -33,9 +37,13 @@ def ensure_package_installed(package_name):
     except ModuleNotFoundError:
         print(f"{package_name} not found. Installing {package_name}...")
         if package_name == 'pip':
-            run_command(f"{sys.executable} -m ensurepip --upgrade")
+            is_pip_installed = run_command(f"{sys.executable} -m ensurepip --upgrade", raise_exception=False)
+
+            if is_pip_installed is None:
+                run_command(f"sudo apt-get update")
+                run_command(f"sudo apt-get install -y python3-pip")
         else:
-            run_command(f"{sys.executable} -m pip install {package_name}")
+            run_command(f"{sys.executable} -m pip install {package_name}", raise_exception=False)
             # Ensure the installed package is in sys.path
             user_base = subprocess.check_output([sys.executable, "-m", "site", "--user-base"]).decode().strip()
             user_site = os.path.join(user_base, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}',
@@ -105,6 +113,7 @@ def create_virtualenv(env_name="providing_env"):
         print(f"Creating virtual environment: {env_name}")
         try:
             venv.create(env_name, with_pip=True)
+            print(f"Virtual environment {env_name} proceed. \n")
             if os.path.exists(env_name):
                 print(f"Virtual environment {env_name} created successfully.")
             else:
@@ -148,3 +157,12 @@ def install_requirements(requirements_file, env_name="providing_env"):
                     run_command(f"{pip_path} install {package}")
                 except Exception as e:
                     print(f"Failed to install {package}: {e}")
+
+
+def is_wsl():
+    try:
+        with open('/proc/version', 'r') as f:
+            version_info = f.read()
+        return 'Microsoft' in version_info or 'WSL' in version_info
+    except FileNotFoundError:
+        return False

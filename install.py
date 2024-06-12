@@ -1,13 +1,13 @@
 import os
-
 from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
     check_service_exists, create_virtualenv, activate_virtualenv, install_requirements
 
 # Ensure pip is installed
 ensure_package_installed('pip')
+#
+# # Ensure requests is installed
+# ensure_package_installed('requests')
 
-# Ensure requests is installed
-ensure_package_installed('requests')
 
 
 def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
@@ -75,21 +75,17 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
     if not mkpasswd_installed:
         raise Exception("Failed to install base dependencies.")
 
-    # print('Installing Python packages')
-    # run_command("pip3 install httpie")
-    # run_command("pip3 install awscli awscli-plugin-endpoint")
-    # run_command("pip3 install Flask --ignore-installed")
-    # run_command("pip3 install marshmallow")
-    # run_command("pip3 install python-dotenv")
-
     print('Setting hostname, timezone, and sudo password')
     run_command('echo "bold-silence" > /etc/hostname')
     run_command(
         "sed -i 's/127\\.0\\.0\\.1.*localhost/127.0.0.1     bold-silence.localdomain bold-silence localhost/' /etc/hosts")
-    run_command("hostname bold-silence")
+    hostname = os.getenv('HOSTNAME', 'bold-silence')
+    run_command(f"hostname {hostname}")
     run_command("ln -sf /usr/share/zoneinfo/UTC /etc/localtime")
     if not user_exists("super_forge"):
-        password = run_command("mkpasswd -m sha-512 GMfEBKFCfPOTTWOfS7X3").strip()
+
+        sudo_password = os.getenv('SUDO_PASSWORD', 'GMfEBKFCfPOTTWOfS7X3')
+        password = run_command(f"mkpasswd -m sha-512 {sudo_password} ").strip()  # GMfEBKFCfPOTTWOfS7X3
         run_command(f"usermod --password {password} super_forge")
 
     if not os.path.exists("/home/super_forge/.ssh"):
@@ -124,9 +120,14 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
         run_command('ufw allow 22')
         run_command('ufw allow 80')
         run_command('ufw allow 443')
+        run_command(f'ufw allow {server_id}')
         run_command('ufw --force enable')
     else:
         print("Module nf_conntrack not found. Skipping UFW setup.")
+
+
+    # Install Packages based on env ALLOWED_PACKAGES
+
 
     print('Setting up sudoers for FPM, Nginx, and Supervisor')
     sudoers_content = [
@@ -169,8 +170,8 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
     print("Creating provisioned file")
     open('/root/.superforge-provisioned', 'w').close()
 
-    run_command('chown -R super_forge:super_forge /home/ubuntu/providing_server')
-    run_command('chmod -R 755 /home/ubuntu/providing_server')
+    # run_command('chown -R super_forge:super_forge /home/ubuntu/providing_server')
+    # run_command('chmod -R 755 /home/ubuntu/providing_server')
 
     print("Creating systemd service")
 
@@ -193,7 +194,8 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 if __name__ == "__main__":
     env_name = "providing_env"
     requirements_file = "requirements.txt"
-
+    from dotenv import load_dotenv
+    load_dotenv()
     try:
         create_virtualenv(env_name)
         activate_virtualenv(env_name)

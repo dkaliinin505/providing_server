@@ -4,3 +4,4 @@ requests~=2.32.3
 python-dotenv~=1.0.1
 httpie~=2.6.0
 awscli~=1.23.0
+pip

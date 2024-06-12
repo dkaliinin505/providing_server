@@ -13,3 +13,8 @@ def action1_route():
 @server_manager_blueprint.route('/action2', methods=['POST'])
 def action2_route():
     return controller.action2()
+
+
+@server_manager_blueprint.route('/install-package', methods=['POST'])
+def install_package_route():
+    return controller.install_package()

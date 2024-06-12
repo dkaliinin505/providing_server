@@ -1,7 +1,8 @@
-import requests
 from functools import wraps
 from flask import request, jsonify
+from marshmallow import ValidationError
 import os
+import requests
 
 
 def validate_request(schema_classes):
@@ -35,8 +36,22 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 data = request.get_json()
                 errors = validator.validate(data)
+
                 if errors:
                     return jsonify({'errors': errors}), 400
+
+                # Load specific config schema if config field exists
+                if 'config' in data:
+                    package_name = data.get('package_name')
+                    try:
+                        config_validator = validator.load_config(package_name)
+                    except ValidationError as e:
+                        return jsonify({'errors': e.messages}), 400
+
+                    config_errors = config_validator.validate(data.get('config', {}))
+                    if config_errors:
+                        return jsonify({'errors': config_errors}), 400
+
                 kwargs['data'] = data
             return f(*args, **kwargs)
 
