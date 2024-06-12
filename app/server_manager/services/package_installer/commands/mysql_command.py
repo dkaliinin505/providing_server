@@ -13,11 +13,11 @@ class MySQLCommand(Command):
 
     def execute(self, data):
         self.config = data.get('config', self.config)
-        # Add MySQL Keys
 
         # Configure MySQL Repositories If Required
         ubuntu_version = run_command("lsb_release -rs")
         if self.version_to_int(ubuntu_version) <= self.version_to_int("20.04"):
+            print("Configuring MySQL Repositories for Ubuntu 20.04 and below")
             run_command("wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
             run_command("dpkg --install mysql-apt-config_0.8.15-1_all.deb")
             run_command("apt-get update")
@@ -30,17 +30,12 @@ class MySQLCommand(Command):
         run_command(
             f'debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password {db_password}"')
 
-        # Install MySQL
-
         # Add MySQL APT Repository
         run_command("apt-get update")
         run_command("apt-get install -y gnupg")
-        run_command("mkdir -p /etc/apt/keyrings")
+        run_command("wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
         run_command(
-            "wget --quiet -O /etc/apt/keyrings/mysql-archive-keyring.gpg https://repo.mysql.com/RPM-GPG-KEY-mysql-2022")
-        release_codename = run_command("lsb_release -cs")
-        run_command(
-            f'echo "deb [signed-by=/etc/apt/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/ubuntu/ {release_codename} mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
+            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
         run_command("apt-get update")
 
         # Install MySQL
