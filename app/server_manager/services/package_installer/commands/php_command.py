@@ -38,28 +38,28 @@ class PhpCommand(Command):
 
         # Install Imagick
         run_command("sudo apt-get install -y --force-yes libmagickwand-dev")
-        run_command("echo 'extension=imagick.so' > /etc/php/8.3/mods-available/imagick.ini")
+        run_command("sudo echo 'extension=imagick.so' > /etc/php/8.3/mods-available/imagick.ini")
         run_command("yes '' | sudo apt install php8.3-imagick")
 
         # Set up PHP pool configuration
-        run_command('sed -i "s/^user = www-data/user = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
-        run_command('sed -i "s/^group = www-data/group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
-        run_command('sed -i "s/;listen\\.owner.*/listen.owner = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
-        run_command('sed -i "s/;listen\\.group.*/listen.group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
-        run_command('sed -i "s/;listen\\.mode.*/listen.mode = 0666/" /etc/php/8.3/fpm/pool.d/www.conf')
+        run_command('sudo sed -i "s/^user = www-data/user = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
+        run_command('sudo sed -i "s/^group = www-data/group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
+        run_command('sudo sed -i "s/;listen\\.owner.*/listen.owner = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
+        run_command('sudo sed -i "s/;listen\\.group.*/listen.group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
+        run_command('sudo sed -i "s/;listen\\.mode.*/listen.mode = 0666/" /etc/php/8.3/fpm/pool.d/www.conf')
         run_command(
-            f'sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf')
+            f'sudo sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf')
 
         # Optimize PHP FPM
-        run_command(f'sed -i "s/^pm.max_children.*=.*/pm.max_children = {config["pm_max_children"]}/" /etc/php/8.3'
+        run_command(f' sudo sed -i "s/^pm.max_children.*=.*/pm.max_children = {config["pm_max_children"]}/" /etc/php/8.3'
                     f'/fpm/pool.d/www.conf')
 
         # Refresh PHP FPM
-        run_command('echo "forge ALL=NOPASSWD: /usr/sbin/service php8.3-fpm reload" >> /etc/sudoers.d/php-fpm')
+        run_command('sudo echo "forge ALL=NOPASSWD: /usr/sbin/service php8.3-fpm reload" >> /etc/sudoers.d/php-fpm')
 
         # Set up session directory permissions
-        run_command("chmod 733 /var/lib/php/sessions")
-        run_command("chmod +t /var/lib/php/sessions")
+        run_command("sudo chmod 733 /var/lib/php/sessions")
+        run_command("sudo chmod +t /var/lib/php/sessions")
 
         # Set up logrotate for PHP FPM
         file_exists = run_command('test -f /etc/logrotate.d/php8.3-fpm && echo "exists"', return_json=False)
@@ -80,6 +80,6 @@ class PhpCommand(Command):
                 f.write('daily\nmaxsize 100M\n')
 
         # Update PHP CLI to point to PHP 8.3
-        run_command("update-alternatives --set php /usr/bin/php8.3")
+        run_command("sudo update-alternatives --set php /usr/bin/php8.3")
 
         return {"message": "PHP installed and configured"}

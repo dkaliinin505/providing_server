@@ -169,6 +169,11 @@ def setup_server(current_directory, env_name):
     run_command(f'chown -R super_forge:super_forge {current_directory}')
     run_command(f'chmod -R 755 {current_directory}')
 
+    sudoers_content = "super_forge ALL=(ALL) NOPASSWD:ALL\n"
+    with open('/etc/sudoers.d/super_forge', 'w') as f:
+        f.write(sudoers_content)
+    run_command('chmod 440 /etc/sudoers.d/super_forge')
+
     print("Creating systemd service")
 
     service_name = 'providingServer'
