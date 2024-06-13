@@ -4,10 +4,11 @@ from utils.util import run_command, module_exists, ensure_package_installed, use
 
 # Ensure pip is installed
 ensure_package_installed('pip')
+
+
 #
 # # Ensure requests is installed
 # ensure_package_installed('requests')
-
 
 
 def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
@@ -76,14 +77,14 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
         raise Exception("Failed to install base dependencies.")
 
     print('Setting hostname, timezone, and sudo password')
-    run_command('echo "bold-silence" > /etc/hostname')
-    run_command(
-        "sed -i 's/127\\.0\\.0\\.1.*localhost/127.0.0.1     bold-silence.localdomain bold-silence localhost/' /etc/hosts")
     hostname = os.getenv('HOSTNAME', 'bold-silence')
+    run_command(f'echo {hostname} > /etc/hostname')  # Env values
+    run_command(
+        f"sed -i 's/127\\.0\\.0\\.1.*localhost/127.0.0.1     {hostname}.localdomain {hostname} localhost/' /etc/hosts")  # Env values
+
     run_command(f"hostname {hostname}")
     run_command("ln -sf /usr/share/zoneinfo/UTC /etc/localtime")
     if not user_exists("super_forge"):
-
         sudo_password = os.getenv('SUDO_PASSWORD', 'GMfEBKFCfPOTTWOfS7X3')
         password = run_command(f"mkpasswd -m sha-512 {sudo_password} ").strip()  # GMfEBKFCfPOTTWOfS7X3
         run_command(f"usermod --password {password} super_forge")
@@ -120,14 +121,10 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
         run_command('ufw allow 22')
         run_command('ufw allow 80')
         run_command('ufw allow 443')
-        run_command(f'ufw allow {server_id}')
+        run_command(f'ufw allow 5000')
         run_command('ufw --force enable')
     else:
         print("Module nf_conntrack not found. Skipping UFW setup.")
-
-
-    # Install Packages based on env ALLOWED_PACKAGES
-
 
     print('Setting up sudoers for FPM, Nginx, and Supervisor')
     sudoers_content = [
@@ -170,13 +167,15 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
     print("Creating provisioned file")
     open('/root/.superforge-provisioned', 'w').close()
 
-    # run_command('chown -R super_forge:super_forge /home/ubuntu/providing_server')
-    # run_command('chmod -R 755 /home/ubuntu/providing_server')
+    # Need to grant privileges for root directory for user super_forge
+    current_directory = os.path.abspath(os.path.dirname(__file__))
+    print('current directory is:', current_directory)
+    run_command(f'chown -R super_forge:super_forge {current_directory}')
+    run_command(f'chmod -R 755 {current_directory}')
 
     print("Creating systemd service")
 
     service_name = 'providingServer'
-    current_directory = os.path.abspath(os.path.dirname(__file__))
     print('env_name:', env_name)
 
     # Using current directory to find the script
@@ -194,12 +193,13 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 if __name__ == "__main__":
     env_name = "providing_env"
     requirements_file = "requirements.txt"
-    from dotenv import load_dotenv
-    load_dotenv()
     try:
         create_virtualenv(env_name)
         activate_virtualenv(env_name)
         install_requirements(requirements_file, env_name)
+        from dotenv import load_dotenv
+
+        load_dotenv()
         setup_server(1, "123456", " ", " ", 1)
         print("Setup complete. The service is running.")
     except Exception as e:
