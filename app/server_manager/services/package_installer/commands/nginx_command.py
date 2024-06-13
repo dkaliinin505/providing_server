@@ -81,17 +81,17 @@ class NginxCommand(Command):
             self.create_default_mime_types(mime_types_path)
 
         memory_limit = self.config.get('memory_limit', '512M')
-        run_command(f"sed -i 's/memory_limit = .*/memory_limit = {memory_limit}/' /etc/php/8.3/fpm/php.ini")
-        run_command("sed -i 's/error_reporting = .*/error_reporting = E_ALL/' /etc/php/8.3/fpm/php.ini")
-        run_command("sed -i 's/display_errors = .*/display_errors = Off/' /etc/php/8.3/fpm/php.ini")
-        run_command("sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/8.3/fpm/php.ini")
+        run_command(f"sudo sed -i 's/memory_limit = .*/memory_limit = {memory_limit}/' /etc/php/8.3/fpm/php.ini")
+        run_command("sudo sed -i 's/error_reporting = .*/error_reporting = E_ALL/' /etc/php/8.3/fpm/php.ini")
+        run_command("sudo sed -i 's/display_errors = .*/display_errors = Off/' /etc/php/8.3/fpm/php.ini")
+        run_command("sudo sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/8.3/fpm/php.ini")
 
     def configure_nginx(self):
-        run_command("sed -i 's/user www-data;/user super_forge;/' /etc/nginx/nginx.conf")
-        run_command("sed -i 's/worker_processes.*/worker_processes auto;/' /etc/nginx/nginx.conf")
-        run_command("sed -i 's/# multi_accept.*/multi_accept on;/' /etc/nginx/nginx.conf")
+        run_command("sudo sed -i 's/user www-data;/user super_forge;/' /etc/nginx/nginx.conf")
+        run_command("sudo sed -i 's/worker_processes.*/worker_processes auto;/' /etc/nginx/nginx.conf")
+        run_command("sudo sed -i 's/# multi_accept.*/multi_accept on;/' /etc/nginx/nginx.conf")
         run_command(
-            "sed -i 's/# server_names_hash_bucket_size.*/server_names_hash_bucket_size 128;/' /etc/nginx/nginx.conf")
+            "sudo sed -i 's/# server_names_hash_bucket_size.*/server_names_hash_bucket_size 128;/' /etc/nginx/nginx.conf")
 
     def create_default_nginx_conf(self, path):
         default_conf = """
@@ -330,10 +330,10 @@ class NginxCommand(Command):
     def restart_services(self):
         nginx_status = run_command("ps aux | grep nginx | grep -v grep", raise_exception=False)
         if not nginx_status.strip():
-            run_command("service nginx start")
+            run_command("sudo service nginx start")
             print("Started Nginx")
         else:
-            run_command("service nginx reload")
+            run_command("sudo service nginx reload")
             print("Reloaded Nginx")
 
         php_fpm_versions = [
@@ -352,7 +352,7 @@ class NginxCommand(Command):
 
         for version in php_fpm_versions:
             if run_command(f"pgrep {version}", raise_exception=False):
-                run_command(f"service {version} restart")
+                run_command(f"sudo service {version} restart")
 
     def install_node_js_and_npm_packages(self):
         run_command("sudo apt-get install -y apt-transport-https")

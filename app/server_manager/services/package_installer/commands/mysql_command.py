@@ -18,9 +18,9 @@ class MySQLCommand(Command):
         ubuntu_version = run_command("lsb_release -rs")
         if self.version_to_int(ubuntu_version) <= self.version_to_int("20.04"):
             print("Configuring MySQL Repositories for Ubuntu 20.04 and below")
-            run_command("wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
-            run_command("dpkg --install mysql-apt-config_0.8.15-1_all.deb")
-            run_command("apt-get update")
+            run_command("sudo wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
+            run_command("sudo dpkg --install mysql-apt-config_0.8.15-1_all.deb")
+            run_command("sudo apt-get update")
 
         # Set The Automated Root Password
         db_password = self.config.get('db_password', 'default_password')
@@ -31,21 +31,21 @@ class MySQLCommand(Command):
             f'debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password {db_password}"')
 
         # Add MySQL APT Repository
-        run_command("apt-get install -y gnupg")
-        run_command("wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
+        run_command("sudo apt-get install -y gnupg")
+        run_command("sudo wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
         run_command(
-            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list')
+            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list')
 
         # Update package lists
         try:
-            run_command("apt-get update")
+            run_command("sudo apt-get update")
         except Exception as e:
             print("Failed to update package lists. Attempting to fix missing keys.")
-            run_command("apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C")
-            run_command("apt-get update")
+            run_command("sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C")
+            run_command("sudo apt-get update")
 
         # Install MySQL
-        run_command("DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server")
+        run_command("DEBIAN_FRONTEND=noninteractive sudo apt-get install -y mysql-server")
 
         # Start MySQL service if not running
         self.ensure_mysql_service_running()
@@ -65,26 +65,26 @@ class MySQLCommand(Command):
         if not mysql_status:
             if is_wsl():
                 try:
-                    if run_command("pgrep mysqld", raise_exception=False):
-                        run_command("pkill mysqld")
-                    run_command("nohup mysqld_safe &", raise_exception=False)
+                    if run_command("sudo pgrep mysqld", raise_exception=False):
+                        run_command("sudo pkill mysqld")
+                    run_command("sudo nohup mysqld_safe &", raise_exception=False)
                     # Wait a bit for the service to start
                     import time
                     time.sleep(5)
-                    mysql_status = run_command("pgrep mysqld")
+                    mysql_status = run_command("sudo pgrep mysqld")
                     if not mysql_status:
                         raise Exception("Failed to start MySQL service.")
                 except Exception as e:
                     raise Exception("Failed to start MySQL service.")
             else:
                 try:
-                    run_command("service mysql start")
+                    run_command("sudo service mysql start")
                 except Exception as e:
                     try:
-                        run_command("service mysqld start")
+                        run_command("sudo service mysqld start")
                     except Exception as e:
                         try:
-                            run_command("service mariadb start")
+                            run_command("sudo service mariadb start")
                         except Exception as e:
                             raise Exception("Failed to start MySQL service on non-WSL system.")
 
@@ -110,7 +110,7 @@ class MySQLCommand(Command):
         # Create Initial Database If Specified
         initial_db = self.config.get('initial_db', 'forge')
         run_command(
-            f'mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
+            f'sudo mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
 
         # Configure Log Rotation
         self.configure_log_rotation()
@@ -135,8 +135,8 @@ class MySQLCommand(Command):
             f'GRANT ALL PRIVILEGES ON *.* TO \'{username}\'@\'%\' WITH GRANT OPTION;',
         ]
         for cmd in commands:
-            run_command(f'mysql --user="root" --password="{db_password}" -e "{cmd}"')
-        run_command(f'mysql --user="root" --password="{db_password}" -e "FLUSH PRIVILEGES;"')
+            run_command(f'sudo mysql --user="root" --password="{db_password}" -e "{cmd}"')
+        run_command(f'sudo mysql --user="root" --password="{db_password}" -e "FLUSH PRIVILEGES;"')
 
     def configure_log_rotation(self):
         if self.file_contains("/etc/logrotate.d/mysql-server", "maxsize"):
