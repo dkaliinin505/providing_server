@@ -6,7 +6,6 @@ from utils.util import run_command
 
 class PhpCommand(Command):
     def execute(self, data):
-
         config = data.get('config', {})
 
         run_command("sudo apt-get update")
@@ -21,16 +20,17 @@ class PhpCommand(Command):
         # Composer installation
         if not os.path.exists("/usr/local/bin/composer"):
             run_command("curl -sS https://getcomposer.org/installer | php")
-            run_command("mv composer.phar /usr/local/bin/composer")
+            run_command("sudo mv composer.phar /usr/local/bin/composer")
             run_command(
-                'echo "super_forge ALL=(root) NOPASSWD: /usr/local/bin/composer self-update*" > /etc/sudoers.d/composer')
+                'echo "super_forge ALL=(root) NOPASSWD: /usr/local/bin/composer self-update*" | sudo tee /etc/sudoers.d/composer'
+            )
 
         # Set up PHP CLI
         run_command('sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/8.3/cli/php.ini')
-        run_command(f'sudo sed -i "s/memory_limit = .*/memory_limit = {config["memory_limit"]}/" /etc/php/8.3/cli/php'
-                    f'.ini')
+        run_command(
+            f'sudo sed -i "s/memory_limit = .*/memory_limit = {config["memory_limit"]}/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/8.3/cli/php.ini')
 
         # Set up PHP FPM
@@ -38,7 +38,7 @@ class PhpCommand(Command):
 
         # Install Imagick
         run_command("sudo apt-get install -y --force-yes libmagickwand-dev")
-        run_command("sudo echo 'extension=imagick.so' > /etc/php/8.3/mods-available/imagick.ini")
+        run_command("echo 'extension=imagick.so' | sudo tee /etc/php/8.3/mods-available/imagick.ini > /dev/null")
         run_command("yes '' | sudo apt install php8.3-imagick")
 
         # Set up PHP pool configuration
@@ -48,14 +48,17 @@ class PhpCommand(Command):
         run_command('sudo sed -i "s/;listen\\.group.*/listen.group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
         run_command('sudo sed -i "s/;listen\\.mode.*/listen.mode = 0666/" /etc/php/8.3/fpm/pool.d/www.conf')
         run_command(
-            f'sudo sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf')
+            f'sudo sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf'
+        )
 
         # Optimize PHP FPM
-        run_command(f' sudo sed -i "s/^pm.max_children.*=.*/pm.max_children = {config["pm_max_children"]}/" /etc/php/8.3'
-                    f'/fpm/pool.d/www.conf')
+        run_command(
+            f' sudo sed -i "s/^pm.max_children.*=.*/pm.max_children = {config["pm_max_children"]}/" /etc/php/8.3/fpm/pool.d/www.conf'
+        )
 
         # Refresh PHP FPM
-        run_command('sudo echo "forge ALL=NOPASSWD: /usr/sbin/service php8.3-fpm reload" >> /etc/sudoers.d/php-fpm')
+        run_command(
+            'echo "forge ALL=NOPASSWD: /usr/sbin/service php8.3-fpm reload" | sudo tee -a /etc/sudoers.d/php-fpm')
 
         # Set up session directory permissions
         run_command("sudo chmod 733 /var/lib/php/sessions")
@@ -64,7 +67,9 @@ class PhpCommand(Command):
         # Set up logrotate for PHP FPM
         file_exists = run_command('test -f /etc/logrotate.d/php8.3-fpm && echo "exists"', return_json=False)
         if file_exists.strip() == "exists":
-            grep_output = run_command('grep --count "maxsize" /etc/logrotate.d/php8.3-fpm', return_json=False, raise_exception=False)
+            grep_output = run_command(
+                'grep --count "maxsize" /etc/logrotate.d/php8.3-fpm', return_json=False, raise_exception=False
+            )
             if grep_output is None or grep_output.strip() == "0":
                 with open('/etc/logrotate.d/php8.3-fpm', 'r') as file:
                     lines = file.readlines()
@@ -83,3 +88,4 @@ class PhpCommand(Command):
         run_command("sudo update-alternatives --set php /usr/bin/php8.3")
 
         return {"message": "PHP installed and configured"}
+
