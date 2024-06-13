@@ -351,8 +351,7 @@ class NginxCommand(Command):
             run_command("sudo mkdir -p /etc/apt/keyrings")
 
         run_command(
-            "curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor --batch -o /etc/apt/keyrings/nodesource.gpg"
-        )
+            "sudo curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg")
 
         node_major = 18
 
