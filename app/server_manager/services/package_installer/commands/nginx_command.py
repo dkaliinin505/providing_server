@@ -47,23 +47,14 @@ class NginxCommand(Command):
         run_command("sudo groups super_forge")
 
         # Update logrotate configuration
-        file_exists = run_command('test -f /etc/logrotate.d/nginx && echo "exists"', return_json=False)
+        file_exists = run_command('sudo test -f /etc/logrotate.d/nginx && echo "exists"', return_json=False)
         if file_exists.strip() == "exists":
-            grep_output = run_command('grep --count "maxsize" /etc/logrotate.d/nginx', return_json=False,
+            grep_output = run_command('sudo grep --count "maxsize" /etc/logrotate.d/nginx', return_json=False,
                                       raise_exception=False)
             if grep_output is None or grep_output.strip() == "0":
-                with open('/etc/logrotate.d/nginx', 'r') as file:
-                    lines = file.readlines()
-
-                with open('/etc/logrotate.d/nginx', 'w') as file:
-                    for line in lines:
-                        file.write(line)
-                        if line.strip() in ['daily', 'weekly', 'monthly', 'yearly']:
-                            file.write('maxsize 100M\n')
+                run_command('sudo sed -i "/daily\|weekly\|monthly\|yearly/a maxsize 100M" /etc/logrotate.d/nginx')
         else:
-            # Create logrotate file for nginx
-            with open('/etc/logrotate.d/nginx', 'w') as f:
-                f.write('daily\nmaxsize 100M\n')
+            run_command('echo "daily\nmaxsize 100M\n" | sudo tee /etc/logrotate.d/nginx > /dev/null')
 
         # Install Node.js and global npm packages
         self.install_node_js_and_npm_packages()
