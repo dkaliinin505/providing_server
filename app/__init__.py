@@ -1,7 +1,6 @@
 from flask import Flask
 from app.server_manager.routes import server_manager_blueprint
 from dotenv import load_dotenv
-import os
 
 
 class App:

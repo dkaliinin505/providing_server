@@ -12,14 +12,14 @@ class NginxCommand(Command):
     def execute(self, data):
         self.config = data.get('config', self.config)
 
-        run_command("apt-get update")
+        run_command("sudo apt-get update")
 
         # Install Nginx
-        run_command("apt-get install -y --force-yes nginx")
-        run_command("systemctl enable nginx.service")
+        run_command("sudo apt-get install -y --force-yes nginx")
+        run_command("sudo systemctl enable nginx.service")
 
         # Generate dhparam File
-        run_command("openssl dhparam -out /etc/nginx/dhparams.pem 2048")
+        run_command("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
         # Configure Nginx and PHP-FPM settings
         self.configure_php_fpm()
@@ -33,7 +33,7 @@ class NginxCommand(Command):
         if os.path.exists('/etc/nginx/sites-available/default'):
             os.remove('/etc/nginx/sites-available/default')
 
-        run_command("service nginx restart")
+        run_command("sudo service nginx restart")
 
         # Install a catch-all server
         self.install_catch_all_server()
@@ -42,9 +42,9 @@ class NginxCommand(Command):
         self.restart_services()
 
         # Add forge user to www-data group
-        run_command("usermod -a -G www-data super_forge")
-        run_command("id super_forge")
-        run_command("groups super_forge")
+        run_command("sudo usermod -a -G www-data super_forge")
+        run_command("sudo id super_forge")
+        run_command("sudo groups super_forge")
 
         # Update logrotate configuration
         file_exists = run_command('test -f /etc/logrotate.d/nginx && echo "exists"', return_json=False)
@@ -296,7 +296,7 @@ class NginxCommand(Command):
         if not os.path.exists('/etc/nginx/ssl/'):
             os.makedirs('/etc/nginx/ssl/')
 
-        run_command("openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout "
+        run_command("sudo openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout "
                     "/etc/nginx/ssl/catch-all.invalid.key -out /etc/nginx/ssl/catch-all.invalid.crt -subj "
                     "\"/C=US/ST=California/L=San Francisco/O=Example Company/OU=IT/CN=example.com\"")
 
@@ -355,22 +355,22 @@ class NginxCommand(Command):
                 run_command(f"service {version} restart")
 
     def install_node_js_and_npm_packages(self):
-        run_command("apt-get install -y apt-transport-https")
+        run_command("sudo apt-get install -y apt-transport-https")
         if not os.path.exists('/etc/apt/keyrings'):
             os.makedirs('/etc/apt/keyrings')
 
         run_command(
-            "curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg")
+            "sudo curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg")
 
         node_major = 18
         with open('/etc/apt/sources.list.d/nodesource.list', 'w') as f:
             f.write(
                 f"deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{node_major}.x nodistro main")
 
-        run_command("apt-get update")
+        run_command("sudo apt-get update")
         run_command("sudo apt-get install -y --force-yes nodejs")
 
-        run_command("npm install -g pm2")
-        run_command("npm install -g gulp")
-        run_command("npm install -g yarn")
-        run_command("npm install -g bun")
+        run_command("sudo npm install -g pm2")
+        run_command("sudo npm install -g gulp")
+        run_command("sudo npm install -g yarn")
+        run_command("sudo npm install -g bun")

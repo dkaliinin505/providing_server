@@ -16,11 +16,12 @@ class InstallPackageSchema(Schema):
 
     @staticmethod
     def load_config(package_name):
-        if package_name == 'php':
-            return PhpConfigSchema()
-        elif package_name == 'nginx':
-            return NginxConfigSchema()
-        elif package_name == 'mysql':
-            return MysqlConfigSchema()
-        else:
-            raise ValidationError({'package_name': 'Invalid package name'})
+        match package_name:
+            case 'php':
+                return PhpConfigSchema()
+            case 'nginx':
+                return NginxConfigSchema()
+            case 'mysql':
+                return MysqlConfigSchema()
+            case _:
+                raise ValidationError({'package_name': 'Invalid package name'})

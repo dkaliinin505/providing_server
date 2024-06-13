@@ -5,8 +5,13 @@ from utils.util import run_command
 
 
 class PhpCommand(Command):
+
+    def __init__(self, config):
+        self.config = config
+        print(f"Config: {config}")
+
     def execute(self, data):
-        config = data.get('config', {})
+        self.config = data.get('config', {})
 
         run_command("sudo apt-get update")
 
@@ -26,11 +31,12 @@ class PhpCommand(Command):
             )
 
         # Set up PHP CLI
+        memory_limit = self.config.get('memory_limit', '512M')
         run_command('sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/8.3/cli/php.ini')
         run_command(
-            f'sudo sed -i "s/memory_limit = .*/memory_limit = {config["memory_limit"]}/" /etc/php/8.3/cli/php.ini')
+            f'sudo sed -i "s/memory_limit = .*/memory_limit = {memory_limit}/" /etc/php/8.3/cli/php.ini')
         run_command('sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/8.3/cli/php.ini')
 
         # Set up PHP FPM
@@ -48,12 +54,13 @@ class PhpCommand(Command):
         run_command('sudo sed -i "s/;listen\\.group.*/listen.group = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')
         run_command('sudo sed -i "s/;listen\\.mode.*/listen.mode = 0666/" /etc/php/8.3/fpm/pool.d/www.conf')
         run_command(
-            f'sudo sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf'
+            f'sudo sed -i "s/;request_terminate_timeout .*/request_terminate_timeout = {self.config["request_terminate_timeout"]}/" /etc/php/8.3/fpm/pool.d/www.conf'
         )
 
+        max_children = self.config.get('pm_max_children', 20)
         # Optimize PHP FPM
         run_command(
-            f' sudo sed -i "s/^pm.max_children.*=.*/pm.max_children = {config["pm_max_children"]}/" /etc/php/8.3/fpm/pool.d/www.conf'
+            f' sudo sed -i "s/^pm.max_children.*=.*/pm.max_children = {max_children}/" /etc/php/8.3/fpm/pool.d/www.conf'
         )
 
         # Refresh PHP FPM
@@ -88,4 +95,3 @@ class PhpCommand(Command):
         run_command("sudo update-alternatives --set php /usr/bin/php8.3")
 
         return {"message": "PHP installed and configured"}
-
