@@ -3,13 +3,12 @@ from utils.util import run_command, module_exists, ensure_package_installed, use
     check_service_exists, create_virtualenv, activate_virtualenv, install_requirements
 
 
-
 #
 # # Ensure requests is installed
 # ensure_package_installed('requests')
 
 
-def setup_server():
+def setup_server(current_directory, env_name):
     if os.geteuid() != 0:
         raise Exception("This script must be run as root.")
 
@@ -166,7 +165,6 @@ def setup_server():
     open('/root/.superforge-provisioned', 'w').close()
 
     # Need to grant privileges for root directory for user super_forge
-    current_directory = os.path.abspath(os.path.dirname(__file__))
     print('current directory is:', current_directory)
     run_command(f'chown -R super_forge:super_forge {current_directory}')
     run_command(f'chmod -R 755 {current_directory}')
@@ -177,7 +175,6 @@ def setup_server():
     print('env_name:', env_name)
 
     # Using current directory to find the script
-    env_path = os.path.join(current_directory, env_name)
     service_script_path = os.path.join(current_directory, "app/wsgi.py")
 
     print(f"Service script path: {service_script_path}")
@@ -194,6 +191,8 @@ if __name__ == "__main__":
 
     # Ensure pip is installed
     ensure_package_installed('pip')
+    current_directory = os.path.abspath(os.path.dirname(__file__))
+    env_path = os.path.join(current_directory, env_name)
 
     try:
         if not os.path.exists(env_name):
@@ -203,10 +202,12 @@ if __name__ == "__main__":
             print("Virtual environment activated.")
             install_requirements(requirements_file, env_name)
             print("Virtual environment created. Please run the script again to start the setup.")
+            print(f"Run the following command to activate the virtual environment: {env_path}/bin/python install.py")
         else:
             from dotenv import load_dotenv
+
             load_dotenv()
-            setup_server()
+            setup_server(current_directory, env_path)
             print("Setup complete. The service is running.")
     except Exception as e:
         print(f"Installation failed: {e}")
