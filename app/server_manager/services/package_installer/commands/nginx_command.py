@@ -291,7 +291,7 @@ class NginxCommand(Command):
 
     def install_catch_all_server(self):
         if not os.path.exists('/etc/nginx/ssl/'):
-            os.makedirs('/etc/nginx/ssl/')
+            run_command("sudo mkdir -p /etc/nginx/ssl/")
 
         run_command("sudo openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout "
                     "/etc/nginx/ssl/catch-all.invalid.key -out /etc/nginx/ssl/catch-all.invalid.crt -subj "
@@ -357,7 +357,7 @@ class NginxCommand(Command):
     def install_node_js_and_npm_packages(self):
         run_command("sudo apt-get install -y apt-transport-https")
         if not os.path.exists('/etc/apt/keyrings'):
-            os.makedirs('/etc/apt/keyrings')
+            run_command("sudo mkdir -p /etc/apt/keyrings")
 
         run_command(
             "sudo curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg")
