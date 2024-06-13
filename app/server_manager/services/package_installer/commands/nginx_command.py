@@ -260,8 +260,7 @@ class NginxCommand(Command):
     text/x-component
     text/x-cross-domain-policy;
     """
-        with open('/etc/nginx/conf.d/gzip.conf', 'w') as f:
-            f.write(gzip_config)
+        run_command(f"echo '{gzip_config.strip()}' | sudo tee /etc/nginx/conf.d/gzip.conf > /dev/null")
 
     def configure_cloudflare(self):
         cloudflare_config = """
@@ -289,8 +288,7 @@ class NginxCommand(Command):
     set_real_ip_from 2c0f:f248::/32;
     real_ip_header X-Forwarded-For;
     """
-        with open('/etc/nginx/conf.d/cloudflare.conf', 'w') as f:
-            f.write(cloudflare_config)
+        run_command(f"echo '{cloudflare_config.strip()}' | sudo tee /etc/nginx/conf.d/cloudflare.conf > /dev/null")
 
     def install_catch_all_server(self):
         if not os.path.exists('/etc/nginx/ssl/'):
@@ -321,8 +319,7 @@ class NginxCommand(Command):
         return 444;
     }
     """
-        with open('/etc/nginx/sites-available/000-catch-all', 'w') as f:
-            f.write(catch_all_config)
+        run_command(f"echo '{catch_all_config.strip()}' | sudo tee /etc/nginx/sites-available/000-catch-all > /dev/null")
 
         if not os.path.exists('/etc/nginx/sites-available/000-catch-all'):
             os.symlink('/etc/nginx/sites-available/000-catch-all', '/etc/nginx/sites-enabled/000-catch-all')
@@ -363,9 +360,9 @@ class NginxCommand(Command):
             "sudo curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg")
 
         node_major = 18
-        with open('/etc/apt/sources.list.d/nodesource.list', 'w') as f:
-            f.write(
-                f"deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{node_major}.x nodistro main")
+
+        nodesource_config = f"deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{node_major}.x nodistro main"
+        run_command(f"echo '{nodesource_config}' | sudo tee /etc/apt/sources.list.d/nodesource.list > /dev/null")
 
         run_command("sudo apt-get update")
         run_command("sudo apt-get install -y --force-yes nodejs")
