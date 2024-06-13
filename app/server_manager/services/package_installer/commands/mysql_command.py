@@ -1,7 +1,5 @@
 import os
-
-import requests
-
+import time
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command, is_wsl
 
@@ -24,17 +22,14 @@ class MySQLCommand(Command):
 
         # Set The Automated Root Password
         db_password = self.config.get('db_password', 'default_password')
-        run_command(f'debconf-set-selections <<< "mysql-community-server mysql-community-server/data-dir select \'\'"')
-        run_command(
-            f'debconf-set-selections <<< "mysql-community-server mysql-community-server/root-pass password {db_password}"')
-        run_command(
-            f'debconf-set-selections <<< "mysql-community-server mysql-community-server/re-root-pass password {db_password}"')
+        run_command(f"echo 'mysql-community-server mysql-community-server/data-dir select \"\"' | sudo debconf-set-selections")
+        run_command(f"echo 'mysql-community-server mysql-community-server/root-pass password {db_password}' | sudo debconf-set-selections")
+        run_command(f"echo 'mysql-community-server mysql-community-server/re-root-pass password {db_password}' | sudo debconf-set-selections")
 
         # Add MySQL APT Repository
         run_command("sudo apt-get install -y gnupg")
-        run_command("sudo wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | apt-key add -")
-        run_command(
-            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list')
+        run_command("sudo wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | sudo apt-key add -")
+        run_command('echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list')
 
         # Update package lists
         try:
@@ -55,7 +50,6 @@ class MySQLCommand(Command):
 
         return {"message": "MySQL installed and configured"}
 
-
     def ensure_mysql_service_running(self):
         try:
             mysql_status = run_command("pgrep mysqld")
@@ -69,7 +63,6 @@ class MySQLCommand(Command):
                         run_command("sudo pkill mysqld")
                     run_command("sudo nohup mysqld_safe &", raise_exception=False)
                     # Wait a bit for the service to start
-                    import time
                     time.sleep(5)
                     mysql_status = run_command("sudo pgrep mysqld")
                     if not mysql_status:
@@ -93,8 +86,7 @@ class MySQLCommand(Command):
         self.append_to_file("/etc/mysql/mysql.conf.d/mysqld.cnf", "default_password_lifetime = 0")
 
         # Set Character Set
-        self.append_to_file("/etc/mysql/my.cnf",
-                            "\n[mysqld]\ndefault_authentication_plugin=mysql_native_password\nskip-log-bin")
+        self.append_to_file("/etc/mysql/my.cnf", "\n[mysqld]\ndefault_authentication_plugin=mysql_native_password\nskip-log-bin")
 
         # Configure Max Connections
         ram = self.get_total_ram()
@@ -109,8 +101,7 @@ class MySQLCommand(Command):
 
         # Create Initial Database If Specified
         initial_db = self.config.get('initial_db', 'forge')
-        run_command(
-            f'sudo mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
+        run_command(f'sudo mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
 
         # Configure Log Rotation
         self.configure_log_rotation()
@@ -164,27 +155,22 @@ class MySQLCommand(Command):
 
     @staticmethod
     def append_to_file(file_path, text):
-        with open(file_path, 'a') as file:
-            file.write(text + "\n")
+        run_command(f'echo "{text}" | sudo tee -a {file_path} > /dev/null')
 
     @staticmethod
     def update_or_append(file_path, key, value):
         try:
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
-
+            lines = run_command(f'sudo cat {file_path}').splitlines()
             updated = False
             for i, line in enumerate(lines):
                 if line.startswith(key):
-                    lines[i] = f"{key} = {value}\n"
+                    lines[i] = f"{key} = {value}"
                     updated = True
                     break
 
             if not updated:
-                lines.append(f"{key} = {value}\n")
+                lines.append(f"{key} = {value}")
 
-            with open(file_path, 'w') as file:
-                file.writelines(lines)
+            run_command(f'echo "{os.linesep.join(lines)}" | sudo tee {file_path} > /dev/null')
         except FileNotFoundError:
-            with open(file_path, 'w') as file:
-                file.write(f"{key} = {value}\n")
+            run_command(f'echo "{key} = {value}" | sudo tee {file_path} > /dev/null')
