@@ -7,7 +7,7 @@ from app.server_manager.services.package_installer.invoker import PackageInstall
 class PackageInstallerService:
     def __init__(self):
         self.installer = PackageInstaller()
-        self.installer.register('php', PhpCommand())
+        self.installer.register('php', PhpCommand({'config': {}}))
         self.installer.register('nginx', NginxCommand({'config': {}}))
         self.installer.register('mysql', MySQLCommand({'config': {}}))
 
