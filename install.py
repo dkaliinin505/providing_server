@@ -197,6 +197,7 @@ if __name__ == "__main__":
         create_virtualenv(env_name)
         activate_virtualenv(env_name)
         install_requirements(requirements_file, env_name)
+        ensure_package_installed('python-dotenv~=1.0.1')
         from dotenv import load_dotenv
 
         load_dotenv()
