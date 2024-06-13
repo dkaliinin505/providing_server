@@ -191,18 +191,19 @@ if __name__ == "__main__":
 
     # Ensure pip is installed
     ensure_package_installed('pip')
+
     current_directory = os.path.abspath(os.path.dirname(__file__))
     env_path = os.path.join(current_directory, env_name)
 
     try:
         if not os.path.exists(env_name):
-            print("Creating virtual environment...")
+            # Create virtual environment
             create_virtualenv(env_name)
             activate_virtualenv(env_name)
             print("Virtual environment activated.")
             install_requirements(requirements_file, env_name)
-            print("Virtual environment created. Please run the script again to start the setup.")
-            print(f"Run the following command to activate the virtual environment: {env_path}/bin/python install.py")
+            print("Virtual environment created")
+            print(f"Please run the script again using following command to continue installation: {env_path}/bin/python install.py")
         else:
             from dotenv import load_dotenv
 

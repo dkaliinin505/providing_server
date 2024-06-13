@@ -9,11 +9,11 @@ class PhpCommand(Command):
 
         config = data.get('config', {})
 
-        run_command("apt-get update")
+        run_command("sudo apt-get update")
 
         # Install PHP 8.3
         run_command(
-            "apt-get install -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' -y --allow-downgrades --allow-remove-essential --allow-change-held-packages "
+            "sudo apt-get install -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' -y --allow-downgrades --allow-remove-essential --allow-change-held-packages "
             "php8.3-fpm php8.3-cli php8.3-dev php8.3-pgsql php8.3-sqlite3 php8.3-gd php8.3-curl php8.3-imap php8.3-mysql php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-soap "
             "php8.3-intl php8.3-readline php8.3-gmp php8.3-redis php8.3-memcached php8.3-msgpack php8.3-igbinary php8.3-swoole"
         )
@@ -37,9 +37,9 @@ class PhpCommand(Command):
         run_command('sudo sed -i "s/display_errors = .*/display_errors = Off/" /etc/php/8.3/fpm/php.ini')
 
         # Install Imagick
-        run_command("apt-get install -y --force-yes libmagickwand-dev")
+        run_command("sudo apt-get install -y --force-yes libmagickwand-dev")
         run_command("echo 'extension=imagick.so' > /etc/php/8.3/mods-available/imagick.ini")
-        run_command("yes '' | apt install php8.3-imagick")
+        run_command("yes '' | sudo apt install php8.3-imagick")
 
         # Set up PHP pool configuration
         run_command('sed -i "s/^user = www-data/user = super_forge/" /etc/php/8.3/fpm/pool.d/www.conf')

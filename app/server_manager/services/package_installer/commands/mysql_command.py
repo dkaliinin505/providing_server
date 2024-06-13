@@ -53,6 +53,8 @@ class MySQLCommand(Command):
         # Configure MySQL
         self.configure_mysql(db_password)
 
+        return {"message": "MySQL installed and configured"}
+
 
     def ensure_mysql_service_running(self):
         try:
