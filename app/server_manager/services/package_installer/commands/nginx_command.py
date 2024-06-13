@@ -29,9 +29,9 @@ class NginxCommand(Command):
 
         # Disable default Nginx site
         if os.path.exists('/etc/nginx/sites-enabled/default'):
-            os.remove('/etc/nginx/sites-enabled/default')
+            run_command("sudo rm -f /etc/nginx/sites-enabled/default")
         if os.path.exists('/etc/nginx/sites-available/default'):
-            os.remove('/etc/nginx/sites-available/default')
+            run_command("sudo rm -f /etc/nginx/sites-available/default")
 
         run_command("sudo service nginx restart")
 
@@ -126,8 +126,8 @@ class NginxCommand(Command):
                 include /etc/nginx/sites-enabled/*;
             }
             """
-        with open(path, 'w') as f:
-            f.write(default_conf)
+
+        run_command(f"echo '{default_conf.strip()}' | sudo tee {path} > /dev/null")
 
         print(f"Created default Nginx configuration at {path}")
 
@@ -221,8 +221,7 @@ class NginxCommand(Command):
         video/x-msvideo                       avi;
     }
     """
-        with open(path, 'w') as f:
-            f.write(mime_types_content)
+        run_command(f"echo '{mime_types_content.strip()}' | sudo tee {path} > /dev/null")
 
         print(f"Created default mime.types at {path}")
 
@@ -322,7 +321,11 @@ class NginxCommand(Command):
         run_command(f"echo '{catch_all_config.strip()}' | sudo tee /etc/nginx/sites-available/000-catch-all > /dev/null")
 
         if not os.path.exists('/etc/nginx/sites-available/000-catch-all'):
-            os.symlink('/etc/nginx/sites-available/000-catch-all', '/etc/nginx/sites-enabled/000-catch-all')
+            # Ensure the target file exists before creating the symlink
+            run_command("sudo touch /etc/nginx/sites-available/000-catch-all")
+
+        if not os.path.exists('/etc/nginx/sites-enabled/000-catch-all'):
+            run_command("sudo ln -s /etc/nginx/sites-available/000-catch-all /etc/nginx/sites-enabled/000-catch-all")
 
     def restart_services(self):
         nginx_status = run_command("ps aux | grep nginx | grep -v grep", raise_exception=False)
