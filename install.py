@@ -2,8 +2,6 @@ import os
 from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
     check_service_exists, create_virtualenv, activate_virtualenv, install_requirements
 
-# Ensure pip is installed
-ensure_package_installed('pip')
 
 
 #
@@ -11,7 +9,7 @@ ensure_package_installed('pip')
 # ensure_package_installed('requests')
 
 
-def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
+def setup_server():
     if os.geteuid() != 0:
         raise Exception("This script must be run as root.")
 
@@ -193,15 +191,22 @@ def setup_server(server_id, sudo_password, db_password, callback, recipe_id):
 if __name__ == "__main__":
     env_name = "providing_env"
     requirements_file = "requirements.txt"
-    try:
-        create_virtualenv(env_name)
-        activate_virtualenv(env_name)
-        install_requirements(requirements_file, env_name)
-        ensure_package_installed('python-dotenv')
-        from dotenv import load_dotenv
 
-        load_dotenv()
-        setup_server(1, "123456", " ", " ", 1)
-        print("Setup complete. The service is running.")
+    # Ensure pip is installed
+    ensure_package_installed('pip')
+
+    try:
+        if not os.path.exists(env_name):
+            print("Creating virtual environment...")
+            create_virtualenv(env_name)
+            activate_virtualenv(env_name)
+            print("Virtual environment activated.")
+            install_requirements(requirements_file, env_name)
+            print("Virtual environment created. Please run the script again to start the setup.")
+        else:
+            from dotenv import load_dotenv
+            load_dotenv()
+            setup_server()
+            print("Setup complete. The service is running.")
     except Exception as e:
         print(f"Installation failed: {e}")
