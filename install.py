@@ -1,6 +1,6 @@
 import os
 from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
-    check_service_exists, create_virtualenv, activate_virtualenv, install_requirements
+    check_service_exists, create_virtualenv, activate_virtualenv, install_requirements, install_python_venv
 
 
 #
@@ -196,6 +196,9 @@ if __name__ == "__main__":
 
     # Ensure pip is installed
     ensure_package_installed('pip')
+
+    # Ensure python3-venv is installed
+    install_python_venv()
 
     current_directory = os.path.abspath(os.path.dirname(__file__))
     env_path = os.path.join(current_directory, env_name)
