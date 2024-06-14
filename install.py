@@ -14,7 +14,7 @@ def setup_server(current_directory, env_name):
 
     uname = run_command("awk -F= '/^NAME/{print $2}' /etc/os-release | sed 's/\"//g'").strip()
     if uname != "Ubuntu":
-        raise Exception("Forge only supports Ubuntu 20.04 and 22.04.")
+        raise Exception("Super Forge only supports Ubuntu 20.04 and 22.04.")
 
     if os.path.exists("/root/.superforge-provisioned"):
         raise Exception("This server has already been provisioned by Super Forge.")
