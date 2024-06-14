@@ -72,10 +72,11 @@ class NginxCommand(Command):
             self.create_default_mime_types(mime_types_path)
 
         memory_limit = self.config.get('memory_limit', '512M')
-        run_command(f"sudo sed -i 's/memory_limit = .*/memory_limit = {memory_limit}/' /etc/php/8.3/fpm/php.ini")
-        run_command("sudo sed -i 's/error_reporting = .*/error_reporting = E_ALL/' /etc/php/8.3/fpm/php.ini")
-        run_command("sudo sed -i 's/display_errors = .*/display_errors = Off/' /etc/php/8.3/fpm/php.ini")
-        run_command("sudo sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/8.3/fpm/php.ini")
+        if os.path.exists('/etc/php/8.3/fpm/php.ini'):
+            run_command(f"sudo sed -i 's/memory_limit = .*/memory_limit = {memory_limit}/' /etc/php/8.3/fpm/php.ini")
+            run_command("sudo sed -i 's/error_reporting = .*/error_reporting = E_ALL/' /etc/php/8.3/fpm/php.ini")
+            run_command("sudo sed -i 's/display_errors = .*/display_errors = Off/' /etc/php/8.3/fpm/php.ini")
+            run_command("sudo sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/8.3/fpm/php.ini")
 
     def configure_nginx(self):
         run_command("sudo sed -i 's/user www-data;/user super_forge;/' /etc/nginx/nginx.conf")
