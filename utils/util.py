@@ -166,3 +166,27 @@ def is_wsl():
         return 'Microsoft' in version_info or 'WSL' in version_info
     except FileNotFoundError:
         return False
+
+
+def ensure_permissions(path):
+    try:
+        # Change permissions for the given path
+        subprocess.check_call(['sudo', 'chmod', '755', path])
+        print(f"Permissions for {path} set to 755")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to set permissions for {path}: {e}")
+        sys.exit(1)
+
+
+def set_permissions_dynamically():
+    current_directory = os.path.abspath(os.path.dirname(__file__))
+    parent_directory = os.path.abspath(os.path.join(current_directory, os.pardir))
+    grandparent_directory = os.path.abspath(os.path.join(parent_directory, os.pardir))
+
+    print(f"Current directory: {current_directory}")
+    print(f"Parent directory: {parent_directory}")
+    print(f"Grandparent directory: {grandparent_directory}")
+
+    ensure_permissions(current_directory)
+    ensure_permissions(parent_directory)
+    ensure_permissions(grandparent_directory)

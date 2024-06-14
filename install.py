@@ -1,6 +1,7 @@
 import os
 from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
-    check_service_exists, create_virtualenv, activate_virtualenv, install_requirements, install_python_venv
+    check_service_exists, create_virtualenv, activate_virtualenv, install_requirements, install_python_venv, \
+    set_permissions_dynamically
 
 
 #
@@ -168,6 +169,8 @@ def setup_server(current_directory, env_name):
     print('current directory is:', current_directory)
     run_command(f'chown -R super_forge:super_forge {current_directory}')
     run_command(f'chmod -R 755 {current_directory}')
+
+    set_permissions_dynamically()
 
     sudoers_content = "super_forge ALL=(ALL) NOPASSWD:ALL\n"
     with open('/etc/sudoers.d/super_forge', 'w') as f:
