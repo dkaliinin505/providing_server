@@ -40,7 +40,7 @@ class MySQLCommand(Command):
             run_command("sudo apt-get update")
 
         # Install MySQL with non-interactive frontend
-        run_command("DEBIAN_FRONTEND=noninteractive sudo apt-get install -y mysql-server", return_json=False, raise_exception=True)
+        run_command("DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y mysql-server", return_json=False, raise_exception=True)
 
         # Start MySQL service if not running
         self.ensure_mysql_service_running()
