@@ -13,7 +13,7 @@ class MySQLCommand(Command):
         self.config = data.get('config', self.config)
 
         # Configure MySQL Repositories If Required
-        ubuntu_version = run_command("lsb_release -rs")
+        ubuntu_version = run_command("lsb_release -rs", return_json=False).strip()
         if self.version_to_int(ubuntu_version) <= self.version_to_int("20.04"):
             print("Configuring MySQL Repositories for Ubuntu 20.04 and below")
             run_command("sudo wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
@@ -39,8 +39,8 @@ class MySQLCommand(Command):
             run_command("sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B7B3B788A8D3785C")
             run_command("sudo apt-get update")
 
-        # Install MySQL
-        run_command("DEBIAN_FRONTEND=noninteractive sudo apt-get install -y mysql-server")
+        # Install MySQL with non-interactive frontend
+        run_command("DEBIAN_FRONTEND=noninteractive sudo apt-get install -y mysql-server", return_json=False, raise_exception=True)
 
         # Start MySQL service if not running
         self.ensure_mysql_service_running()
@@ -52,19 +52,19 @@ class MySQLCommand(Command):
 
     def ensure_mysql_service_running(self):
         try:
-            mysql_status = run_command("pgrep mysqld")
+            mysql_status = run_command("pgrep mysqld", return_json=False, raise_exception=False)
         except Exception as e:
             mysql_status = ""
 
         if not mysql_status:
             if is_wsl():
                 try:
-                    if run_command("sudo pgrep mysqld", raise_exception=False):
+                    if run_command("sudo pgrep mysqld", return_json=False, raise_exception=False):
                         run_command("sudo pkill mysqld")
-                    run_command("sudo nohup mysqld_safe &", raise_exception=False)
+                    run_command("sudo nohup mysqld_safe &", return_json=False, raise_exception=False)
                     # Wait a bit for the service to start
                     time.sleep(5)
-                    mysql_status = run_command("sudo pgrep mysqld")
+                    mysql_status = run_command("sudo pgrep mysqld", return_json=False)
                     if not mysql_status:
                         raise Exception("Failed to start MySQL service.")
                 except Exception as e:
@@ -160,7 +160,7 @@ class MySQLCommand(Command):
     @staticmethod
     def update_or_append(file_path, key, value):
         try:
-            lines = run_command(f'sudo cat {file_path}').splitlines()
+            lines = run_command(f'sudo cat {file_path}', return_json=False).splitlines()
             updated = False
             for i, line in enumerate(lines):
                 if line.startswith(key):
@@ -174,3 +174,4 @@ class MySQLCommand(Command):
             run_command(f'echo "{os.linesep.join(lines)}" | sudo tee {file_path} > /dev/null')
         except FileNotFoundError:
             run_command(f'echo "{key} = {value}" | sudo tee {file_path} > /dev/null')
+
