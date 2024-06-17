@@ -116,13 +116,16 @@ fastcgi_param   HTTP_PROXY  "";
 
     def add_tls_for_ubuntu(self):
         ubuntu_version = run_command("lsb_release -rs").strip()
-        domain = {self.config['domain']}
+        domain = self.config.get('domain')
         if self.version_to_int(ubuntu_version) >= self.version_to_int("20.04"):
             print(f"Server on Ubuntu {ubuntu_version}")
-            run_command(f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" /etc/nginx/sites-available/{domain}')
+            config_file_path = f"/etc/nginx/sites-available/{domain}"
+            if os.path.exists(config_file_path):
+                run_command(f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" {config_file_path}')
+            else:
+                raise Exception(f"File {config_file_path} does not exist.")
 
     def create_nginx_config_directories(self):
-
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/before")
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/after")
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/server")
@@ -149,7 +152,7 @@ fastcgi_param   HTTP_PROXY  "";
     }}
     """
         run_command(
-            f'echo "{redirector_config.strip()}" | sudo tee /etc/nginx/forge-conf/super-froge.com/before/redirect.conf')
+            f'echo "{redirector_config.strip()}" | sudo tee /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
     def restart_services(self):
         run_command("sudo service nginx reload")
