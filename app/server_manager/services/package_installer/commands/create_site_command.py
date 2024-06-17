@@ -156,10 +156,23 @@ fastcgi_param   HTTP_PROXY  "";
 
     def restart_services(self):
         run_command("sudo service nginx reload")
-        php_fpm_versions = ["php8.3-fpm", "php8.2-fpm", "php8.1-fpm", "php8.0-fpm", "php7.4-fpm", "php7.3-fpm", "php7.2-fpm", "php7.1-fpm", "php7.0-fpm", "php5.6-fpm", "php5-fpm"]
+        php_fpm_versions = [
+            "php8.3-fpm",
+            "php8.2-fpm",
+            "php8.1-fpm",
+            "php8.0-fpm",
+            "php7.4-fpm",
+            "php7.3-fpm",
+            "php7.2-fpm",
+            "php7.1-fpm",
+            "php7.0-fpm",
+            "php5.6-fpm",
+            "php5-fpm"
+        ]
+
         for version in php_fpm_versions:
-            if run_command(f"ps aux | grep {version} | grep -v grep"):
-                run_command(f"sudo service {version} restart > /dev/null 2>&1")
+            if run_command(f"pgrep {version}", raise_exception=False):
+                run_command(f"sudo service {version} restart")
 
     @staticmethod
     def version_to_int(version):
