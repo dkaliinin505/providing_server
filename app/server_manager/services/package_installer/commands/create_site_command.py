@@ -20,7 +20,7 @@ class CreateSiteCommand(Command):
         self.write_redirector()
         self.restart_services()
 
-        return {"message": "Nginx installed and configured"}
+        return {"message": "Site web-server config created and configured"}
 
     def create_fastcgi_params(self):
         fastcgi_params = """
@@ -52,6 +52,7 @@ fastcgi_param   HTTP_PROXY  "";
             run_command("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
     def write_nginx_server_block(self):
+        print("Creating NGINX server block")
         domain = self.config.get('domain')  # Default value in case domain is not provided
         nginx_config = f"""
 # IMPORTANT CONFIG (DO NOT REMOVE!)
