@@ -54,64 +54,64 @@ fastcgi_param   HTTP_PROXY  "";
     def write_nginx_server_block(self):
         domain = self.config.get('domain')  # Default value in case domain is not provided
         nginx_config = f"""
-    # IMPORTANT CONFIG (DO NOT REMOVE!)
-    include forge-conf/{domain}/before/*;
+# IMPORTANT CONFIG (DO NOT REMOVE!)
+include forge-conf/{domain}/before/*;
 
-    server {{
-        listen 80;
-        listen [::]:80;
-        server_name {domain};
-        server_tokens off;
-        root /home/super_forge/{domain}/public;
+server {{
+    listen 80;
+    listen [::]:80;
+    server_name {domain};
+    server_tokens off;
+    root /home/super_forge/{domain}/public;
 
-        # FORGE SSL (DO NOT REMOVE!)
-        # ssl_certificate;
-        # ssl_certificate_key;
+    # FORGE SSL (DO NOT REMOVE!)
+    # ssl_certificate;
+    # ssl_certificate_key;
 
-        ssl_protocols TLSv1.2 TLSv1.3;
-        ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-        ssl_prefer_server_ciphers off;
-        ssl_dhparam /etc/nginx/dhparams.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_dhparam /etc/nginx/dhparams.pem;
 
-        add_header X-Frame-Options "SAMEORIGIN";
-        add_header X-XSS-Protection "1; mode=block";
-        add_header X-Content-Type-Options "nosniff";
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
 
-        index index.html index.htm index.php;
+    index index.html index.htm index.php;
 
-        charset utf-8;
-
-        # FORGE CONFIG (DO NOT REMOVE!)
-        include forge-conf/{domain}/server/*;
-
-        location / {{
-            try_files $uri $uri/ /index.php?$query_string;
-        }}
-
-        location = /favicon.ico {{ access_log off; log_not_found off; }}
-        location = /robots.txt  {{ access_log off; log_not_found off; }}
-
-        access_log off;
-        error_log  /var/log/nginx/{domain}-error.log error;
-
-        error_page 404 /index.php;
-
-        location ~ \.php$ {{
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-            fastcgi_index index.php;
-            include fastcgi_params;
-        }}
-
-        location ~ /\.(?!well-known).* {{
-            deny all;
-        }}
-    }}
+    charset utf-8;
 
     # FORGE CONFIG (DO NOT REMOVE!)
-    include forge-conf/{domain}/after/*;
-    """
+    include forge-conf/{domain}/server/*;
 
+    location / {{
+        try_files $uri $uri/ /index.php?$query_string;
+    }}
+
+    location = /favicon.ico {{ access_log off; log_not_found off; }}
+    location = /robots.txt  {{ access_log off; log_not_found off; }}
+
+    access_log off;
+    error_log  /var/log/nginx/{domain}-error.log error;
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {{
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }}
+
+    location ~ /\.(?!well-known).* {{
+        deny all;
+    }}
+}}
+
+# FORGE CONFIG (DO NOT REMOVE!)
+include forge-conf/{domain}/after/*;
+"""
+        print(f"Generated NGINX config:\n{nginx_config}")  # Debugging output to verify content
         run_command(f'echo "{nginx_config.strip()}" | sudo tee /etc/nginx/sites-available/{domain}')
 
     def add_tls_for_ubuntu(self):
@@ -137,22 +137,21 @@ fastcgi_param   HTTP_PROXY  "";
 
     def write_redirector(self):
         redirector_config = f"""
-    server {{
-        listen 80;
-        listen [::]:80;
-        server_tokens off;
+server {{
+    listen 80;
+    listen [::]:80;
+    server_tokens off;
 
-        server_name www.{self.config['domain']};
+    server_name www.{self.config['domain']};
 
-        if ($http_x_forwarded_proto = 'https') {{
-            return 301 https://{self.config['domain']}$request_uri;
-        }}
-
-        return 301 $scheme://{self.config['domain']}$request_uri;
+    if ($http_x_forwarded_proto = 'https') {{
+        return 301 https://{self.config['domain']}$request_uri;
     }}
-    """
-        run_command(
-            f'echo "{redirector_config.strip()}" | sudo tee /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
+
+    return 301 $scheme://{self.config['domain']}$request_uri;
+}}
+"""
+        run_command(f'echo "{redirector_config.strip()}" | sudo tee /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
     def restart_services(self):
         run_command("sudo service nginx reload")
@@ -177,3 +176,4 @@ fastcgi_param   HTTP_PROXY  "";
     @staticmethod
     def version_to_int(version):
         return int("".join(version.split(".")))
+
