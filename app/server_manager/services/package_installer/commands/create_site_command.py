@@ -52,8 +52,7 @@ fastcgi_param   HTTP_PROXY  "";
             run_command("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
     def write_nginx_server_block(self):
-        print("Creating NGINX server block")
-        domain = self.config.get('domain')  # Default value in case domain is not provided
+        domain = self.config.get('domain')
         nginx_config = f"""
 # IMPORTANT CONFIG (DO NOT REMOVE!)
 include forge-conf/{domain}/before/*;
@@ -112,8 +111,10 @@ server {{
 # FORGE CONFIG (DO NOT REMOVE!)
 include forge-conf/{domain}/after/*;
 """
-        print(f"Generated NGINX config:\n{nginx_config}")  # Debugging output to verify content
-        run_command(f'echo "{nginx_config.strip()}" | sudo tee /etc/nginx/sites-available/{domain}')
+        with open('/tmp/nginx_server_block.conf', 'w') as f:
+            f.write(nginx_config.strip())
+
+        run_command(f'sudo mv /tmp/nginx_server_block.conf /etc/nginx/sites-available/{domain}')
 
     def add_tls_for_ubuntu(self):
         ubuntu_version = run_command("lsb_release -rs").strip()
@@ -134,7 +135,8 @@ include forge-conf/{domain}/after/*;
     def enable_nginx_sites(self):
         run_command(f"sudo rm -f /etc/nginx/sites-enabled/{self.config['domain']}")
         run_command(f"sudo rm -f /etc/nginx/sites-enabled/www.{self.config['domain']}")
-        run_command(f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
+        run_command(
+            f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
     def write_redirector(self):
         redirector_config = f"""
@@ -152,7 +154,11 @@ server {{
     return 301 $scheme://{self.config['domain']}$request_uri;
 }}
 """
-        run_command(f'echo "{redirector_config.strip()}" | sudo tee /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
+        with open('/tmp/nginx_redirector.conf', 'w') as f:
+            f.write(redirector_config.strip())
+
+        run_command(
+            f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
     def restart_services(self):
         run_command("sudo service nginx reload")
@@ -177,4 +183,3 @@ server {{
     @staticmethod
     def version_to_int(version):
         return int("".join(version.split(".")))
-
