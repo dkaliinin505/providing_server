@@ -43,7 +43,7 @@ class CreateSiteCommand(Command):
     fastcgi_param   SERVER_NAME         \\$server_name;
     fastcgi_param   HTTPS               \\$https if_not_empty;
     fastcgi_param   REDIRECT_STATUS     200;
-    fastcgi_param   HTTP_PROXY          "";
+    fastcgi_param   HTTP_PROXY          \\"";
     """
         run_command(f'echo "{fastcgi_params.strip()}" | sudo tee /etc/nginx/fastcgi_params')
 
