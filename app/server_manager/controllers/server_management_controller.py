@@ -3,7 +3,8 @@ from app.server_manager.services.package_installer.package_installer_service imp
 from app.server_manager.services.server_management.server_management_service import ServerManagementService
 from app.server_manager.validators import validate_request
 from app.server_manager.validators.schemas.install_package_schema import InstallPackageSchema
-from app.server_manager.validators.schemas.validation_schema import RequestSchema, AnotherRequestSchema
+from app.server_manager.validators.schemas.management.create_site_config_schema import CreateSiteSchema
+from app.server_manager.validators.schemas.validation_schema import RequestSchema
 
 
 class ServerManagementController:
