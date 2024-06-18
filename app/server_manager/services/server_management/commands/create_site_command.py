@@ -4,12 +4,12 @@ from utils.util import run_command
 
 
 class CreateSiteCommand(Command):
-    def __init__(self, data):
-        self.config = data
-        print(f"Config: {data}")
+    def __init__(self, config):
+        self.config = config
+        print(f"Config: {config}")
 
     def execute(self, data):
-        self.config = data.get('data', {})
+        self.config = data.get('config', {})
 
         self.create_fastcgi_params()
         self.generate_dhparams()

@@ -6,7 +6,7 @@ class ServerManagementService:
 
     def __init__(self):
         self.executor = ServerManagementExecutor()
-        self.executor.register('create_site', CreateSiteCommand({}))
+        self.executor.register('create_site', CreateSiteCommand({'config': {}}))
 
     def create_site(self, data):
         return self.executor.execute('create_site', data)
