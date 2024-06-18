@@ -6,7 +6,6 @@ from app.server_manager.validators.schemas.packages.mysql_config_schema import M
 from app.server_manager.validators.schemas.packages.nginx_config_schema import NginxConfigSchema
 from app.server_manager.validators.schemas.packages.php_config_schema import PhpConfigSchema
 from app.server_manager.validators.schemas.packages.redis_config_schema import RedisConfigSchema
-from app.server_manager.validators.schemas.management.create_site_config_schema import CreateSiteConfigSchema
 
 load_dotenv()
 
@@ -27,7 +26,5 @@ class InstallPackageSchema(Schema):
                 return MysqlConfigSchema()
             case 'redis':
                 return RedisConfigSchema()
-            case 'create_site':
-                return CreateSiteConfigSchema()
             case _:
                 raise ValidationError({'package_name': 'Invalid package name'})

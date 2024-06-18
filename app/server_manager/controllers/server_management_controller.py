@@ -11,14 +11,14 @@ class ServerManagementController:
         self.server_management_service = ServerManagementService()
         self.package_installer_service = PackageInstallerService()
 
-    @validate_request({'POST': RequestSchema})
-    def action1(self, data):
-        result = self.server_management_service.action1(data)
+    @validate_request({'POST': CreateSiteSchema})
+    def create_site(self, data):
+        result = self.server_management_service.create_site(data)
         return jsonify(result)
 
-    @validate_request({'POST': AnotherRequestSchema})
-    def action2(self, data):
-        result = self.server_management_service.action2(data)
+    @validate_request({'POST': RequestSchema})
+    def install_application(self, data):
+        result = self.server_management_service.create_site(data)
         return jsonify(result)
 
     @validate_request({'POST': InstallPackageSchema})
