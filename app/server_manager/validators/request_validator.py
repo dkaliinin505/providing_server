@@ -29,26 +29,24 @@ def validate_request(schema_classes):
                 if response.status_code != 200:
                     return jsonify({'errors': 'Invalid authorization token'}), 401
 
-            # Validation of data
             method = request.method
             if method in schema_classes:
                 schema_class = schema_classes[method]
                 validator = schema_class()
                 data = request.get_json()
-                errors = validator.validate(data)
 
+                errors = validator.validate(data)
                 if errors:
                     return jsonify({'errors': errors}), 400
 
-                # Load specific config schema if config field exists
-                if 'config' in data:
-                    package_name = data.get('package_name')
+                if 'config' in data.get('data', {}):
+                    package_name = data['data'].get('package_name')
                     try:
                         config_validator = validator.load_config(package_name)
                     except ValidationError as e:
                         return jsonify({'errors': e.messages}), 400
 
-                    config_errors = config_validator.validate(data.get('config', {}))
+                    config_errors = config_validator.validate(data['data'].get('config', {}))
                     if config_errors:
                         return jsonify({'errors': config_errors}), 400
 
