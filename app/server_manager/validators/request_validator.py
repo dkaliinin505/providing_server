@@ -37,10 +37,6 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 data = request.get_json()
 
-                errors = validator.validate(data.get('config', {}))
-                if errors:
-                    return jsonify({'errors': errors}), 400
-
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
                     try:
@@ -51,6 +47,10 @@ def validate_request(schema_classes):
                     config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         return jsonify({'errors': config_errors}), 400
+
+                    errors = validator.validate(data.get('config', {}))
+                    if errors:
+                        return jsonify({'errors': errors}), 400
 
                 kwargs['data'] = data
             return f(*args, **kwargs)
