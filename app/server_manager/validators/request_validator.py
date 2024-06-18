@@ -35,7 +35,7 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 data = request.get_json()
 
-                errors = validator.validate(data)
+                errors = validator.validate(data.get('data', {}))
                 if errors:
                     return jsonify({'errors': errors}), 400
 
