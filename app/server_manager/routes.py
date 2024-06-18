@@ -11,7 +11,7 @@ def create_site():
 
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
-def create_site():
+def create_site_route():
     return controller.create_site()
 
 
