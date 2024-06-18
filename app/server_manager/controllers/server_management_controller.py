@@ -5,10 +5,7 @@ from app.server_manager.validators import validate_request
 from app.server_manager.validators.schemas.install_package_schema import InstallPackageSchema
 from app.server_manager.validators.schemas.management.create_site_config_schema import CreateSiteSchema
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
-
-
-class GenerateDeployKeySchema:
-    pass
+from app.server_manager.validators.schemas.management.generate_deploy_key_config_schema import GenerateDeployKeyCommandSchema
 
 
 class ServerManagementController:
@@ -16,7 +13,7 @@ class ServerManagementController:
         self.server_management_service = ServerManagementService()
         self.package_installer_service = PackageInstallerService()
 
-    @validate_request({'POST': GenerateDeployKeySchema})
+    @validate_request({'POST': GenerateDeployKeyCommandSchema})
     def generate_deploy_key(self, data):
         result = self.server_management_service.generate_deploy_key(data)
         return jsonify(result)
