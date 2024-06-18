@@ -7,10 +7,19 @@ from app.server_manager.validators.schemas.management.create_site_config_schema 
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
 
 
+class GenerateDeployKeySchema:
+    pass
+
+
 class ServerManagementController:
     def __init__(self):
         self.server_management_service = ServerManagementService()
         self.package_installer_service = PackageInstallerService()
+
+    @validate_request({'POST': GenerateDeployKeySchema})
+    def generate_deploy_key(self, data):
+        result = self.server_management_service.generate_deploy_key(data)
+        return jsonify(result)
 
     @validate_request({'POST': CreateSiteSchema})
     def create_site(self, data):
@@ -18,7 +27,7 @@ class ServerManagementController:
         return jsonify(result)
 
     @validate_request({'POST': RequestSchema})
-    def install_application(self, data):
+    def clone_and_install_application(self, data):
         result = self.server_management_service.create_site(data)
         return jsonify(result)
 
