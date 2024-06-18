@@ -4,6 +4,8 @@ from marshmallow import ValidationError
 import os
 import requests
 
+from app.server_manager.validators.schemas.install_package_schema import InstallPackageSchema
+
 
 def validate_request(schema_classes):
     """
@@ -35,18 +37,18 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 data = request.get_json()
 
-                errors = validator.validate(data.get('data', {}))
+                errors = validator.validate(data.get('config', {}))
                 if errors:
                     return jsonify({'errors': errors}), 400
 
-                if 'config' in data.get('data', {}):
-                    package_name = data['data'].get('package_name')
+                if isinstance(validator, InstallPackageSchema):
+                    package_name = data.get('package_name')
                     try:
                         config_validator = validator.load_config(package_name)
                     except ValidationError as e:
                         return jsonify({'errors': e.messages}), 400
 
-                    config_errors = config_validator.validate(data['data'].get('config', {}))
+                    config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         return jsonify({'errors': config_errors}), 400
 
