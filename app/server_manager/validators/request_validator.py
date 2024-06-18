@@ -48,9 +48,9 @@ def validate_request(schema_classes):
                     if config_errors:
                         return jsonify({'errors': config_errors}), 400
 
-                    errors = validator.validate(data.get('config', {}))
-                    if errors:
-                        return jsonify({'errors': errors}), 400
+                errors = validator.validate(data.get('config', {}))
+                if errors:
+                    return jsonify({'errors': errors}), 400
 
                 kwargs['data'] = data
             return f(*args, **kwargs)
