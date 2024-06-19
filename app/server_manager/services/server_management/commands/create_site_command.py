@@ -1,6 +1,10 @@
+import logging
 import os
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class CreateSiteCommand(Command):
@@ -9,8 +13,10 @@ class CreateSiteCommand(Command):
         print(f"Config: {config}")
 
     def execute(self, data):
-        self.config = data.get('data', {})
 
+        self.config = data.get('data', {})
+        logging.debug(f"Config: {self.config}")
+        logging.debug(f"Data: {data}")
         self.create_fastcgi_params()
         self.generate_dhparams()
         self.write_nginx_server_block()
