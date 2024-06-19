@@ -9,8 +9,10 @@ class GenerateDeployKeyCommand(Command):
         print(f"Config: {config}")
 
     def execute(self, data):
+        domain = self.config.get('domain')
+
         # SSH key path
-        ssh_key_path = f'/home/super_forge/.ssh/{self.config.get("domain")}'
+        ssh_key_path = f'/home/super_forge/.ssh/{domain}'
         ssh_key_pub_path = f'{ssh_key_path}.pub'
 
         # Create .ssh directory
@@ -18,7 +20,7 @@ class GenerateDeployKeyCommand(Command):
             run_command('sudo -u super_forge mkdir -p /home/super_forge/.ssh')
             run_command('sudo -u super_forge chmod 700 /home/super_forge/.ssh')
 
-        # Generate SSH key
+        # Generate SSH key if it doesn't exist
         if not os.path.exists(ssh_key_path):
             run_command(f'sudo -u super_forge ssh-keygen -t rsa -b 4096 -f {ssh_key_path} -N ""')
             run_command(f'sudo -u super_forge chmod 600 {ssh_key_path}')
