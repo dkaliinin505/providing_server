@@ -47,31 +47,24 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 logger.debug(f"Validator: {validator}")
 
-                if method == 'DELETE' or method == 'GET':
-                    data = request.args.to_dict()
-                else:
-                    data = request.get_json()
+                data = get_request_data(method)
 
                 logger.debug(f"Data: {data}")
 
+                errors = validate_data(validator, data)
+                if errors:
+                    return jsonify({'errors': errors}), 400
+
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
-
-                    try:
-                        config_validator = validator.load_config(package_name)
-                    except ValidationError as e:
-                        logger.debug(f"Validation error: {e.messages}")
-                        return jsonify({'errors': e.messages}), 400
+                    config_validator = get_config_validator(validator, package_name)
+                    if not config_validator:
+                        return jsonify({'errors': 'Invalid package name'}), 400
 
                     config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         logger.debug(f"Config validation errors: {config_errors}")
                         return jsonify({'errors': config_errors}), 400
-                else:
-                    errors = validator.validate(data)
-                    if errors:
-                        logger.debug(f"Validation errors: {errors}")
-                        return jsonify({'errors': errors}), 400
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
@@ -80,3 +73,25 @@ def validate_request(schema_classes):
         return decorated_function
 
     return decorator
+
+
+def get_request_data(method):
+    if method == 'DELETE' or method == 'GET':
+        return request.args.to_dict()
+    else:
+        return request.get_json()
+
+
+def validate_data(validator, data):
+    errors = validator.validate(data)
+    if errors:
+        logger.debug(f"Validation errors: {errors}")
+    return errors
+
+
+def get_config_validator(validator, package_name):
+    try:
+        return validator.load_config(package_name)
+    except ValidationError as e:
+        logger.debug(f"Validation error: {e.messages}")
+        return None
