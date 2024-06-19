@@ -35,37 +35,32 @@ def validate_request(schema_classes):
             if method in schema_classes:
                 schema_class = schema_classes[method]
                 validator = schema_class()
+                data = request.get_json()
 
-                if method in ['POST', 'PUT']:
+                if isinstance(validator, InstallPackageSchema):
                     data = request.get_json()
+                    package_name = data.get('package_name')
 
-                    if isinstance(validator, InstallPackageSchema):
-                        package_name = data.get('package_name')
+                    try:
+                        config_validator = validator.load_config(package_name)
+                    except ValidationError as e:
+                        return jsonify({'errors': e.messages}), 400
 
-                        try:
-                            config_validator = validator.load_config(package_name)
-                        except ValidationError as e:
-                            return jsonify({'errors': e.messages}), 400
+                    config_errors = config_validator.validate(data.get('config', {}))
+                    if config_errors:
+                        return jsonify({'errors': config_errors}), 400
 
-                        config_errors = config_validator.validate(data.get('config', {}))
-                        if config_errors:
-                            return jsonify({'errors': config_errors}), 400
-                    else:
-                        errors = validator.validate(data)
-                        if errors:
-                            return jsonify({'errors': errors}), 400
-
-                    kwargs['data'] = data
                 else:
-                    # For GET, DELETE and other methods, use request.args for validation
-                    data = request.args.to_dict()
+                    if method == 'DELETE':
+                        data = request.args.to_dict()
+                    else:
+                        data = request.get_json()
 
                     errors = validator.validate(data)
                     if errors:
                         return jsonify({'errors': errors}), 400
 
-                    kwargs['data'] = data
-
+                kwargs['data'] = data
             return f(*args, **kwargs)
 
         return decorated_function
