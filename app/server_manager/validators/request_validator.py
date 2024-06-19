@@ -40,7 +40,7 @@ def validate_request(schema_classes):
                     data = request.args.to_dict()
                 else:
                     data = request.get_json()
-
+                print(f"Data: {data}")
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
 
@@ -58,7 +58,7 @@ def validate_request(schema_classes):
                         return jsonify({'errors': errors}), 400
 
                 kwargs['data'] = data
-                print(f"Data: {data}")
+
             return f(*args, **kwargs)
 
         return decorated_function
