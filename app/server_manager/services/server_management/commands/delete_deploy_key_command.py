@@ -9,8 +9,10 @@ class DeleteDeployKeyCommand(Command):
         print(f"Config: {config}")
 
     def execute(self, data):
+        self.config = data.get('config', {})
+        domain = self.config.get('domain')
         # SSH key path
-        ssh_key_path = f'/home/super_forge/.ssh/{self.config.get("domain")}'
+        ssh_key_path = f'/home/super_forge/.ssh/{domain}'
         ssh_key_pub_path = f'{ssh_key_path}.pub'
 
         # Check if the key files exist and delete them
