@@ -40,6 +40,7 @@ def validate_request(schema_classes):
 
             method = request.method
             logger.debug(f"HTTP Method: {method}")
+            logger.debug(f"Schema Class: {schema_classes}")
 
             if method in schema_classes:
                 schema_class = schema_classes[method]
