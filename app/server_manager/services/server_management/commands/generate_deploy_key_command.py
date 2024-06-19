@@ -15,7 +15,8 @@ class GenerateDeployKeyCommand(Command):
     def execute(self, data):
         self.config = data.get('config', {})
         domain = self.config.get('domain')
-
+        logger.debug(f"Data: {data}")
+        logger.debug(f"Config: {self.config}")
         # SSH key path
         ssh_key_path = f'/home/super_forge/.ssh/{domain}'
         ssh_key_pub_path = f'{ssh_key_path}.pub'
