@@ -50,7 +50,7 @@ def validate_request(schema_classes):
                 if method == 'DELETE' or method == 'GET':
                     data = request.args.to_dict()
                 else:
-                    data = request.get_json().get('config', {})
+                    data = request.get_json()
 
                 logger.debug(f"Data: {data}")
 
