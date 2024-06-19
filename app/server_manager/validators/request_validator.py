@@ -35,27 +35,37 @@ def validate_request(schema_classes):
             if method in schema_classes:
                 schema_class = schema_classes[method]
                 validator = schema_class()
-                data = request.get_json()
 
-                if isinstance(validator, InstallPackageSchema):
+                if method in ['POST', 'PUT']:
                     data = request.get_json()
-                    package_name = data.get('package_name')
 
-                    try:
-                        config_validator = validator.load_config(package_name)
-                    except ValidationError as e:
-                        return jsonify({'errors': e.messages}), 400
+                    if isinstance(validator, InstallPackageSchema):
+                        package_name = data.get('package_name')
 
-                    config_errors = config_validator.validate(data.get('config', {}))
-                    if config_errors:
-                        return jsonify({'errors': config_errors}), 400
+                        try:
+                            config_validator = validator.load_config(package_name)
+                        except ValidationError as e:
+                            return jsonify({'errors': e.messages}), 400
 
+                        config_errors = config_validator.validate(data.get('config', {}))
+                        if config_errors:
+                            return jsonify({'errors': config_errors}), 400
+                    else:
+                        errors = validator.validate(data)
+                        if errors:
+                            return jsonify({'errors': errors}), 400
+
+                    kwargs['data'] = data
                 else:
-                    errors = validator.validate(data.get('config', {}))
+                    # For GET, DELETE and other methods, use request.args for validation
+                    data = request.args.to_dict()
+
+                    errors = validator.validate(data)
                     if errors:
                         return jsonify({'errors': errors}), 400
 
-                kwargs['data'] = data
+                    kwargs['data'] = data
+
             return f(*args, **kwargs)
 
         return decorated_function
