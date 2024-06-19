@@ -9,7 +9,7 @@ class CreateSiteCommand(Command):
         print(f"Config: {config}")
 
     def execute(self, data):
-        self.config = data.get('config', {})
+        self.config = data.get('data', {})
 
         self.create_fastcgi_params()
         self.generate_dhparams()

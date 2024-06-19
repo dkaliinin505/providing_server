@@ -9,7 +9,7 @@ class DeleteDeployKeyCommand(Command):
         print(f"Config: {config}")
 
     def execute(self, data):
-        self.config = data.get('config', {})
+        self.config = data.get('data', {})
         domain = self.config.get('domain')
         # SSH key path
         ssh_key_path = f'/home/super_forge/.ssh/{domain}'
