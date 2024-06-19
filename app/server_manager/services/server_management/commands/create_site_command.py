@@ -14,9 +14,8 @@ class CreateSiteCommand(Command):
 
     def execute(self, data):
 
-        self.config = data.get('data', {})
+        self.config = data
         logging.debug(f"Config: {self.config}")
-        logging.debug(f"Data: {data}")
         self.create_fastcgi_params()
         self.generate_dhparams()
         self.write_nginx_server_block()
