@@ -18,7 +18,7 @@ class ServerManagementController:
         result = self.server_management_service.generate_deploy_key(data)
         return jsonify(result)
 
-    @validate_request({'POST': GenerateDeployKeyCommandSchema})
+    @validate_request({'DELETE': GenerateDeployKeyCommandSchema})
     def delete_deploy_key(self, data):
         result = self.server_management_service.generate_deploy_key(data)
         return jsonify(result)
