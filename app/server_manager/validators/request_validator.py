@@ -35,10 +35,13 @@ def validate_request(schema_classes):
             if method in schema_classes:
                 schema_class = schema_classes[method]
                 validator = schema_class()
-                data = request.get_json()
+
+                if method == 'DELETE' or method == 'GET':
+                    data = request.args.to_dict()
+                else:
+                    data = request.get_json()
 
                 if isinstance(validator, InstallPackageSchema):
-                    data = request.get_json()
                     package_name = data.get('package_name')
 
                     try:
@@ -49,18 +52,13 @@ def validate_request(schema_classes):
                     config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         return jsonify({'errors': config_errors}), 400
-
                 else:
-                    if method == 'DELETE':
-                        data = request.args.to_dict()
-                    else:
-                        data = request.get_json()
-
                     errors = validator.validate(data)
                     if errors:
                         return jsonify({'errors': errors}), 400
 
                 kwargs['data'] = data
+                print(f"Data: {data}")
             return f(*args, **kwargs)
 
         return decorated_function
