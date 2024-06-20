@@ -285,7 +285,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         db_host = get_env_variable('DB_HOST', 'localhost')
 
         print(f"Checking database {db_name} on host {db_host} with user {db_user}")
-
+        logger.info(f"Checking database {db_name} on host {db_host} with user {db_user}")
         # Check if the database exists
         if not self.check_database_exists(self, db_name, db_user, db_password):
             print(f"Database {db_name} does not exist. Creating the database.")
