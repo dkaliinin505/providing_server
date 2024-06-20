@@ -207,12 +207,19 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         with open(env_file_path, 'r') as file:
             env_data = file.readlines()
 
-        env_data = [line.replace('APP_ENV=', 'APP_ENV=production\n') if line.startswith('APP_ENV=') else line for line in env_data]
-        env_data = [line.replace('APP_URL=', f'APP_URL="http://{domain}"\n') if line.startswith('APP_URL=') else line for line in env_data]
-        env_data = [line.replace('APP_DEBUG=', 'APP_DEBUG=false\n') if line.startswith('APP_DEBUG=') else line for line in env_data]
+        new_env_data = []
+        for line in env_data:
+            if line.startswith('APP_ENV='):
+                new_env_data.append('APP_ENV=production\n')
+            elif line.startswith('APP_URL='):
+                new_env_data.append(f'APP_URL=http://{domain}\n')
+            elif line.startswith('APP_DEBUG='):
+                new_env_data.append('APP_DEBUG=false\n')
+            else:
+                new_env_data.append(line)
 
         with open(env_file_path, 'w') as file:
-            file.writelines(env_data)
+            file.writelines(new_env_data)
 
         if laravel_version > 10:
             self.setup_sqlite_database(env_file_path, site_path)
