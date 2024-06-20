@@ -60,10 +60,10 @@ fastcgi_param   HTTP_PROXY          \\"\\";
         domain = self.config.get('domain')
         root_path = self.config.get('root_path', f'/home/super_forge/{domain}/public')
 
-        nested_structure = self.config.get('nested_structure', False)
+        is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', '')
 
-        if nested_structure:
+        if is_nested_structure:
             root_path = f'/home/super_forge/{domain}/{nested_folder}/public'
 
         nginx_config = f"""

@@ -17,7 +17,7 @@ class DeploySiteCommand(Command):
         branch = self.config.get('branch', 'master')
         ssh_command = f'ssh -F /home/super_forge/.ssh/{domain}-config'
         site_path = f'/home/super_forge/{domain}'
-        nested_structure = self.config.get('nested_structure', False)
+        is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
         # Remove The Current Site Directory
@@ -25,16 +25,16 @@ class DeploySiteCommand(Command):
             shutil.rmtree(site_path)
 
         # Clone The Repository Into The Site
-        self.clone_repository(repository_url, branch, site_path, ssh_command, nested_structure, nested_folder)
+        self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
 
         # Install Composer Dependencies If Requested
-        self.install_composer_dependencies(site_path, nested_structure, nested_folder)
+        self.install_composer_dependencies(site_path, is_nested_structure, nested_folder)
 
         # Create Environment File If Necessary
-        self.create_env_file(site_path, domain, nested_structure, nested_folder)
+        self.create_env_file(site_path, domain, is_nested_structure, nested_folder)
 
         # Run Artisan Migrations If Requested
-        self.run_migrations(site_path, nested_structure, nested_folder)
+        self.run_migrations(site_path, is_nested_structure, nested_folder)
 
         return {"message": "Site deployed successfully"}
 
@@ -67,7 +67,7 @@ class DeploySiteCommand(Command):
             with open(env_file_path, 'w') as env_file:
                 env_file.write(env_content)
 
-        self.update_env_file(env_file_path, laravel_version, domain)
+        self.update_env_file(env_file_path, laravel_version, domain, site_path)
 
     def get_laravel_version(self, site_path):
         composer_json_path = os.path.join(site_path, 'composer.json')
@@ -200,7 +200,7 @@ VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
 VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 """
 
-    def update_env_file(self, env_file_path, laravel_version, domain):
+    def update_env_file(self, env_file_path, laravel_version, domain, site_path):
         with open(env_file_path, 'r') as file:
             env_data = file.readlines()
 
