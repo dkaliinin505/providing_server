@@ -52,6 +52,7 @@ class DeployProjectCommand(Command):
 
     def check_database_exists(self, db_name, db_user, db_password, db_host='localhost'):
         command = f"mysql -u{db_user} -p{db_password} -h{db_host} -e 'USE {db_name};'"
+        logger.info(f"Checking if database {db_name} exists with command: {command}")
         try:
             run_command(command, raise_exception=False)
             print(f"Database {db_name} exists.")
