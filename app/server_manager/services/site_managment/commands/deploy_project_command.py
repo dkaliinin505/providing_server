@@ -29,10 +29,6 @@ class DeployProjectCommand(Command):
         # Ensure the parent directory exists
         os.makedirs(site_path, exist_ok=True)
 
-        # Remove The Current Site Directory
-        if os.path.exists(site_path):
-            shutil.rmtree(site_path)
-
         # Clone The Repository Into The Site
         self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
 
@@ -307,8 +303,8 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
         # Run additional commands after deployment
         try:
+            run_command(f"php8.3 {site_path}/artisan key:generate --force")
             run_command(f"php8.3 {site_path}/artisan config:cache")
-            run_command(f"php8.3 {site_path}/artisan key:generate")
             run_command(f"php8.3 {site_path}/artisan db:seed --force")
         except Exception as e:
             print(f"Error running after deployment commands: {str(e)}")
