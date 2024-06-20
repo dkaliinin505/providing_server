@@ -1,14 +1,10 @@
-import logging
 import os
-import json
 import shutil
+import subprocess
+import json
+from dotenv import load_dotenv, dotenv_values
 from app.server_manager.interfaces.command_interface import Command
-from utils.env_util import get_env_variable
-from utils.util import run_command
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
+from utils.util import run_command, get_env_variable, update_env_variable
 
 class DeployProjectCommand(Command):
     def __init__(self, config):
@@ -46,6 +42,16 @@ class DeployProjectCommand(Command):
 
         return {"message": "Site deployed and configured successfully"}
 
+    def check_database_exists(self, db_name, db_user, db_password, db_host='localhost'):
+        command = f"mysql -u{db_user} -p{db_password} -h{db_host} -e 'USE {db_name};'"
+        try:
+            run_command(command, raise_exception=False)
+            print(f"Database {db_name} exists.")
+            return True
+        except Exception as e:
+            print(f"Database {db_name} does not exist: {str(e)}")
+            return False
+
     def clone_repository(self, repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder):
         git_command = f'git clone --depth 1 --single-branch -c core.sshCommand="{ssh_command}" -b {branch} {repository_url} {site_path}'
         run_command(git_command)
@@ -55,7 +61,7 @@ class DeployProjectCommand(Command):
         if is_nested_structure:
             nested_path = os.path.join(site_path, nested_folder)
             if not os.path.exists(nested_path):
-                raise FileNotFoundError(f"Nested folder {nested_path} does not exist.")
+                raise Exception(f"Nested path {nested_path} does not exist.")
             os.chdir(nested_path)
 
     def install_composer_dependencies(self, site_path, is_nested_structure, nested_folder):
@@ -85,7 +91,6 @@ class DeployProjectCommand(Command):
         with open(composer_json_path) as f:
             composer_data = json.load(f)
         laravel_version = composer_data.get('require', {}).get('laravel/framework', '0.0.0')
-        laravel_version = laravel_version.lstrip('^')  # Remove the caret symbol if present
         return int(laravel_version.split('.')[0])
 
     def generate_env_content(self, laravel_version):
@@ -224,12 +229,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
                 key, value = line.strip().split('=', 1)
                 env_dict[key] = value
 
-        # Log the original DB_PASSWORD
-        original_db_password = env_dict.get('DB_PASSWORD', 'Not Set')
-        logger.debug(f"Original DB_PASSWORD: {original_db_password}")
-
         # Update the specific values
-        # env_dict['APP_ENV'] = 'production'
         env_dict['APP_URL'] = f'http://{domain}'
         env_dict['APP_DEBUG'] = 'false'
 
@@ -238,10 +238,8 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
         # Update the DB_PASSWORD in the cloned project .env file
         if main_db_password:
+            print(f"Updating DB_PASSWORD: {main_db_password}")
             env_dict['DB_PASSWORD'] = main_db_password
-
-        # Log the new DB_PASSWORD
-        logger.debug(f"New DB_PASSWORD: {env_dict['DB_PASSWORD']}")
 
         # Generate the updated .env content
         updated_env_data = '\n'.join([f'{key}={value}' for key, value in env_dict.items()])
@@ -249,8 +247,6 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         # Write the updated .env content back to the file
         with open(env_file_path, 'w') as file:
             file.write(updated_env_data)
-
-        logger.debug(f"Updated .env file content: {updated_env_data}")
 
         if laravel_version > 10:
             self.setup_sqlite_database(env_file_path, site_path)
@@ -267,8 +263,27 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
                 open(sqlite_db_path, 'a').close()  # create the sqlite database file if it doesn't exist
                 run_command('php8.3 artisan migrate --force')
 
-    def run_migrations(self, site_path, nested_structure, nested_folder):
-        if nested_structure:
+    def run_migrations(self, site_path, is_nested_structure, nested_folder):
+        if is_nested_structure:
             site_path = os.path.join(site_path, nested_folder)
+
+        # Load DB credentials from .env
+        dotenv_path = os.path.join(site_path, '.env')
+        load_dotenv(dotenv_path)
+        db_user = get_env_variable('DB_USERNAME')
+        db_password = get_env_variable('DB_PASSWORD')
+        db_name = get_env_variable('DB_DATABASE')
+        db_host = get_env_variable('DB_HOST', 'localhost')
+
+        print(f"Checking database {db_name} on host {db_host} with user {db_user}")
+
+        # Check if the database exists
+        if not self.check_database_exists(db_name, db_user, db_password, db_host):
+            print(f"Database {db_name} does not exist. Please create the database before running migrations.")
+            return
+
         if os.path.isfile(os.path.join(site_path, 'artisan')):
-            run_command(f'php8.3 {os.path.join(site_path, "artisan")} migrate --force')
+            try:
+                run_command(f'php8.3 {os.path.join(site_path, "artisan")} migrate --force')
+            except Exception as e:
+                print(f"Error running migrations: {str(e)}")
