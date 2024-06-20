@@ -27,6 +27,6 @@ def install_package_route():
     return server_management_controller.install_package()
 
 
-@server_manager_blueprint.route('/deploy-application', methods=['POST'])
-def deploy_application_route():
+@server_manager_blueprint.route('/deploy-project', methods=['POST'])
+def deploy_project_route():
     return site_management_controller.deploy_project()

@@ -5,7 +5,7 @@ from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
 
 
-class DeploySiteCommand(Command):
+class DeployProjectCommand(Command):
     def __init__(self, config):
         self.config = config
         print(f"Config: {config}")

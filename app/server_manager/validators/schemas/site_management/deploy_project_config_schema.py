@@ -5,7 +5,7 @@ from app.server_manager.validators.rules.domain_rule import validate_domain
 from app.server_manager.validators.rules.nested_structure_rule import validate_nested_structure
 
 
-class DeploySiteSchema(Schema):
+class DeployProjectSchema(Schema):
     domain = fields.Str(required=True, validate=[validate_domain, validate_domain_exist])
     repository_url = fields.Url(required=True)
     branch = fields.Str(required=True, validate=validate.Length(min=5, max=300))
