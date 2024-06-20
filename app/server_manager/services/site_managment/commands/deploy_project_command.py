@@ -283,9 +283,11 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         print(f"Checking database {db_name} on host {db_host} with user {db_user}")
 
         # Check if the database exists
-        if not self.check_database_exists(db_name, db_user, db_password, db_host):
-            print(f"Database {db_name} does not exist. Please create the database before running migrations.")
-            return
+        if not self.check_database_exists(self, db_name, db_user, db_password):
+            print(f"Database {db_name} does not exist. Creating the database.")
+            if not self.create_database_if_not_exists(db_name, db_user, db_password):
+                print(f"Failed to create the database {db_name}.")
+                return
 
         if os.path.isfile(os.path.join(site_path, 'artisan')):
             try:
@@ -303,3 +305,13 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         run_command(f"php8.3 {site_path}/artisan db:seed")
 
         return
+
+    def create_database_if_not_exists(self, db_name, db_user, db_password):
+        create_db_command = f'sudo mysql --user="{db_user}" --password="{db_password}" -e "CREATE DATABASE IF NOT EXISTS {db_name} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
+        try:
+            run_command(create_db_command)
+            print(f"Database {db_name} created or already exists.")
+        except Exception as e:
+            print(f"Error creating database {db_name}: {str(e)}")
+            return False
+        return True
