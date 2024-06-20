@@ -2,7 +2,7 @@ from flask import jsonify
 
 from app.server_manager.services.site_managment.site_management_service import SiteManagementService
 from app.server_manager.validators import validate_request
-from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeploySiteSchema
+from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
 
 
 class SiteManagementController:
