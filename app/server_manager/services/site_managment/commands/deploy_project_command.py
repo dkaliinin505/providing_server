@@ -1,9 +1,14 @@
+import logging
 import os
 import json
 import shutil
 from app.server_manager.interfaces.command_interface import Command
 from utils.env_util import get_env_variable
 from utils.util import run_command
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 class DeployProjectCommand(Command):
     def __init__(self, config):
@@ -219,6 +224,10 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
                 key, value = line.strip().split('=', 1)
                 env_dict[key] = value
 
+        # Log the original DB_PASSWORD
+        original_db_password = env_dict.get('DB_PASSWORD', 'Not Set')
+        logger.debug(f"Original DB_PASSWORD: {original_db_password}")
+
         # Update the specific values
         # env_dict['APP_ENV'] = 'production'
         env_dict['APP_URL'] = f'http://{domain}'
@@ -231,12 +240,17 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         if main_db_password:
             env_dict['DB_PASSWORD'] = main_db_password
 
+        # Log the new DB_PASSWORD
+        logger.debug(f"New DB_PASSWORD: {env_dict['DB_PASSWORD']}")
+
         # Generate the updated .env content
         updated_env_data = '\n'.join([f'{key}={value}' for key, value in env_dict.items()])
 
         # Write the updated .env content back to the file
         with open(env_file_path, 'w') as file:
             file.write(updated_env_data)
+
+        logger.debug(f"Updated .env file content: {updated_env_data}")
 
         if laravel_version > 10:
             self.setup_sqlite_database(env_file_path, site_path)
