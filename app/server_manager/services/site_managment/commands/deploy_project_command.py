@@ -46,7 +46,7 @@ class DeployProjectCommand(Command):
         if is_nested_structure:
             nested_path = os.path.join(site_path, nested_folder)
             if not os.path.exists(nested_path):
-                os.makedirs(nested_path)
+                raise FileNotFoundError(f"Nested folder {nested_path} does not exist.")
             os.chdir(nested_path)
 
     def install_composer_dependencies(self, site_path, is_nested_structure, nested_folder):
