@@ -5,9 +5,12 @@ import venv
 def run_command(command, return_json=False, raise_exception=True):
     print(f"Running command: {command}")
     result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
+
     if result.returncode != 0:
         error_message = f"Command failed: {command}\n{result.stderr}"
+        print(error_message)
 
+        # General error handling for all exceptions
         if return_json:
             return json.dumps({'error': error_message}), 400
         else:
@@ -16,6 +19,7 @@ def run_command(command, return_json=False, raise_exception=True):
             else:
                 print(error_message)
                 return None
+
     print(f"Command output: {result.stdout}")
     return result.stdout.strip()
 
