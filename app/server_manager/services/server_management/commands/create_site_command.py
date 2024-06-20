@@ -25,7 +25,7 @@ class CreateSiteCommand(Command):
         self.write_redirector()
         self.restart_services()
 
-        return {"message": "Site web-server config created and configured"}
+        return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
         fastcgi_params = """
