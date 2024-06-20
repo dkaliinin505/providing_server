@@ -237,7 +237,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
         # Update the specific values
         env_dict['APP_URL'] = f'http://{domain}'
-        env_dict['APP_DEBUG'] = 'false'
+        env_dict['APP_DEBUG'] = 'true'
 
         # Get the DB_PASSWORD from the main project .env file
         main_db_password = get_env_variable('DB_PASSWORD')
@@ -304,8 +304,8 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         # Run additional commands after deployment
         try:
             run_command(f"php8.3 {site_path}/artisan key:generate --force")
-            run_command(f"php8.3 {site_path}/artisan config:cache")
             run_command(f"php8.3 {site_path}/artisan db:seed --force")
+            run_command(f"php8.3 {site_path}/artisan config:cache --force")
         except Exception as e:
             print(f"Error running after deployment commands: {str(e)}")
             logger.error(f"Error running after deployment commands: {str(e)}")
