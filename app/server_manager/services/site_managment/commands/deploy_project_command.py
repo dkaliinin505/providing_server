@@ -6,6 +6,7 @@ from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
 from utils.env_util import get_env_variable
 
+
 class DeployProjectCommand(Command):
     def __init__(self, config):
         self.config = config
