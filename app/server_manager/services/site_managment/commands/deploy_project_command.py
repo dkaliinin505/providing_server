@@ -76,6 +76,7 @@ class DeployProjectCommand(Command):
         with open(composer_json_path) as f:
             composer_data = json.load(f)
         laravel_version = composer_data.get('require', {}).get('laravel/framework', '0.0.0')
+        laravel_version = laravel_version.lstrip('^')  # Remove the caret symbol if present
         return int(laravel_version.split('.')[0])
 
     def generate_env_content(self, laravel_version):
