@@ -306,9 +306,13 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
             site_path = os.path.join(site_path, nested_folder)
 
         # Run additional commands after deployment
-        run_command(f"php8.3 {site_path}/artisan config:cache")
-        run_command(f"php8.3 {site_path}/artisan key:generate")
-        run_command(f"php8.3 {site_path}/artisan db:seed --force", raise_exception=False)
+        try:
+            run_command(f"php8.3 {site_path}/artisan config:cache")
+            run_command(f"php8.3 {site_path}/artisan key:generate")
+            run_command(f"php8.3 {site_path}/artisan db:seed --force")
+        except Exception as e:
+            print(f"Error running after deployment commands: {str(e)}")
+            logger.error(f"Error running after deployment commands: {str(e)}")
 
         return
 
