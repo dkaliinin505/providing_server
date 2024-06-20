@@ -50,8 +50,8 @@ class DeployProjectCommand(Command):
 
         return {"message": "Site deployed and configured successfully"}
 
-    def check_database_exists(self, db_name, db_user, db_password, db_host='localhost'):
-        command = f"mysql -u{db_user} -p{db_password} -h{db_host} -e 'USE {db_name};'"
+    def check_database_exists(self, db_name, db_user, db_password):
+        command = f'sudo mysql --user="{db_user}" --password="{db_password}" -e "CREATE DATABASE {db_name} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
         logger.info(f"Checking if database {db_name} exists with command: {command}")
         try:
             run_command(command, raise_exception=False)
