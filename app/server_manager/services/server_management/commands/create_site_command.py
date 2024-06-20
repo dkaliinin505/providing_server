@@ -58,6 +58,14 @@ fastcgi_param   HTTP_PROXY          \\"\\";
 
     def write_nginx_server_block(self):
         domain = self.config.get('domain')
+        root_path = self.config.get('root_path', f'/home/super_forge/{domain}/public')
+
+        nested_structure = self.config.get('nested_structure', False)
+        nested_folder = self.config.get('nested_folder', '')
+
+        if nested_structure:
+            root_path = f'/home/super_forge/{domain}/{nested_folder}/public'
+
         nginx_config = f"""
         # IMPORTANT CONFIG (DO NOT REMOVE!)
         include forge-conf/{domain}/before/*;
@@ -67,7 +75,7 @@ fastcgi_param   HTTP_PROXY          \\"\\";
             listen [::]:80;
             server_name {domain};
             server_tokens off;
-            root /home/super_forge/{domain}/public;
+            root {root_path};
         
             # FORGE SSL (DO NOT REMOVE!)
             # ssl_certificate;

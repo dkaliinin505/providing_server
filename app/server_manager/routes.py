@@ -29,4 +29,4 @@ def install_package_route():
 
 @server_manager_blueprint.route('/deploy-application', methods=['POST'])
 def deploy_application_route():
-    return site_management_controller.clone_and_install_application()
+    return site_management_controller.deploy_project()
