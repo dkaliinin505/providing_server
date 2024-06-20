@@ -1,10 +1,10 @@
 import os
 import shutil
-import subprocess
 import json
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command, get_env_variable, update_env_variable
+from utils.util import run_command
+from utils.env_util import get_env_variable
 
 class DeployProjectCommand(Command):
     def __init__(self, config):
