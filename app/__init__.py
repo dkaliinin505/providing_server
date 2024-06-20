@@ -13,7 +13,7 @@ class App:
         self.app.run(host='0.0.0.0', port=5000)
 
 
-app_instance = App().app
+app_instance = App()
 
 if __name__ == "__main__":
     app_instance.run()
