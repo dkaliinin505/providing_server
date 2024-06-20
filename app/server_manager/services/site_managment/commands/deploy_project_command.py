@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import json
@@ -5,6 +6,9 @@ from dotenv import load_dotenv
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
 from utils.env_util import get_env_variable
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class DeployProjectCommand(Command):
@@ -308,6 +312,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
     def create_database_if_not_exists(self, db_name, db_user, db_password):
         create_db_command = f'sudo mysql --user="{db_user}" --password="{db_password}" -e "CREATE DATABASE IF NOT EXISTS {db_name} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
+        logger.info(f"Creating database {db_name} with command: {create_db_command}")
         try:
             run_command(create_db_command)
             print(f"Database {db_name} created or already exists.")
