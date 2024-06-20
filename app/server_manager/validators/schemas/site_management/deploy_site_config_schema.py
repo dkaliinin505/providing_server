@@ -10,7 +10,7 @@ class DeploySiteSchema(Schema):
     repository_url = fields.Url(required=True)
     branch = fields.Str(required=True, validate=validate.Range(min=5, max=300))
     is_nested_structure = fields.Bool(missing=False)
-    nested_folder = fields.Str(validate=validate.Range(min=5, max=300))
+    nested_folder = fields.Str(validate=validate.Range(min=3, max=300))
 
     @validates_schema
     def validate_nested_structure_wrapper(self, data, **kwargs):
