@@ -41,6 +41,11 @@ class DeployProjectCommand(Command):
         # Run Artisan Migrations If Requested
         self.run_migrations(site_path, is_nested_structure, nested_folder)
 
+        # Run Artisan Commands after deployment
+        run_command(f"{site_path}/artisan config:cache")
+        run_command(f"{site_path}/artisan key:generate")
+        run_command(f"{site_path}/artisan db:seed")
+
         return {"message": "Site deployed and configured successfully"}
 
     def check_database_exists(self, db_name, db_user, db_password, db_host='localhost'):
