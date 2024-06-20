@@ -4,7 +4,6 @@ import shutil
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
 
-
 class DeployProjectCommand(Command):
     def __init__(self, config):
         self.config = config
@@ -36,26 +35,29 @@ class DeployProjectCommand(Command):
         # Run Artisan Migrations If Requested
         self.run_migrations(site_path, is_nested_structure, nested_folder)
 
-        return {"message": "Site deployed successfully"}
+        return {"message": "Site deployed and configured successfully"}
 
-    def clone_repository(self, repository_url, branch, site_path, ssh_command, nested_structure, nested_folder):
+    def clone_repository(self, repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder):
         git_command = f'git clone --depth 1 --single-branch -c core.sshCommand="{ssh_command}" -b {branch} {repository_url} {site_path}'
         run_command(git_command)
         os.chdir(site_path)
         run_command(f'git config core.sshCommand "{ssh_command}"')
         run_command('git submodule update --init --recursive')
-        if nested_structure:
-            os.chdir(os.path.join(site_path, nested_folder))
+        if is_nested_structure:
+            nested_path = os.path.join(site_path, nested_folder)
+            if not os.path.exists(nested_path):
+                os.makedirs(nested_path)
+            os.chdir(nested_path)
 
-    def install_composer_dependencies(self, site_path, nested_structure, nested_folder):
-        if nested_structure:
+    def install_composer_dependencies(self, site_path, is_nested_structure, nested_folder):
+        if is_nested_structure:
             os.chdir(os.path.join(site_path, nested_folder))
         else:
             os.chdir(site_path)
         run_command('php8.3 /usr/local/bin/composer install --no-interaction --prefer-dist --optimize-autoloader')
 
-    def create_env_file(self, site_path, domain, nested_structure, nested_folder):
-        if nested_structure:
+    def create_env_file(self, site_path, domain, is_nested_structure, nested_folder):
+        if is_nested_structure:
             site_path = os.path.join(site_path, nested_folder)
         laravel_version = self.get_laravel_version(site_path)
         env_file_path = os.path.join(site_path, '.env')
