@@ -278,6 +278,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
         # Load DB credentials from .env
         dotenv_path = os.path.join(site_path, '.env')
+        logger.info(f"Loading environment variables from {dotenv_path}")
         load_dotenv(dotenv_path)
         db_user = get_env_variable('DB_USERNAME')
         db_password = get_env_variable('DB_PASSWORD')
