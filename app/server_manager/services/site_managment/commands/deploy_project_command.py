@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 from app.server_manager.interfaces.command_interface import Command
+from utils.env_util import get_env_variable
 from utils.util import run_command
 
 class DeployProjectCommand(Command):
@@ -210,19 +211,19 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         with open(env_file_path, 'r') as file:
             env_data = file.readlines()
 
-        new_env_data = []
-        for line in env_data:
-            if line.startswith('APP_ENV='):
-                new_env_data.append('APP_ENV=production\n')
-            elif line.startswith('APP_URL='):
-                new_env_data.append(f'APP_URL=http://{domain}\n')
-            elif line.startswith('APP_DEBUG='):
-                new_env_data.append('APP_DEBUG=false\n')
-            else:
-                new_env_data.append(line)
+        env_data = [line.replace('APP_ENV=', 'APP_ENV=production\n') if line.startswith('APP_ENV=') else line for line in env_data]
+        env_data = [line.replace('APP_URL=', f'APP_URL="http://{domain}"\n') if line.startswith('APP_URL=') else line for line in env_data]
+        env_data = [line.replace('APP_DEBUG=', 'APP_DEBUG=false\n') if line.startswith('APP_DEBUG=') else line for line in env_data]
+
+        # Get the DB_PASSWORD from the main project .env file
+        main_db_password = get_env_variable('DB_PASSWORD')
+
+        # Update the DB_PASSWORD in the cloned project .env file
+        if main_db_password:
+            env_data = [line.replace('DB_PASSWORD=', f'DB_PASSWORD={main_db_password}\n') if line.startswith('DB_PASSWORD=') else line for line in env_data]
 
         with open(env_file_path, 'w') as file:
-            file.writelines(new_env_data)
+            file.writelines(env_data)
 
         if laravel_version > 10:
             self.setup_sqlite_database(env_file_path, site_path)

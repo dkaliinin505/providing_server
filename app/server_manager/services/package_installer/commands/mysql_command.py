@@ -2,11 +2,13 @@ import os
 import time
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command, is_wsl
+from utils.env_util import load_env, update_env_variable
 
 
 class MySQLCommand(Command):
     def __init__(self, config):
         self.config = config
+        load_env()
         print(f"Config: {config}")
 
     def execute(self, data):
@@ -16,20 +18,26 @@ class MySQLCommand(Command):
         ubuntu_version = run_command("lsb_release -rs", return_json=False).strip()
         if self.version_to_int(ubuntu_version) <= self.version_to_int("20.04"):
             print("Configuring MySQL Repositories for Ubuntu 20.04 and below")
-            run_command("sudo wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
+            run_command(
+                "sudo wget --no-check-certificate -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb")
             run_command("sudo dpkg --install mysql-apt-config_0.8.15-1_all.deb")
             run_command("sudo apt-get update")
 
         # Set The Automated Root Password
         db_password = self.config.get('db_password', 'default_password')
-        run_command(f"echo 'mysql-community-server mysql-community-server/data-dir select \"\"' | sudo debconf-set-selections")
-        run_command(f"echo 'mysql-community-server mysql-community-server/root-pass password {db_password}' | sudo debconf-set-selections")
-        run_command(f"echo 'mysql-community-server mysql-community-server/re-root-pass password {db_password}' | sudo debconf-set-selections")
+        run_command(
+            f"echo 'mysql-community-server mysql-community-server/data-dir select \"\"' | sudo debconf-set-selections")
+        run_command(
+            f"echo 'mysql-community-server mysql-community-server/root-pass password {db_password}' | sudo debconf-set-selections")
+        run_command(
+            f"echo 'mysql-community-server mysql-community-server/re-root-pass password {db_password}' | sudo debconf-set-selections")
 
         # Add MySQL APT Repository
         run_command("sudo apt-get install -y gnupg")
-        run_command("sudo wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | sudo apt-key add -")
-        run_command('echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list')
+        run_command(
+            "sudo wget --no-check-certificate -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 | sudo apt-key add -")
+        run_command(
+            'echo "deb http://repo.mysql.com/apt/ubuntu/ $(lsb_release -cs) mysql-8.0" | sudo tee /etc/apt/sources.list.d/mysql.list')
 
         # Update package lists
         try:
@@ -40,13 +48,17 @@ class MySQLCommand(Command):
             run_command("sudo apt-get update")
 
         # Install MySQL with non-interactive frontend
-        run_command("DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y mysql-server", return_json=False, raise_exception=True)
+        run_command("DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y mysql-server", return_json=False,
+                    raise_exception=True)
 
         # Start MySQL service if not running
         self.ensure_mysql_service_running()
 
         # Configure MySQL
         self.configure_mysql(db_password)
+
+        # Update .env file with new MySQL credentials
+        update_env_variable("DB_PASSWORD", db_password)
 
         return {"message": "MySQL installed and configured"}
 
@@ -86,7 +98,8 @@ class MySQLCommand(Command):
         self.append_to_file("/etc/mysql/mysql.conf.d/mysqld.cnf", "default_password_lifetime = 0")
 
         # Set Character Set
-        self.append_to_file("/etc/mysql/my.cnf", "\n[mysqld]\ndefault_authentication_plugin=mysql_native_password\nskip-log-bin")
+        self.append_to_file("/etc/mysql/my.cnf",
+                            "\n[mysqld]\ndefault_authentication_plugin=mysql_native_password\nskip-log-bin")
 
         # Configure Max Connections
         ram = self.get_total_ram()
@@ -101,7 +114,8 @@ class MySQLCommand(Command):
 
         # Create Initial Database If Specified
         initial_db = self.config.get('initial_db', 'forge')
-        run_command(f'sudo mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
+        run_command(
+            f'sudo mysql --user="root" --password="{db_password}" -e "CREATE DATABASE {initial_db} CHARACTER SET utf8 COLLATE utf8_unicode_ci;"')
 
         # Configure Log Rotation
         self.configure_log_rotation()
@@ -174,4 +188,3 @@ class MySQLCommand(Command):
             run_command(f'echo "{os.linesep.join(lines)}" | sudo tee {file_path} > /dev/null')
         except FileNotFoundError:
             run_command(f'echo "{key} = {value}" | sudo tee {file_path} > /dev/null')
-
