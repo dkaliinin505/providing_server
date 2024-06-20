@@ -1,27 +1,32 @@
 import subprocess, json, os, sys, importlib
+import traceback
 import venv
 
 
 def run_command(command, return_json=False, raise_exception=True):
     print(f"Running command: {command}")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
+        if result.returncode != 0:
+            error_message = f"Command failed: {command}\n{result.stderr}"
+            print(error_message)
 
-    if result.returncode != 0:
-        error_message = f"Command failed: {command}\n{result.stderr}"
-        print(error_message)
-
-        # General error handling for all exceptions
-        if return_json:
-            return json.dumps({'error': error_message}), 400
-        else:
-            if raise_exception:
-                raise Exception(error_message)
+            if return_json:
+                return json.dumps({'error': error_message}), 400
             else:
-                print(error_message)
-                return None
+                if raise_exception:
+                    raise Exception(error_message)
+                else:
+                    print(error_message)
+                    return None
 
-    print(f"Command output: {result.stdout}")
-    return result.stdout.strip()
+        print(f"Command output: {result.stdout}")
+        return result.stdout.strip()
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        traceback.print_exc()
+        if raise_exception:
+            raise
 
 
 def install_package(package_name):
