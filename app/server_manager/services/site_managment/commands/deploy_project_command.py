@@ -42,9 +42,7 @@ class DeployProjectCommand(Command):
         self.run_migrations(site_path, is_nested_structure, nested_folder)
 
         # Run Artisan Commands after deployment
-        run_command(f"{site_path}/artisan config:cache")
-        run_command(f"{site_path}/artisan key:generate")
-        run_command(f"{site_path}/artisan db:seed")
+        self.after_deployment(site_path, is_nested_structure, nested_folder)
 
         return {"message": "Site deployed and configured successfully"}
 
@@ -294,3 +292,14 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
                 run_command(f'php8.3 {os.path.join(site_path, "artisan")} migrate --force')
             except Exception as e:
                 print(f"Error running migrations: {str(e)}")
+
+    def after_deployment(self, site_path, is_nested_structure, nested_folder):
+        if is_nested_structure:
+            site_path = os.path.join(site_path, nested_folder)
+
+        # Run additional commands after deployment
+        run_command(f"{site_path}/artisan config:cache")
+        run_command(f"{site_path}/artisan key:generate")
+        run_command(f"{site_path}/artisan db:seed")
+
+        return
