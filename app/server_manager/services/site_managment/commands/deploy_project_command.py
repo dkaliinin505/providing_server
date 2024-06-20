@@ -208,22 +208,35 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 """
 
     def update_env_file(self, env_file_path, laravel_version, domain, site_path):
+        # Read the current .env file content
         with open(env_file_path, 'r') as file:
             env_data = file.readlines()
 
-        env_data = [line.replace('APP_ENV=', 'APP_ENV=production\n') if line.startswith('APP_ENV=') else line for line in env_data]
-        env_data = [line.replace('APP_URL=', f'APP_URL="http://{domain}"\n') if line.startswith('APP_URL=') else line for line in env_data]
-        env_data = [line.replace('APP_DEBUG=', 'APP_DEBUG=false\n') if line.startswith('APP_DEBUG=') else line for line in env_data]
+        # Create a dictionary to store the .env variables
+        env_dict = {}
+        for line in env_data:
+            if '=' in line:
+                key, value = line.strip().split('=', 1)
+                env_dict[key] = value
+
+        # Update the specific values
+        # env_dict['APP_ENV'] = 'production'
+        env_dict['APP_URL'] = f'http://{domain}'
+        env_dict['APP_DEBUG'] = 'false'
 
         # Get the DB_PASSWORD from the main project .env file
         main_db_password = get_env_variable('DB_PASSWORD')
 
         # Update the DB_PASSWORD in the cloned project .env file
         if main_db_password:
-            env_data = [line.replace('DB_PASSWORD=', f'DB_PASSWORD={main_db_password}\n') if line.startswith('DB_PASSWORD=') else line for line in env_data]
+            env_dict['DB_PASSWORD'] = main_db_password
 
+        # Generate the updated .env content
+        updated_env_data = '\n'.join([f'{key}={value}' for key, value in env_dict.items()])
+
+        # Write the updated .env content back to the file
         with open(env_file_path, 'w') as file:
-            file.writelines(env_data)
+            file.write(updated_env_data)
 
         if laravel_version > 10:
             self.setup_sqlite_database(env_file_path, site_path)
