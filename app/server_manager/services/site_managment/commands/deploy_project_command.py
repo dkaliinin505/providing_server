@@ -289,7 +289,7 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
         print(f"Checking database {db_name} on host {db_host} with user {db_user}")
         logger.info(f"Checking database {db_name} on host {db_host} with user {db_user}")
         # Check if the database exists
-        if not self.check_database_exists(self, db_name, db_user, db_password):
+        if not self.check_database_exists(db_name, db_user, db_password):
             print(f"Database {db_name} does not exist. Creating the database.")
             if not self.create_database_if_not_exists(db_name, db_user, db_password):
                 print(f"Failed to create the database {db_name}.")
