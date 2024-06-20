@@ -19,6 +19,9 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
+        # Ensure the parent directory exists
+        os.makedirs(site_path, exist_ok=True)
+
         # Remove The Current Site Directory
         if os.path.exists(site_path):
             shutil.rmtree(site_path)
