@@ -298,8 +298,8 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
             site_path = os.path.join(site_path, nested_folder)
 
         # Run additional commands after deployment
-        run_command(f"{site_path}/artisan config:cache")
-        run_command(f"{site_path}/artisan key:generate")
-        run_command(f"{site_path}/artisan db:seed")
+        run_command(f"php8.3 {site_path}/artisan config:cache")
+        run_command(f"php8.3 {site_path}/artisan key:generate")
+        run_command(f"php8.3 {site_path}/artisan db:seed")
 
         return
