@@ -110,7 +110,7 @@ class CreateSiteCommand(Command):
             redirector_config = template_file.read()
 
         # Replace placeholders with actual values
-        redirector_config = redirector_config.replace('{{domain}}', domain)
+        redirector_config = redirector_config.replace('{domain}', domain)
 
         with open('/tmp/nginx_redirector.conf', 'w') as f:
             f.write(redirector_config)
