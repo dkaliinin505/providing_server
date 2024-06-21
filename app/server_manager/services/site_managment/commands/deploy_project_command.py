@@ -2,10 +2,9 @@ import logging
 import os
 import shutil
 import json
-from dotenv import load_dotenv
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
-from utils.env_util import get_env_variable
+from utils.env_util import get_env_variable,load_env,update_env_variable
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -28,6 +27,21 @@ class DeployProjectCommand(Command):
 
         # Ensure the parent directory exists
         os.makedirs(site_path, exist_ok=True)
+
+        # Before cloning the repository, check if the site already exists and running
+        # Check if the site is already cloned
+        if os.path.exists(site_path):
+            env_file_path = os.path.join(site_path, '.env')
+            if os.path.isfile(env_file_path):
+                # Load the .env file and check the APP_KEY
+                app_key = get_env_variable('APP_KEY', env_file_path)
+                if app_key:
+                    print(f"The site at {site_path} is already running with APP_KEY set.")
+                    return {"message": "Site is already running."}
+
+        # Remove The Current Site Directory if it exists
+        if os.path.exists(site_path):
+            shutil.rmtree(site_path)
 
         # Clone The Repository Into The Site
         self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
@@ -100,128 +114,14 @@ class DeployProjectCommand(Command):
         return int(laravel_version.split('.')[0])
 
     def generate_env_content(self, laravel_version):
+        base_dir = os.path.dirname(__file__)
         if laravel_version >= 11:
-            return """APP_NAME=Laravel
-APP_ENV=production
-APP_KEY=
-APP_DEBUG=false
-APP_TIMEZONE=UTC
-APP_URL=http://localhost
-
-APP_LOCALE=en
-APP_FALLBACK_LOCALE=en
-APP_FAKER_LOCALE=en_US
-
-APP_MAINTENANCE_DRIVER=file
-APP_MAINTENANCE_STORE=database
-
-LOG_CHANNEL=stack
-LOG_STACK=single
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
-
-DB_CONNECTION=sqlite
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=
-# DB_USERNAME=forge
-# DB_PASSWORD=""
-
-BROADCAST_CONNECTION=log
-CACHE_STORE=database
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
-SESSION_DRIVER=database
-SESSION_LIFETIME=120
-
-MEMCACHED_HOST=127.0.0.1
-
-REDIS_CLIENT=phpredis
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=""
-REDIS_PORT=6379
-
-MAIL_MAILER=log
-MAIL_HOST=127.0.0.1
-MAIL_PORT=2525
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_HOST=
-PUSHER_PORT=443
-PUSHER_SCHEME=https
-PUSHER_APP_CLUSTER=mt1
-
-VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_HOST="${PUSHER_HOST}"
-VITE_PUSHER_PORT="${PUSHER_PORT}"
-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-"""
+            template_path = os.path.join(base_dir, 'config_templates', 'laravel_11_template.env')
         else:
-            return """APP_NAME=Laravel
-APP_ENV=production
-APP_KEY=
-APP_DEBUG=false
-APP_URL=http://localhost
+            template_path = os.path.join(base_dir, 'config_templates', 'laravel_default_template.env')
 
-LOG_CHANNEL=stack
-
-DB_CONNECTION=
-DB_HOST=127.0.0.1
-DB_PORT=
-DB_DATABASE=
-DB_USERNAME=forge
-DB_PASSWORD=""
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=""
-REDIS_PORT=6379
-
-MAIL_DRIVER=smtp
-MAIL_HOST=smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS=null
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_APP_CLUSTER=mt1
-
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_HOST="${PUSHER_HOST}"
-VITE_PUSHER_PORT="${PUSHER_PORT}"
-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-"""
+        with open(template_path, 'r') as file:
+            return file.read()
 
     def update_env_file(self, env_file_path, laravel_version, domain, site_path):
         # Read the current .env file content
