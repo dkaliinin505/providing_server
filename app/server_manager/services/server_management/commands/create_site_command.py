@@ -97,23 +97,23 @@ class CreateSiteCommand(Command):
             f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
     def write_redirector(self):
+        domain = self.config['domain']
         # Path to the template file
         template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
         template_path = (template_directory / 'nginx_redirector_template.conf').resolve()
 
-        # Read the template file
-        with open(template_path, 'r') as template_file:
+        if not template_path.is_file():
+            raise FileNotFoundError(f"Template file not found: {template_path}")
+
+        with template_path.open('r') as template_file:
             redirector_config = template_file.read()
 
-        # Replace placeholders with actual values
-        redirector_config = redirector_config.format(domain=self.config['domain'])
+        redirector_config = redirector_config.format(domain=domain)
 
-        # Write the content to the /etc/nginx/forge-conf/{domain}/before/redirect.conf file
         with open('/tmp/nginx_redirector.conf', 'w') as f:
             f.write(redirector_config.strip())
 
-        run_command(
-            f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
+        run_command(f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{domain}/before/redirect.conf')
 
     def restart_services(self):
         run_command("sudo service nginx reload")
