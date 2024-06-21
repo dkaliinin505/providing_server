@@ -28,22 +28,30 @@ class CreateSiteCommand(Command):
         return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
-        # Path to the template file
-        template_path = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            '..',
-            'templates',
-            'nginx',
-            'fastcgi_params_template.conf'
+        # Define the path to the templates directory
+        template_directory = os.path.join(
+            os.path.dirname(__file__),  # Current directory
+            '..',  # Move up to the parent directory (commands)
+            '..',  # Move up to the parent directory (server_management)
+            '..',  # Move up to the parent directory (services)
+            'templates',  # Move into the 'templates' directory
+            'nginx'  # Move into the 'nginx' directory if needed
         )
+
+        # Define the template file path
+        template_path = os.path.join(template_directory, 'fastcgi_params_template.conf')
+
+        # Print the constructed path for verification
         print(f"Template path: {template_path}")
 
-        # Read the template file
+        # Check if the path exists
+        if not os.path.isfile(template_path):
+            raise FileNotFoundError(f"Template file not found: {template_path}")
+
+        # Load and use the template
         with open(template_path, 'r') as template_file:
             fastcgi_params = template_file.read()
 
-        # Write the content to the /etc/nginx/fastcgi_params file
         run_command(f'echo "{fastcgi_params.strip()}" | sudo tee /etc/nginx/fastcgi_params')
 
     def generate_dhparams(self):
