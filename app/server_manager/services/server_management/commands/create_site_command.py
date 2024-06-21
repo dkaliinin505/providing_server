@@ -34,14 +34,14 @@ class CreateSiteCommand(Command):
         template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
         template_path = template_directory / 'fastcgi_params_template.conf'
 
-        if not template_path.is_file():
-            raise FileNotFoundError(f"Template file not found: {template_path}")
-
         with open(template_path, 'r') as template_file:
             fastcgi_params = template_file.read()
 
-        # Write the content to the fastcgi_params file
-        run_command(f'echo "{fastcgi_params.strip()}" | sudo tee /etc/nginx/fastcgi_params')
+        # Write the content to the fastcgi_params file using a safer approach to handle quotes
+        with open('/tmp/fastcgi_params', 'w') as temp_file:
+            temp_file.write(fastcgi_params)
+
+        run_command('sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
 
     def generate_dhparams(self):
         if not os.path.isfile('/etc/nginx/dhparams.pem'):
