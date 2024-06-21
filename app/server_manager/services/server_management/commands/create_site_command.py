@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command, version_to_int
 
@@ -28,28 +29,15 @@ class CreateSiteCommand(Command):
         return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
-        # Define the path to the templates directory
-        template_directory = os.path.join(
-            os.path.dirname(__file__),  # Current directory
-            '..',  # Move up to the parent directory (commands)
-            '..',  # Move up to the parent directory (server_management)
-            '..',  # Move up to the parent directory (services)
-            'templates',  # Move into the 'templates' directory
-            'nginx'  # Move into the 'nginx' directory if needed
-        )
+        current_dir = Path(__file__).resolve().parent
+        template_directory = current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
 
-        # Define the template file path
-        template_path = os.path.join(template_directory, 'fastcgi_params_template.conf')
+        template_path = (template_directory / 'fastcgi_params_template.conf').resolve()
 
-        # Print the constructed path for verification
-        print(f"Template path: {template_path}")
-
-        # Check if the path exists
-        if not os.path.isfile(template_path):
+        if not template_path.is_file():
             raise FileNotFoundError(f"Template file not found: {template_path}")
 
-        # Load and use the template
-        with open(template_path, 'r') as template_file:
+        with template_path.open('r') as template_file:
             fastcgi_params = template_file.read()
 
         run_command(f'echo "{fastcgi_params.strip()}" | sudo tee /etc/nginx/fastcgi_params')
