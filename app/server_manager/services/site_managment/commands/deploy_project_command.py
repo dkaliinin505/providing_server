@@ -4,7 +4,7 @@ import shutil
 import json
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
-from utils.env_util import get_env_variable,load_env,update_env_variable
+from utils.env_util import get_env_variable, load_env, update_env_variable
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -29,9 +29,12 @@ class DeployProjectCommand(Command):
         os.makedirs(site_path, exist_ok=True)
 
         # Before cloning the repository, check if the site already exists and running
-        # Check if the site is already cloned
-        if os.path.exists(site_path):
+        if is_nested_structure:
+            env_file_path = os.path.join(site_path, nested_folder, '.env')
+        else:
             env_file_path = os.path.join(site_path, '.env')
+
+        if os.path.exists(site_path):
             if os.path.isfile(env_file_path):
                 # Load the .env file and check the APP_KEY
                 app_key = get_env_variable('APP_KEY', env_file_path)
@@ -176,7 +179,6 @@ class DeployProjectCommand(Command):
         # Load DB credentials from .env
         dotenv_path = os.path.join(site_path, '.env')
         logger.info(f"Loading environment variables from {dotenv_path}")
-        load_dotenv(dotenv_path)
         db_user = get_env_variable('DB_USERNAME', dotenv_path)
         db_password = get_env_variable('DB_PASSWORD', dotenv_path)
         db_name = get_env_variable('DB_DATABASE', dotenv_path)
