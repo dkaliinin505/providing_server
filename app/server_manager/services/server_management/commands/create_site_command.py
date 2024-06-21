@@ -30,20 +30,29 @@ class CreateSiteCommand(Command):
         return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
-        # Path to the template file
-        template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
-        template_path = template_directory / 'fastcgi_params_template.conf'
-
-        if not template_path.is_file():
-            raise FileNotFoundError(f"Template file not found: {template_path}")
-
-        with template_path.open('r') as template_file:
-            fastcgi_params = template_file.read()
-
-        with open('/tmp/fastcgi_params', 'w') as f:
-            f.write(fastcgi_params.strip())
-
-        run_command(f'sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
+        fastcgi_params = """
+fastcgi_param   QUERY_STRING        \\$query_string;
+fastcgi_param   REQUEST_METHOD      \\$request_method;
+fastcgi_param   CONTENT_TYPE        \\$content_type;
+fastcgi_param   CONTENT_LENGTH      \\$content_length;
+fastcgi_param   SCRIPT_FILENAME     \\$realpath_root\\$fastcgi_script_name;
+fastcgi_param   SCRIPT_NAME         \\$fastcgi_script_name;
+fastcgi_param   REQUEST_URI         \\$request_uri;
+fastcgi_param   DOCUMENT_URI        \\$document_uri;
+fastcgi_param   DOCUMENT_ROOT       \\$realpath_root;
+fastcgi_param   SERVER_PROTOCOL     \\$server_protocol;
+fastcgi_param   GATEWAY_INTERFACE   CGI/1.1;
+fastcgi_param   SERVER_SOFTWARE     nginx/\\$nginx_version;
+fastcgi_param   REMOTE_ADDR         \\$remote_addr;
+fastcgi_param   REMOTE_PORT         \\$remote_port;
+fastcgi_param   SERVER_ADDR         \\$server_addr;
+fastcgi_param   SERVER_PORT         \\$server_port;
+fastcgi_param   SERVER_NAME         \\$server_name;
+fastcgi_param   HTTPS               \\$https if_not_empty;
+fastcgi_param   REDIRECT_STATUS     200;
+fastcgi_param   HTTP_PROXY          \\"\\";
+"""
+        run_command(f'echo "{fastcgi_params.strip()}" | sudo tee /etc/nginx/fastcgi_params')
 
     def generate_dhparams(self):
         if not os.path.isfile('/etc/nginx/dhparams.pem'):
@@ -59,18 +68,64 @@ class CreateSiteCommand(Command):
         if is_nested_structure:
             root_path = f'/home/super_forge/{domain}/{nested_folder}/public'
 
-        # Path to the template file
-        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
-        template_path = (template_directory / 'nginx_template.conf').resolve()
-
-        # Read the template file
-        with open(template_path, 'r') as template_file:
-            nginx_template = template_file.read()
-
-        # Replace placeholders with actual values
-        nginx_config = nginx_template.replace('{{domain}}', domain).replace('{{root_path}}', root_path)
-
-        # Write the config to a temporary file
+        nginx_config = f"""
+        # IMPORTANT CONFIG (DO NOT REMOVE!)
+        include forge-conf/{domain}/before/*;
+        
+        server {{
+            listen 80;
+            listen [::]:80;
+            server_name {domain};
+            server_tokens off;
+            root {root_path};
+        
+            # FORGE SSL (DO NOT REMOVE!)
+            # ssl_certificate;
+            # ssl_certificate_key;
+        
+            ssl_protocols TLSv1.2 TLSv1.3;
+            ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+            ssl_prefer_server_ciphers off;
+            ssl_dhparam /etc/nginx/dhparams.pem;
+        
+            add_header X-Frame-Options "SAMEORIGIN";
+            add_header X-XSS-Protection "1; mode=block";
+            add_header X-Content-Type-Options "nosniff";
+        
+            index index.html index.htm index.php;
+        
+            charset utf-8;
+        
+            # FORGE CONFIG (DO NOT REMOVE!)
+            include forge-conf/{domain}/server/*;
+        
+            location / {{
+                try_files $uri $uri/ /index.php?$query_string;
+            }}
+        
+            location = /favicon.ico {{ access_log off; log_not_found off; }}
+            location = /robots.txt  {{ access_log off; log_not_found off; }}
+        
+            access_log off;
+            error_log  /var/log/nginx/{domain}-error.log error;
+        
+            error_page 404 /index.php;
+        
+            location ~ \.php$ {{
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+                fastcgi_index index.php;
+                include fastcgi_params;
+                }}
+                
+                location ~ /\.(?!well-known).* {{
+                deny all;
+                }}
+                }}
+                
+                # FORGE CONFIG (DO NOT REMOVE!)
+                include forge-conf/{domain}/after/*;
+                """
         with open('/tmp/nginx_server_block.conf', 'w') as f:
             f.write(nginx_config.strip())
 
@@ -100,24 +155,26 @@ class CreateSiteCommand(Command):
             f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
     def write_redirector(self):
-        domain = self.config['domain']
-        # Path to the template file
-        template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
-        template_path = template_directory / 'nginx_redirector_template.conf'
-
-        if not template_path.is_file():
-            raise FileNotFoundError(f"Template file not found: {template_path}")
-
-        with template_path.open('r') as template_file:
-            redirector_config = template_file.read()
-
-        # Replace placeholders with actual values
-        redirector_config = redirector_config.replace('{{domain}}', domain)
-
+        redirector_config = f"""
+        server {{
+            listen 80;
+            listen [::]:80;
+            server_tokens off;
+        
+            server_name www.{self.config['domain']};
+        
+            if ($http_x_forwarded_proto = 'https') {{
+                return 301 https://{self.config['domain']}$request_uri;
+            }}
+        
+            return 301 $scheme://{self.config['domain']}$request_uri;
+        }}
+        """
         with open('/tmp/nginx_redirector.conf', 'w') as f:
             f.write(redirector_config.strip())
 
-        run_command(f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{domain}/before/redirect.conf')
+        run_command(
+            f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
     def restart_services(self):
         run_command("sudo service nginx reload")
