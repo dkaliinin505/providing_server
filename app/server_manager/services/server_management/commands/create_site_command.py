@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class CreateSiteCommand(Command):
     def __init__(self, config):
         self.config = config
+        self.current_dir = Path(__file__).resolve().parent
         print(f"Config: {config}")
 
     def execute(self, data):
@@ -29,8 +30,7 @@ class CreateSiteCommand(Command):
         return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
-        current_dir = Path(__file__).resolve().parent
-        template_directory = current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
 
         template_path = (template_directory / 'fastcgi_params_template.conf').resolve()
 
@@ -57,7 +57,8 @@ class CreateSiteCommand(Command):
             root_path = f'/home/super_forge/{domain}/{nested_folder}/public'
 
         # Path to the template file
-        template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'nginx', 'nginx_template.conf')
+        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_path = (template_directory / 'nginx_template.conf').resolve()
 
         # Read the template file
         with open(template_path, 'r') as template_file:
@@ -97,7 +98,8 @@ class CreateSiteCommand(Command):
 
     def write_redirector(self):
         # Path to the template file
-        template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'nginx', 'nginx_redirector_template.conf')
+        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_path = (template_directory / 'nginx_redirector_template.conf').resolve()
 
         # Read the template file
         with open(template_path, 'r') as template_file:
