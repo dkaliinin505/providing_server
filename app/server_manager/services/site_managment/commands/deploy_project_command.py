@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import json
+from pathlib import Path
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
 from utils.env_util import get_env_variable, load_env, update_env_variable
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 class DeployProjectCommand(Command):
     def __init__(self, config):
         self.config = config
+        self.current_dir = Path(__file__).resolve().parent
         print(f"Config: {config}")
 
     def execute(self, data):
@@ -42,10 +44,6 @@ class DeployProjectCommand(Command):
                 if app_key:
                     print(f"The site at {site_path} is already running with APP_KEY set.")
                     return {"message": "Site is already running."}
-
-        # Remove The Current Site Directory if it exists
-        if os.path.exists(site_path):
-            shutil.rmtree(site_path)
 
         # Clone The Repository Into The Site
         self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
@@ -97,6 +95,7 @@ class DeployProjectCommand(Command):
     def create_env_file(self, site_path, domain, is_nested_structure, nested_folder):
         if is_nested_structure:
             site_path = os.path.join(site_path, nested_folder)
+
         laravel_version = self.get_laravel_version(site_path)
         env_file_path = os.path.join(site_path, '.env')
 
@@ -118,13 +117,11 @@ class DeployProjectCommand(Command):
         return int(laravel_version.split('.')[0])
 
     def generate_env_content(self, laravel_version):
-        base_dir = os.path.dirname(__file__)
+        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'laravel'
         if laravel_version >= 11:
-            template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'laravel',
-                                         'laravel_11_template.env')
+            template_path = (template_directory / 'laravel_11_template.env').resolve()
         else:
-            template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'laravel',
-                                         'laravel_default_template.env')
+            template_path = (template_directory / 'laravel_default_template.env').resolve()
 
         with open(template_path, 'r') as file:
             return file.read()
