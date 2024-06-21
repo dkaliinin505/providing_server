@@ -30,7 +30,10 @@ class CreateSiteCommand(Command):
         return {"message": "Website server configuration created and applied successfully"}
 
     def create_fastcgi_params(self):
-        template_path = Path(__file__).parent.parent / 'templates' / 'nginx' / 'fastcgi_params_template.conf'
+        # Path to the template file
+        template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_path = template_directory / 'fastcgi_params_template.conf'
+
         if not template_path.is_file():
             raise FileNotFoundError(f"Template file not found: {template_path}")
 
