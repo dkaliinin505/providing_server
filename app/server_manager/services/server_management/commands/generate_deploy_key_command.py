@@ -1,10 +1,6 @@
 import os
-import logging
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import run_command
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 class GenerateDeployKeyCommand(Command):

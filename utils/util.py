@@ -199,3 +199,7 @@ def set_permissions_dynamically():
     ensure_permissions(current_directory)
     ensure_permissions(parent_directory)
     ensure_permissions(grandparent_directory)
+
+
+def version_to_int(version):
+    return int("".join(version.split(".")))
