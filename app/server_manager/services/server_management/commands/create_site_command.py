@@ -29,7 +29,7 @@ class CreateSiteCommand(Command):
 
     def create_fastcgi_params(self):
         # Path to the template file
-        template_path = os.path.join(os.path.dirname(__file__), 'fastcgi_params_template.conf')
+        template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'nginx', 'fastcgi_params_template.conf')
 
         # Read the template file
         with open(template_path, 'r') as template_file:
@@ -53,7 +53,7 @@ class CreateSiteCommand(Command):
             root_path = f'/home/super_forge/{domain}/{nested_folder}/public'
 
         # Path to the template file
-        template_path = os.path.join(os.path.dirname(__file__), 'nginx_template.conf')
+        template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'nginx', 'nginx_template.conf')
 
         # Read the template file
         with open(template_path, 'r') as template_file:
@@ -93,7 +93,7 @@ class CreateSiteCommand(Command):
 
     def write_redirector(self):
         # Path to the template file
-        template_path = os.path.join(os.path.dirname(__file__), 'nginx_redirector_template.conf')
+        template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'nginx', 'nginx_redirector_template.conf')
 
         # Read the template file
         with open(template_path, 'r') as template_file:

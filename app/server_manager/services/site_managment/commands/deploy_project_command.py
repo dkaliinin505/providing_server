@@ -120,9 +120,11 @@ class DeployProjectCommand(Command):
     def generate_env_content(self, laravel_version):
         base_dir = os.path.dirname(__file__)
         if laravel_version >= 11:
-            template_path = os.path.join(base_dir, 'config_templates', 'laravel_11_template.env')
+            template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'laravel',
+                                         'laravel_11_template.env')
         else:
-            template_path = os.path.join(base_dir, 'config_templates', 'laravel_default_template.env')
+            template_path = os.path.join(os.path.dirname(__file__), '..', '..', 'templates', 'laravel',
+                                         'laravel_default_template.env')
 
         with open(template_path, 'r') as file:
             return file.read()
