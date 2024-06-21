@@ -99,8 +99,8 @@ class CreateSiteCommand(Command):
     def write_redirector(self):
         domain = self.config['domain']
         # Path to the template file
-        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
-        template_path = (template_directory / 'nginx_redirector_template.conf').resolve()
+        template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_path = template_directory / 'nginx_redirector_template.conf'
 
         if not template_path.is_file():
             raise FileNotFoundError(f"Template file not found: {template_path}")
