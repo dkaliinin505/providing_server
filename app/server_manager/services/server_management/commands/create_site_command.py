@@ -98,23 +98,22 @@ class CreateSiteCommand(Command):
             f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
     def write_redirector(self):
-        redirector_config = f"""
-        server {{
-            listen 80;
-            listen [::]:80;
-            server_tokens off;
-        
-            server_name www.{self.config['domain']};
-        
-            if ($http_x_forwarded_proto = 'https') {{
-                return 301 https://{self.config['domain']}$request_uri;
-            }}
-        
-            return 301 $scheme://{self.config['domain']}$request_uri;
-        }}
-        """
+        domain = self.config['domain']
+        # Path to the template file
+        template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
+        template_path = (template_directory / 'nginx_redirector_template.conf').resolve()
+
+        if not template_path.is_file():
+            raise FileNotFoundError(f"Template file not found: {template_path}")
+
+        with template_path.open('r') as template_file:
+            redirector_config = template_file.read()
+
+        # Replace placeholders with actual values
+        redirector_config = redirector_config.replace('{{domain}}', domain)
+
         with open('/tmp/nginx_redirector.conf', 'w') as f:
-            f.write(redirector_config.strip())
+            f.write(redirector_config)
 
         run_command(
             f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
