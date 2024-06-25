@@ -28,13 +28,14 @@ class DeleteCertBotCertCommand(Command):
 
         # Define the regex pattern to find the specific server block
         pattern = re.compile(r"""
-                    server\s*\{\s*
-                    if\s*\(\$host\s*=\s*""" + re.escape(domain) + r"""\)\s*\{\s*
+                    server\s*{\s*
+                    if\s*\(\$host\s*=\s*""" + re.escape(domain) + r"""\)\s*{\s*
                     return\s*301\s*https://\$host\$request_uri;\s*
-                    \}\s*
+                    }\s*
                     server_name\s*""" + re.escape(domain) + r""";\s*
                     listen\s*80;\s*
-                    \}\s*
+                    return\s*404;\s*
+                    }\s*
                     """, re.VERBOSE)
 
         with open(nginx_config_path, 'r') as file:
