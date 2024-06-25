@@ -41,7 +41,7 @@ class DeleteCertBotCertCommand(Command):
 
         # Remove the server block with the redirect to HTTPS
         redirect_block_pattern = re.compile(
-            r"server\s*\{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}}\s*#\s*\n\s*listen\s*80;\s*\n\s*listen\s*\[::\]:80;\s*\n\s*server_name\s*{};\s*\n\s*return\s*404;\s*\n\s*\}}\s*#\s*\n".format(
+            r"server\s*\{{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}}\s*#\s*\n\s*listen\s*80;\s*\n\s*listen\s*\[::\]:80;\s*\n\s*server_name\s*{};\s*\n\s*return\s*404;\s*\n\s*\}}\s*#\s*\n".format(
                 domain, domain), re.MULTILINE)
         config_content = re.sub(redirect_block_pattern, "", config_content)
 
