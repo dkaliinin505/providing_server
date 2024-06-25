@@ -12,13 +12,13 @@ class DeleteCertBotCertCommand(Command):
 
     def execute(self, data):
         self.config = data
-        self.remove_ssl_certificate()
+        #self.remove_ssl_certificate()
+        self.update_nginx_config_for_http()
         print(f"SSL certificate removed successfully for domain: {self.config.get('domain')}")
 
     def remove_ssl_certificate(self):
         domain = self.config['domain']
         run_command(f"sudo certbot delete --cert-name {domain}")
-        self.update_nginx_config_for_http()
 
     def update_nginx_config_for_http(self):
         domain = self.config['domain']
