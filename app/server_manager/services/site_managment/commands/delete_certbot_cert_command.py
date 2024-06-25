@@ -39,16 +39,12 @@ class DeleteCertBotCertCommand(Command):
         config_content = config_content.replace("ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;", "")
         config_content = config_content.replace("# managed by Certbot", "")
 
-        # Regex pattern to match the server block
-        redirect_block_pattern = re.compile(
-            r"server\s*\{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}}\s*#\s*\n\s*server_name\s*{};\s*\n\s*listen\s*80;\s*\n\s*return\s*404;\s*\n\s*\}}\s*#\s*\n".format(
+        # Identify and remove the specific server block for HTTP to HTTPS redirect
+        block_pattern = re.compile(
+            r"server\s*{\s*if\s*\(\$host\s*=\s*{}\)\s*{{\s*return\s*301\s*https://\$host\$request_uri;\s*}}\s*#\s*\n\s*server_name\s*{};\s*listen\s*80;\s*return\s*404;\s*#\s*}}\s*".format(
                 re.escape(domain), re.escape(domain)), re.MULTILINE)
 
-        # Print the regex pattern
-        print("Regex Pattern:\n", redirect_block_pattern.pattern)
-
-        # Remove the server block with the redirect to HTTPS
-        config_content, num_subs = re.subn(redirect_block_pattern, "", config_content)
+        config_content, num_subs = re.subn(block_pattern, "", config_content)
 
         # Print the number of substitutions made
         print(f"Number of substitutions made: {num_subs}")
