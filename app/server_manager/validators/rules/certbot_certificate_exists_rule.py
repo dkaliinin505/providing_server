@@ -14,14 +14,21 @@ def validate_certbot_certificate_exists(domain):
         result = run_command(f"sudo certbot certificates -d {domain}", return_json=False, raise_exception=False)
         logger.debug(f"Result: {result}")
         logger.debug(f"Domain: {domain}")
-        if f"Domains: {domain}" in result:
-            print(f"Domains: {domain} in result")
-        raise ValidationError(f"Test.")
-        if result is None:
-            raise ValidationError(f"Certificate for domain {domain} does not exist.")
 
-        # Check if the output contains the domain
-        if f"Domains: {domain}" not in result:
+        # Split the result into lines
+        result_lines = result.splitlines()
+
+        # Iterate through the lines to find the line containing the domain
+        domain_exists = False
+        for line in result_lines:
+            if f"Domains: {domain}" in line:
+                domain_exists = True
+                break
+
+        logger.debug(f"Domain exists: {domain_exists}")
+        raise ValidationError(f"TEST")
+
+        if not domain_exists:
             raise ValidationError(f"Certificate for domain {domain} does not exist.")
     except Exception as e:
         raise ValidationError(f"Error checking certificate for domain {domain}: {str(e)}")
