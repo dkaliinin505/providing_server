@@ -15,7 +15,7 @@ class DeleteCertBotCertCommand(Command):
         self.config = data
         #self.remove_ssl_certificate()
         self.update_nginx_config_for_http()
-        print(f"SSL certificate removed successfully for domain: {self.config.get('domain')}")
+        return {"message": f"SSL certificate removed successfully for domain: {self.config.get('domain')}"}
 
     def remove_ssl_certificate(self):
         domain = self.config['domain']
