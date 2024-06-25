@@ -1,3 +1,4 @@
+import logging
 import re
 import shutil
 
@@ -28,34 +29,39 @@ class DeleteCertBotCertCommand(Command):
         with open(nginx_config_path, 'r') as file:
             config_content = file.readlines()
 
-        # Remove all SSL-related lines and the specific server block for HTTP to HTTPS redirect
-        modified_content = []
-        inside_redirect_block = False
+            # Remove all SSL-related lines and the specific server block for HTTP to HTTPS redirect
+            modified_content = []
+            inside_redirect_block = False
+            brace_count = 0
 
-        for line in config_content:
-            if "listen [::]:443 ssl ipv6only=on;" in line or "listen 443 ssl;" in line or \
-                    f"ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;" in line or \
-                    f"ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;" in line or \
-                    "include /etc/letsencrypt/options-ssl-nginx.conf;" in line or "ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;" in line or \
-                    " managed by Certbot" in line:
-                continue
+            for line in config_content:
+                if "listen [::]:443 ssl ipv6only=on;" in line or "listen 443 ssl;" in line or \
+                        f"ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;" in line or \
+                        f"ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;" in line or \
+                        "include /etc/letsencrypt/options-ssl-nginx.conf;" in line or "ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;" in line or \
+                        " managed by Certbot" in line:
+                    continue
 
-            if inside_redirect_block:
-                if "}" in line:
-                    inside_redirect_block = False
-                continue
+                if re.search(r'server\s*{', line) and re.search(
+                        r'if\s*\(\$host\s*=\s*{}\)\s*{{\s*return\s*301\s*https://\$host\$request_uri;'.format(
+                                domain.replace('.', '\.')), line):
+                    inside_redirect_block = True
+                    brace_count = 1
+                    continue
 
-            if "server {" in line and "if ($host = " in line and f"return 301 https://$host$request_uri;" in line:
-                inside_redirect_block = True
-                continue
+                if inside_redirect_block:
+                    brace_count += line.count('{') - line.count('}')
+                    if brace_count == 0:
+                        inside_redirect_block = False
+                    continue
 
-            modified_content.append(line)
+                modified_content.append(line)
 
         # Print the number of substitutions made
-        print(f"Number of lines removed: {len(config_content) - len(modified_content)}")
+        logging.info(f"Number of lines in config: {len(config_content)}")
 
         # Print config content after modification
-        print("Modified Nginx Config Content:\n", "".join(modified_content))
+        logging.info("Modified Nginx Config Content:\n", "".join(modified_content))
 
         with open(temp_config_path, 'w') as file:
             file.writelines(modified_content)
