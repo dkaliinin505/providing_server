@@ -35,3 +35,8 @@ def deploy_project_route():
 @server_manager_blueprint.route('/create-certbot-cert', methods=['POST'])
 def create_certbot_cert_route():
     return site_management_controller.create_certbot_cert()
+
+
+@server_manager_blueprint.route('/delete-certbot-cert', methods=['DELETE'])
+def delete_certbot_cert_route():
+    return site_management_controller.delete_certbot_cert()
