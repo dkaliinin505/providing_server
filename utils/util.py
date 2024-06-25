@@ -1,6 +1,10 @@
+import logging
 import subprocess, json, os, sys, importlib
 import traceback
 import venv
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def run_command(command, return_json=False, raise_exception=True):
@@ -8,6 +12,7 @@ def run_command(command, return_json=False, raise_exception=True):
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
         if result.returncode != 0:
+            logger.debug(f"Result: {result}")
             error_message = f"Command failed: {command}\n{result.stderr}"
             print(error_message)
 
