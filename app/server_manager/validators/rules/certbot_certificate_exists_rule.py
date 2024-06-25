@@ -11,9 +11,10 @@ logger = logging.getLogger(__name__)
 def validate_certbot_certificate_exists(domain):
     try:
         # Check if the certificate exists for the given domain
-        result = run_command(f"certbot certificates -d {domain}", return_json=False, raise_exception=False)
+        result = run_command(f"sudo certbot certificates -d {domain}", return_json=False, raise_exception=False)
         logger.debug(f"Result: {result}")
         logger.debug(f"Domain: {domain}")
+        raise ValidationError(f"Test.")
         if result is None:
             raise ValidationError(f"Certificate for domain {domain} does not exist.")
 
