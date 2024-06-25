@@ -12,12 +12,11 @@ def validate_certbot_certificate_exists(domain):
     try:
         # Check if the certificate exists for the given domain
         result = run_command(f"certbot certificates -d {domain}", return_json=False, raise_exception=False)
-
+        logger.debug(f"Result: {result}")
+        logger.debug(f"Domain: {domain}")
         if result is None:
             raise ValidationError(f"Certificate for domain {domain} does not exist.")
 
-        print(f"Result: {result}")
-        logger.debug(f"Result: {result}")
         # Check if the output contains the domain
         if f"Domains: {domain}" not in result:
             raise ValidationError(f"Certificate for domain {domain} does not exist.")
