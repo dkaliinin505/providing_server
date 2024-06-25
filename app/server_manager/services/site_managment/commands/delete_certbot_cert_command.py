@@ -26,34 +26,39 @@ class DeleteCertBotCertCommand(Command):
         temp_config_path = f"/tmp/{domain}_nginx_config"
 
         with open(nginx_config_path, 'r') as file:
-            config_content = file.read()
+            config_content = file.readlines()
 
-        # Remove all SSL-related lines
-        config_content = config_content.replace("listen [::]:443 ssl ipv6only=on;", "")
-        config_content = config_content.replace("listen 443 ssl;", "")
-        config_content = config_content.replace(f"ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;",
-                                                "")
-        config_content = config_content.replace(f"ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;",
-                                                "")
-        config_content = config_content.replace("include /etc/letsencrypt/options-ssl-nginx.conf;", "")
-        config_content = config_content.replace("ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;", "")
-        config_content = config_content.replace("# managed by Certbot", "")
+        # Remove all SSL-related lines and the specific server block for HTTP to HTTPS redirect
+        modified_content = []
+        inside_redirect_block = False
 
-        # Identify and remove the specific server block for HTTP to HTTPS redirect
-        block_pattern = re.compile(
-            r"server\s*{\s*if\s*\(\$host\s*=\s*{}\)\s*{{\s*return\s*301\s*https://\$host\$request_uri;\s*}}\s*#\s*\n\s*server_name\s*{};\s*listen\s*80;\s*return\s*404;\s*#\s*}}\s*".format(
-                re.escape(domain), re.escape(domain)), re.MULTILINE)
+        for line in config_content:
+            if "listen [::]:443 ssl ipv6only=on;" in line or "listen 443 ssl;" in line or \
+                    f"ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;" in line or \
+                    f"ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;" in line or \
+                    "include /etc/letsencrypt/options-ssl-nginx.conf;" in line or "ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;" in line or \
+                    " managed by Certbot" in line:
+                continue
 
-        config_content, num_subs = re.subn(block_pattern, "", config_content)
+            if inside_redirect_block:
+                if "}" in line:
+                    inside_redirect_block = False
+                continue
+
+            if "server {" in line and "if ($host = " in line and f"return 301 https://$host$request_uri;" in line:
+                inside_redirect_block = True
+                continue
+
+            modified_content.append(line)
 
         # Print the number of substitutions made
-        print(f"Number of substitutions made: {num_subs}")
+        print(f"Number of lines removed: {len(config_content) - len(modified_content)}")
 
         # Print config content after modification
-        print("Modified Nginx Config Content:\n", config_content)
+        print("Modified Nginx Config Content:\n", "".join(modified_content))
 
         with open(temp_config_path, 'w') as file:
-            file.write(config_content)
+            file.writelines(modified_content)
 
         shutil.move(temp_config_path, nginx_config_path)
         run_command("sudo systemctl reload nginx")
