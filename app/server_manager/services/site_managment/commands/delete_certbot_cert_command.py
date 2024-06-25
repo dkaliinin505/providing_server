@@ -57,4 +57,4 @@ class DeleteCertBotCertCommand(Command):
             file.write(config_content)
 
         shutil.move(temp_config_path, nginx_config_path)
-        run_command("sudo systemctl reload nginx")
+        run_command("sudo systemctl restart nginx")
