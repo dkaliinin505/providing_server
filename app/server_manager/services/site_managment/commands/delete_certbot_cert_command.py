@@ -37,13 +37,24 @@ class DeleteCertBotCertCommand(Command):
                                                 "")
         config_content = config_content.replace("include /etc/letsencrypt/options-ssl-nginx.conf;", "")
         config_content = config_content.replace("ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;", "")
-        config_content = config_content.replace(" managed by Certbot", "")
+        config_content = config_content.replace("# managed by Certbot", "")
+
+        # Regex pattern to match the server block
+        redirect_block_pattern = re.compile(
+            r"server\s*\{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}}\s*#\s*\n\s*server_name\s*{};\s*\n\s*listen\s*80;\s*\n\s*return\s*404;\s*\n\s*\}}\s*#\s*\n".format(
+                re.escape(domain), re.escape(domain)), re.MULTILINE)
+
+        # Print the regex pattern
+        print("Regex Pattern:\n", redirect_block_pattern.pattern)
 
         # Remove the server block with the redirect to HTTPS
-        redirect_block_pattern = re.compile(
-            r"server\s*\{{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}}\s*#\s*\n\s*listen\s*80;\s*\n\s*listen\s*\[::\]:80;\s*\n\s*server_name\s*{};\s*\n\s*return\s*404;\s*\n\s*\}}\s*#\s*\n".format(
-                domain, domain), re.MULTILINE)
-        config_content = re.sub(redirect_block_pattern, "", config_content)
+        config_content, num_subs = re.subn(redirect_block_pattern, "", config_content)
+
+        # Print the number of substitutions made
+        print(f"Number of substitutions made: {num_subs}")
+
+        # Print config content after modification
+        print("Modified Nginx Config Content:\n", config_content)
 
         with open(temp_config_path, 'w') as file:
             file.write(config_content)
