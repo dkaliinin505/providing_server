@@ -1,3 +1,4 @@
+import re
 import shutil
 
 from app.server_manager.interfaces.command_interface import Command
@@ -30,13 +31,19 @@ class DeleteCertBotCertCommand(Command):
         # Remove all SSL-related lines
         config_content = config_content.replace("listen [::]:443 ssl ipv6only=on;", "")
         config_content = config_content.replace("listen 443 ssl;", "")
-        config_content = config_content.replace("ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;",
+        config_content = config_content.replace(f"ssl_certificate /etc/letsencrypt/live/{domain}/fullchain.pem;",
                                                 "")
-        config_content = config_content.replace("ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;",
+        config_content = config_content.replace(f"ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;",
                                                 "")
         config_content = config_content.replace("include /etc/letsencrypt/options-ssl-nginx.conf;", "")
         config_content = config_content.replace("ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;", "")
         config_content = config_content.replace(" managed by Certbot", "")
+
+        # Remove the server block with the redirect to HTTPS
+        redirect_block_pattern = re.compile(
+            r"server\s*\{\s*if\s*\(\$host\s*=\s*{}\)\s*\{{\s*return\s*301\s*https://\$host\$request_uri;\s*\}\s*\#\s*\n\s*listen\s*80;\s*\n\s*listen\s*\[::\]:80;\s*\n\s*server_name\s*{};\s*\n\s*return\s*404;\s*\n\s*\}\s*\#\s*\n".format(
+                domain, domain), re.MULTILINE)
+        config_content = re.sub(redirect_block_pattern, "", config_content)
 
         with open(temp_config_path, 'w') as file:
             file.write(config_content)

@@ -12,10 +12,10 @@ class CreateCertBotCertificateCommand(Command):
         self.check_and_install_certbot()
         try:
             self.create_ssl_certificate()
-            run_command("sudo systemctl reload nginx")
-            print(f"SSL certificate created successfully for domain: {self.config.get('domain')}")
+            run_command("sudo systemctl restart nginx")
+            return {"message": f"SSL certificate created successfully for domain: {self.config.get('domain')}"}
         except Exception as e:
-            print(f"Failed to create SSL certificate: {str(e)}")
+            return {f"Failed to create SSL certificate: {str(e)}"}
 
     def create_ssl_certificate(self):
         domain = self.config.get('domain')
