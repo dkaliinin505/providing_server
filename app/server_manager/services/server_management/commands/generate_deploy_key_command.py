@@ -18,7 +18,7 @@ class GenerateDeployKeyCommand(Command):
         # Delete then Create config file for the GitHub
         run_command(f'sudo -u super_forge touch {ssh_key_path}-config')
         run_command(f'sudo -u super_forge echo "Host github.com" >> {ssh_key_path}-config')
-        run_command(f'sudo -u super_forge echo "\n" >> {ssh_key_path}-config')
+        run_command(f'sudo -u super_forge echo "  User git" >> {ssh_key_path}-config')
         run_command(f'sudo -u super_forge echo "  IdentityFile {ssh_key_path}" >> {ssh_key_path}-config')
         run_command(f'sudo -u super_forge echo "  IdentitiesOnly yes" >> {ssh_key_path}-config')
         run_command(f'sudo chown super_forge /home/super_forge/.ssh/{domain}-config')
