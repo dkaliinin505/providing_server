@@ -15,6 +15,15 @@ class GenerateDeployKeyCommand(Command):
         ssh_key_path = f'/home/super_forge/.ssh/{domain}'
         ssh_key_pub_path = f'{ssh_key_path}.pub'
 
+        # Delete then Create config file for the GitHub
+        run_command(f'sudo -u super_forge touch {ssh_key_path}-config')
+        run_command(f'sudo -u super_forge echo "Host github.com" >> {ssh_key_path}-config')
+        run_command(f'sudo -u super_forge echo "\n" >> {ssh_key_path}-config')
+        run_command(f'sudo -u super_forge echo "  IdentityFile {ssh_key_path}" >> {ssh_key_path}-config')
+        run_command(f'sudo -u super_forge echo "  IdentitiesOnly yes" >> {ssh_key_path}-config')
+        run_command(f'sudo chown super_forge /home/super_forge/.ssh/{domain}-config')
+        run_command(f'sudo chmod 600 /home/super_forge/.ssh/{domain}-config')
+
         # Create .ssh directory
         if not os.path.exists('/home/super_forge/.ssh'):
             run_command('sudo -u super_forge mkdir -p /home/super_forge/.ssh')

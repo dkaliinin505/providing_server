@@ -15,6 +15,10 @@ class DeleteDeployKeyCommand(Command):
         ssh_key_path = f'/home/super_forge/.ssh/{domain}'
         ssh_key_pub_path = f'{ssh_key_path}.pub'
 
+        # Delete the config file for the GitHub
+        if os.path.exists(f'{ssh_key_path}-config'):
+            run_command(f'sudo -u super_forge rm -f {ssh_key_path}-config')
+
         # Check if the key files exist and delete them
         if os.path.exists(ssh_key_path):
             run_command(f'sudo -u super_forge rm -f {ssh_key_path}')
