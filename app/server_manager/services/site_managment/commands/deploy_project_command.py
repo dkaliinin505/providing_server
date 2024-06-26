@@ -97,6 +97,11 @@ class DeployProjectCommand(Command):
             os.chdir(os.path.join(site_path, nested_folder))
         else:
             os.chdir(site_path)
+
+        # Check if composer.lock file exists
+        if os.path.isfile(os.path.join(site_path, 'composer.lock')):
+            run_command('rm -f composer.lock')
+
         run_command('php8.3 /usr/local/bin/composer install --no-interaction --prefer-dist --optimize-autoloader')
 
     def create_env_file(self, site_path, domain, is_nested_structure, nested_folder):
