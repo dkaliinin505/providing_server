@@ -55,6 +55,9 @@ class DeployProjectCommand(Command):
         # Install Composer Dependencies If Requested
         self.install_composer_dependencies(site_path, is_nested_structure, nested_folder)
 
+        # Install NPM Dependencies If Requested
+        self.install_node_dependencies(site_path, is_nested_structure, nested_folder)
+
         # Create Environment File If Necessary
         self.create_env_file(site_path, domain, is_nested_structure, nested_folder)
 
@@ -228,3 +231,11 @@ class DeployProjectCommand(Command):
             print(f"Error creating database {db_name}: {str(e)}")
             return False
         return True
+
+    def install_node_dependencies(self, site_path, is_nested_structure, nested_folder):
+        if is_nested_structure:
+            os.chdir(os.path.join(site_path, nested_folder))
+        else:
+            os.chdir(site_path)
+        if os.path.isfile(os.path.join(site_path, 'package.json')):
+            run_command('npm install')
