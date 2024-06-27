@@ -33,9 +33,9 @@ class SiteManagementController(Controller):
         return jsonify(result)
 
     @validate_request({'GET': RequestSchema})
-    def test(self):
-        run_command('php artisan test')
-        return jsonify({'message': 'Test'})
+    def test(self, data):
+        result = run_command('php artisan test')
+        return jsonify(result)
 
     def __del__(self):
         super().cleanup(resource_types=[SiteManagementService])
