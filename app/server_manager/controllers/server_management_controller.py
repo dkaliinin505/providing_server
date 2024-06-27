@@ -6,8 +6,15 @@ from app.server_manager.services.server_management.server_management_service imp
 from app.server_manager.validators import validate_request
 from app.server_manager.validators.schemas.install_package_schema import InstallPackageSchema
 from app.server_manager.validators.schemas.server_management.create_site_config_schema import CreateSiteSchema
+from app.server_manager.validators.schemas.server_management.mysql.create_database_schema import CreateDatabaseSchema
+from app.server_manager.validators.schemas.server_management.mysql.create_database_user_schema import \
+    CreateDatabaseUserSchema
+from app.server_manager.validators.schemas.server_management.mysql.delete_database_schema import DeleteDatabaseSchema
+from app.server_manager.validators.schemas.server_management.mysql.delete_database_user_config import \
+    DeleteDatabaseUserSchema
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
-from app.server_manager.validators.schemas.server_management.generate_deploy_key_config_schema import GenerateDeployKeyCommandSchema
+from app.server_manager.validators.schemas.server_management.generate_deploy_key_config_schema import \
+    GenerateDeployKeyCommandSchema
 
 
 class ServerManagementController(Controller):
@@ -34,6 +41,31 @@ class ServerManagementController(Controller):
     @validate_request({'POST': InstallPackageSchema})
     def install_package(self, data):
         result = self.package_installer_service.install_package(data)
+        return jsonify(result)
+
+    @validate_request({'POST': CreateDatabaseSchema})
+    def create_database(self, data):
+        result = self.server_management_service.create_database(data)
+        return jsonify(result)
+
+    @validate_request({'POST': CreateDatabaseUserSchema})
+    def create_database_user(self, data):
+        result = self.server_management_service.create_database_user(data)
+        return jsonify(result)
+
+    @validate_request({'DELETE': DeleteDatabaseSchema})
+    def delete_database(self, data):
+        result = self.server_management_service.delete_database(data)
+        return jsonify(result)
+
+    @validate_request({'DELETE': DeleteDatabaseUserSchema})
+    def delete_database_user(self, data):
+        result = self.server_management_service.delete_database_user(data)
+        return jsonify(result)
+
+    @validate_request({'PUT': CreateDatabaseUserSchema})
+    def update_database_user(self, data):
+        result = self.server_management_service.update_database_user(data)
         return jsonify(result)
 
     def __del__(self):
