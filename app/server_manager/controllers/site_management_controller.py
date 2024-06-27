@@ -35,8 +35,9 @@ class SiteManagementController(Controller):
 
     @validate_request({'GET': RequestSchema})
     def test(self, data):
-        result = update_env_variable('DB_PASSWORD', 'test')
-        return jsonify(result)
+        run_command("sudo cp env.example .env.development")
+        run_command("sudo chown super_forge:super_forge .env.development")
+        return jsonify({"message": "Site Management Controller is working"})
 
     def __del__(self):
         super().cleanup(resource_types=[SiteManagementService])
