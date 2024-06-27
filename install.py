@@ -181,6 +181,7 @@ def setup_server(current_directory, env_name):
     print('current directory is:', current_directory)
     run_command(f'chown -R super_forge:super_forge {current_directory}')
     run_command(f'chmod -R 755 {current_directory}')
+    run_command(f'chmod super_forge:super_forge {current_directory}/.env')
 
     set_permissions_dynamically()
 
