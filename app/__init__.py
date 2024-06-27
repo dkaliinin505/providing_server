@@ -15,5 +15,6 @@ class App:
 
 app_instance = App()
 
+
 if __name__ == "__main__":
     app_instance.run()
