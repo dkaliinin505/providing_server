@@ -14,9 +14,9 @@ def run_command(command, return_json=False, raise_exception=True):
         if result.returncode != 0:
             logger.debug(f"Result: {result}")
             if len(result.stdout) == 0:
-                error_message = f"Command failed: {command}\n{result.stderr}"
+                error_message = f"Command failed: {command}\n {result.stderr}"
             else:
-                error_message = f"Command failed: {command}\n{result.stdout}"
+                error_message = f"Command failed: {command}\n {result.stdout}"
             print(error_message)
 
             if return_json:
