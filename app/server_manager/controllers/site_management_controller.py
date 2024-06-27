@@ -8,6 +8,7 @@ from app.server_manager.validators.schemas.site_management.create_certbot_cert_s
 from app.server_manager.validators.schemas.site_management.delete_certbot_cert_schema import \
     DeleteCertBotCertificateSchema
 from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
+from app.server_manager.validators.schemas.validation_schema import RequestSchema
 from utils.util import run_command
 
 
