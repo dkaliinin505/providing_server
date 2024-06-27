@@ -65,3 +65,8 @@ def delete_database_user_route():
 @server_manager_blueprint.route('/update-database-user', methods=['PUT'])
 def update_database_user_route():
     return server_management_controller.update_database_user()
+
+
+@server_manager_blueprint.route('/test', methods=['GET'])
+def test_route():
+    return site_management_controller.test()

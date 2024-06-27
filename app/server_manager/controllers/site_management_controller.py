@@ -8,6 +8,7 @@ from app.server_manager.validators.schemas.site_management.create_certbot_cert_s
 from app.server_manager.validators.schemas.site_management.delete_certbot_cert_schema import \
     DeleteCertBotCertificateSchema
 from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
+from utils.util import run_command
 
 
 class SiteManagementController(Controller):
@@ -29,6 +30,11 @@ class SiteManagementController(Controller):
     def delete_certbot_cert(self, data):
         result = self.site_management_service.delete_certbot_cert(data)
         return jsonify(result)
+
+    @validate_request({'GET': None})
+    def test(self):
+        run_command('php artisan test')
+        return jsonify({'message': 'Test'})
 
     def __del__(self):
         super().cleanup(resource_types=[SiteManagementService])
