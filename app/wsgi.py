@@ -1,14 +1,15 @@
 import sys
 import os
+from flask import jsonify
 
 # Add the app directory to the path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import app_instance
 from app.exceptions.http_exception import ProvidingServerHTTPException
-from flask import jsonify
 
-@app_instance.errorhandler(Exception)
+
+@app_instance.app.errorhandler(Exception)
 def handle_exception(e):
     # If the exception is a custom one, use its status code and message
     if isinstance(e, ProvidingServerHTTPException):
