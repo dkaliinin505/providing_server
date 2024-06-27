@@ -31,7 +31,7 @@ class SiteManagementController(Controller):
         result = self.site_management_service.delete_certbot_cert(data)
         return jsonify(result)
 
-    @validate_request({'GET': None})
+    @validate_request({'GET': RequestSchema})
     def test(self):
         run_command('php artisan test')
         return jsonify({'message': 'Test'})

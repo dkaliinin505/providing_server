@@ -19,9 +19,7 @@ def handle_exception(e):
 
     # Handle non-HTTP exceptions
     response = jsonify({
-        "code": 500,
-        "name": "Internal Server Error",
-        "description": str(e)
+        "message": str(e),
     })
     response.status_code = 500
     return response

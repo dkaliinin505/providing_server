@@ -2,8 +2,8 @@ from marshmallow import Schema, fields
 
 
 class RequestSchema(Schema):
-    param1 = fields.Str(required=True)
-    param2 = fields.Str(required=True)
+    param1 = fields.Str(required=False)
+    param2 = fields.Str(required=False)
 
 
 class AnotherRequestSchema(Schema):
