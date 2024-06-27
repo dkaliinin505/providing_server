@@ -11,7 +11,7 @@ def load_env(env_file_path=None):
 def update_env_variable(key, value, env_file_path=None):
     if env_file_path is None:
         env_file_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-    set_key(env_file_path, key, value)
+    set_key(env_file_path, key, value, "never")
     # Reload the environment variables after updating
     load_env(env_file_path)
 

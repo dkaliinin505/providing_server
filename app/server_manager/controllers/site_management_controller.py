@@ -9,6 +9,7 @@ from app.server_manager.validators.schemas.site_management.delete_certbot_cert_s
     DeleteCertBotCertificateSchema
 from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
+from utils.env_util import update_env_variable
 from utils.util import run_command
 
 
@@ -34,7 +35,7 @@ class SiteManagementController(Controller):
 
     @validate_request({'GET': RequestSchema})
     def test(self, data):
-        result = run_command('php /home/super_forge/lang-app.thesinella.com/api/artisan bebra')
+        result = update_env_variable('DB_PASSWORD', 'test')
         return jsonify(result)
 
     def __del__(self):
