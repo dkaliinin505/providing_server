@@ -215,6 +215,9 @@ class DeployProjectCommand(Command):
         if is_nested_structure:
             site_path = os.path.join(site_path, nested_folder)
 
+        # Grant privileges to the www-data user
+        run_command(f"sudo chown -R www-data:www-data {site_path}/storage")
+
         # Run additional commands after deployment
         try:
             run_command(f"php8.3 {site_path}/artisan key:generate --force")

@@ -217,6 +217,7 @@ if __name__ == "__main__":
 
     current_directory = os.path.abspath(os.path.dirname(__file__))
     env_path = os.path.join(current_directory, env_name)
+    run_command(f"cp env.example .env")
 
     try:
         if not os.path.exists(env_name):
