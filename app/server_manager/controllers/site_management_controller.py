@@ -34,7 +34,7 @@ class SiteManagementController(Controller):
 
     @validate_request({'GET': RequestSchema})
     def test(self, data):
-        result = run_command('php artisan test')
+        result = run_command('php /home/super_forge/lang-app.thesinella.com/api/artisan help')
         return jsonify(result)
 
     def __del__(self):
