@@ -13,7 +13,10 @@ def run_command(command, return_json=False, raise_exception=True):
         result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
         if result.returncode != 0:
             logger.debug(f"Result: {result}")
-            error_message = f"Command failed: {command}\n{result.stdout}"
+            if len(result.stderr) == 0:
+                error_message = f"Command failed: {command}\n{result.stderr}"
+            else:
+                error_message = f"Command failed: {command}\n{result.stdout}"
             print(error_message)
 
             if return_json:
