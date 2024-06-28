@@ -33,6 +33,7 @@ class TaskManager:
                         result = future.result()
                         return {"task_id": task_id, "status": "completed", "result": result}
                     except Exception as e:
+                        logging.error(f"Error in task {task_id}: {str(e)}")
                         return {"task_id": task_id, "status": "error", "error": str(e)}
                 else:
                     return {"task_id": task_id, "status": "in_progress"}
