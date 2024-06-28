@@ -12,7 +12,6 @@ from app.server_manager.validators.schemas.server_management.mysql.create_databa
 from app.server_manager.validators.schemas.server_management.mysql.delete_database_schema import DeleteDatabaseSchema
 from app.server_manager.validators.schemas.server_management.mysql.delete_database_user_config import \
     DeleteDatabaseUserSchema
-from app.server_manager.validators.schemas.validation_schema import RequestSchema
 from app.server_manager.validators.schemas.server_management.generate_deploy_key_config_schema import \
     GenerateDeployKeyCommandSchema
 

@@ -1,4 +1,5 @@
 class Controller:
+
     def cleanup(self, resource_types=None):
         if resource_types is None:
             resource_types = []
