@@ -76,3 +76,11 @@ class TaskManager(metaclass=SingletonMeta):
                 else:
                     return {"task_id": task_id, "status": "in_progress"}
         return {"message": "Task ID not found"}
+
+    def cleanup(self):
+        logging.info("Shutting down executor")
+        self.executor.shutdown(wait=True)
+        logging.info("Executor shut down")
+
+
+task_manager_instance = TaskManager()
