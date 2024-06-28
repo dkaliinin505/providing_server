@@ -45,11 +45,12 @@ class TaskManager:
     def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
+        logging.info(f"Results: {self.id_to_result}")
         if task_id in self.id_to_result:
             result, _ = self.id_to_result[task_id]
             return result
-        for future, id in self.future_to_id.items():
-            if id == task_id:
+        for future, future_id in self.future_to_id.items():
+            if future_id == task_id:
                 if future.done():
                     try:
                         result = future.result()
