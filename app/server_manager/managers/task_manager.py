@@ -22,6 +22,7 @@ class TaskManager:
         future = self.executor.submit(func, *args, **kwargs)
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
+        logging.info(f"Tasks: {self.future_to_id}")
         future.add_done_callback(self._task_done_callback)
         return task_id
 
