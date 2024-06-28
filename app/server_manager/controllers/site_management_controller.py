@@ -16,7 +16,6 @@ class SiteManagementController(Controller):
     def __init__(self):
         super().__init__()
         self.site_management_service = SiteManagementService()
-        self.task_manager = TaskManager()
 
     @validate_request({'POST': DeployProjectSchema})
     def deploy_project(self, data):
