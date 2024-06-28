@@ -1,7 +1,7 @@
 import concurrent.futures
 import logging
 import threading
-from time import time
+from time import time, sleep
 
 
 class TaskManager:
@@ -26,6 +26,7 @@ class TaskManager:
 
     def submit_task(self, func, *args, **kwargs):
         task_id = self._generate_unique_id()
+        logging.info(f"Submitting task with ID: {task_id}")
         future = self.executor.submit(func, *args, **kwargs)
         logging.info(f"Future: {future}")
         self.future_to_id[future] = task_id
@@ -35,6 +36,7 @@ class TaskManager:
 
     def _task_done_callback(self, future):
         task_id = self.future_to_id.pop(future)
+        logging.info(f"Task completed with ID: {task_id}")
         try:
             result = future.result()
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
