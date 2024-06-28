@@ -1,7 +1,7 @@
 import concurrent.futures
 import logging
 import threading
-from time import time, sleep
+from time import time
 
 
 class TaskManager:
@@ -17,18 +17,9 @@ class TaskManager:
             self.id_counter += 1
             return self.id_counter
 
-    def _cleanup_old_results(self):
-        current_time = time()
-        expired_keys = [key for key, (result, timestamp) in self.id_to_result.items() if
-                        current_time - timestamp > 3600]
-        for key in expired_keys:
-            del self.id_to_result[key]
-
     def submit_task(self, func, *args, **kwargs):
         task_id = self._generate_unique_id()
-        logging.info(f"Submitting task with ID: {task_id}")
         future = self.executor.submit(func, *args, **kwargs)
-        logging.info(f"Future: {future}")
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
         future.add_done_callback(self._task_done_callback)
@@ -42,7 +33,6 @@ class TaskManager:
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
         except Exception as e:
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
-        self._cleanup_old_results()
 
     def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
@@ -56,8 +46,11 @@ class TaskManager:
                 if future.done():
                     try:
                         result = future.result()
+                        self.id_to_result[task_id] = (
+                            {"task_id": task_id, "status": "completed", "result": result}, time())
                         return {"task_id": task_id, "status": "completed", "result": result}
                     except Exception as e:
+                        self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
                         return {"task_id": task_id, "status": "error", "error": str(e)}
                 else:
                     return {"task_id": task_id, "status": "in_progress"}
