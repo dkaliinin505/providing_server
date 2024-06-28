@@ -7,12 +7,13 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def run_command(command, return_json=False, raise_exception=True):
+def run_command(command, return_json=False, raise_exception=True, is_logging=False):
     print(f"Running command: {command}")
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True, executable="/bin/bash")
         if result.returncode != 0:
-            logger.debug(f"Result: {result}")
+            if is_logging:
+                logger.debug(f"Result: {result}")
             if len(result.stdout) == 0:
                 error_message = f"Command failed: {command} \n {result.stderr}"
             else:
