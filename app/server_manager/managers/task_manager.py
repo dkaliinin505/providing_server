@@ -26,6 +26,7 @@ class SingletonMeta(type):
 class TaskManager(metaclass=SingletonMeta):
     def __init__(self):
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+        self.loop = asyncio.get_event_loop()
         self.future_to_id = {}
         self.id_to_result = {}
         self.id_counter = 0
@@ -37,9 +38,8 @@ class TaskManager(metaclass=SingletonMeta):
             return self.id_counter
 
     async def submit_task(self, func, *args):
-        loop = asyncio.get_event_loop()
         task_id = self._generate_unique_id()
-        future = loop.run_in_executor(self.executor, func, *args)
+        future = self.loop.run_in_executor(self.executor, func, *args)
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
         future.add_done_callback(self._task_done_callback)
