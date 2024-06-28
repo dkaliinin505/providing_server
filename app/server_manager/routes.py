@@ -5,7 +5,7 @@ from app.server_manager.controllers.server_management_controller import ServerMa
 from app.server_manager.controllers.site_management_controller import SiteManagementController
 
 server_manager_blueprint = Blueprint('server_manager', __name__)
-controller = Controller()
+task_manager = Controller().task_manager
 server_management_controller = ServerManagementController()
 site_management_controller = SiteManagementController()
 
@@ -77,4 +77,4 @@ def test_route():
 
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
 def task_status_route(task_id):
-    return controller.get_task_status(task_id)
+    return site_management_controller.get_task_status(task_id)
