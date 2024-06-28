@@ -54,6 +54,7 @@ class TaskManager(metaclass=SingletonMeta):
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
         except Exception as e:
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
+        self.cleanup()
 
     def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
@@ -83,4 +84,3 @@ class TaskManager(metaclass=SingletonMeta):
         logging.info("Executor shut down")
 
 
-task_manager_instance = TaskManager()
