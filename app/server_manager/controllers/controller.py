@@ -1,10 +1,9 @@
 from flask import jsonify
 
-from app.server_manager.managers.task_manager import TaskManager
+from app.server_manager.managers.task_manager import task_manager_instance
 
 
 class Controller:
-    task_manager = TaskManager()
 
     def cleanup(self, resource_types=None):
         if resource_types is None:
@@ -19,7 +18,7 @@ class Controller:
         self.cleanup()
 
     def __init__(self):
-        pass
+        self.task_manager = task_manager_instance
 
     def get_task_status(self, task_id):
         status = self.task_manager.get_task_status(task_id)
