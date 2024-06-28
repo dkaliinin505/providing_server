@@ -1,8 +1,11 @@
 from flask import Blueprint
+
+from app.server_manager.controllers.controller import Controller
 from app.server_manager.controllers.server_management_controller import ServerManagementController
 from app.server_manager.controllers.site_management_controller import SiteManagementController
 
 server_manager_blueprint = Blueprint('server_manager', __name__)
+controller = Controller()
 server_management_controller = ServerManagementController()
 site_management_controller = SiteManagementController()
 
@@ -70,3 +73,8 @@ def update_database_user_route():
 @server_manager_blueprint.route('/test', methods=['GET'])
 def test_route():
     return site_management_controller.test()
+
+
+@server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
+def task_status_route(task_id):
+    return controller.get_task_status(task_id)
