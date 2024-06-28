@@ -1,4 +1,5 @@
 import concurrent.futures
+import logging
 import threading
 
 
@@ -21,6 +22,8 @@ class TaskManager:
         return task_id
 
     def get_task_status(self, task_id):
+        logging.info(f"Task ID: {task_id}")
+        logging.info(f"Tasks: {self.future_to_id}")
         for future, id in self.future_to_id.items():
             if id == task_id:
                 if future.done():
