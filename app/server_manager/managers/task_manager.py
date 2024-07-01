@@ -17,7 +17,7 @@ class SingletonMeta(type):
 
 class TaskManager(metaclass=SingletonMeta):
     def __init__(self):
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
         self.future_to_id = {}
         self.id_to_result = {}
         self.id_counter = 0
