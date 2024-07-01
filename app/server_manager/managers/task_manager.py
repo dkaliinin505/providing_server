@@ -79,9 +79,9 @@ class TaskManager(metaclass=SingletonMeta):
         return {"message": "Task ID not found"}
 
     async def worker(self):
+        logging.info("Worker is running")
         while True:
             await asyncio.sleep(1)
-            logging.info("Worker is running")
 
     async def start_worker(self):
         asyncio.create_task(self.worker())
