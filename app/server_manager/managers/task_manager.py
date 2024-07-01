@@ -1,6 +1,7 @@
 import asyncio
 import concurrent.futures
 import logging
+import threading
 from time import time
 
 
@@ -20,12 +21,11 @@ class SingletonMeta(type):
 
 class TaskManager(metaclass=SingletonMeta):
     def __init__(self):
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
-        self.loop = asyncio.get_event_loop()
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
         self.future_to_id = {}
         self.id_to_result = {}
         self.id_counter = 0
-        self.lock = asyncio.Lock()
+        self.lock = threading.Lock()
 
     async def _generate_unique_id(self):
         async with self.lock:
