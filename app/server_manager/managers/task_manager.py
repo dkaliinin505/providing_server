@@ -48,18 +48,26 @@ class TaskManager(metaclass=SingletonMeta):
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
             logging.error(f"Error for Task ID: {task_id}: {str(e)}")
 
-    def get_task_status(self, task_id):
+    async def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
         logging.info(f"Results: {self.id_to_result}")
+
         if task_id in self.id_to_result:
             result, _ = self.id_to_result[task_id]
+            # If result is coroutine, return json "in_progress"
+            if asyncio.iscoroutine(result["result"]):
+                return {"task_id": task_id, "status": "in_progress"}
             return result
+
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
                 if future.done():
                     try:
                         result = future.result()
+                        # Check if result is coroutine
+                        if asyncio.iscoroutine(result):
+                            result = await result
                         self.id_to_result[task_id] = (
                             {"task_id": task_id, "status": "completed", "result": result}, time())
                         return {"task_id": task_id, "status": "completed", "result": result}
@@ -76,4 +84,4 @@ class TaskManager(metaclass=SingletonMeta):
             logging.info("Worker is running")
 
     async def start_worker(self):
-        await asyncio.create_task(self.worker())
+        asyncio.create_task(self.worker())

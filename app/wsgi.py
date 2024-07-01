@@ -27,7 +27,7 @@ def handle_exception(e):
 
 
 async def main():
-    from app.server_manager.managers.task_manager import TaskManager  # Импортируйте TaskManager здесь
+    from app.server_manager.managers.task_manager import TaskManager
     task_manager = TaskManager()
     await task_manager.start_worker()
     await app_instance.run()
