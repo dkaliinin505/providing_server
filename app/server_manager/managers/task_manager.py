@@ -55,13 +55,16 @@ class TaskManager(metaclass=SingletonMeta):
         logging.info(f"Results: {self.id_to_result}")
         if task_id in self.id_to_result:
             result, _ = self.id_to_result[task_id]
-            logging.info(f"Result found for Task : {result}")
+            if asyncio.iscoroutine(result["result"]):
+                result["result"] = await result["result"]
             return result
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
                 if future.done():
                     try:
                         result = future.result()
+                        if asyncio.iscoroutine(result):
+                            result = await result
                         self.id_to_result[task_id] = (
                             {"task_id": task_id, "status": "completed", "result": result}, time())
                         return {"task_id": task_id, "status": "completed", "result": result}
@@ -71,3 +74,4 @@ class TaskManager(metaclass=SingletonMeta):
                 else:
                     return {"task_id": task_id, "status": "in_progress"}
         return {"message": "Task ID not found"}
+
