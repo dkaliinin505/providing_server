@@ -35,8 +35,8 @@ class SiteManagementController(Controller):
         return jsonify(result)
 
     @validate_request({'GET': RequestSchema})
-    def test(self, data):
-        task_id = asyncio.run(self.task_manager.submit_task(self.site_management_service.test, data))
+    async def test(self, data):
+        task_id = await self.task_manager.create_task(self.site_management_service.test, data)
         return jsonify({"message": "Test Task started in background", "task_id": task_id}), 200
 
     def __del__(self):
