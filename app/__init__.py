@@ -21,7 +21,7 @@ app_instance = App()
 async def main():
     from app.server_manager.managers.task_manager import TaskManager
     task_manager = TaskManager()
-    await asyncio.create_task(task_manager.worker())
+    await task_manager.start_worker()
     await app_instance.run()
 
 
