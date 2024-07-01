@@ -29,12 +29,12 @@ class SiteManagementService(Service):
     def delete_certbot_cert(self, data):
         return self.executor.execute('delete_certbot_cert', data)
 
-    def test(self, data):
+    async def test(self, data):
         logging.info("Test Task started")
-        time.sleep(15)
-        run_command("sudo cp env.example .env.development", False, False)
-        run_command("sudo chown super_forge:super_forge .env.development", False, False)
-        time.sleep(15)
-        run_command("sudo ls -ll")
-        logging.info("Test Task started")
+        await asyncio.sleep(15)
+        await run_command_async("sudo cp env.example .env.development")
+        await run_command_async("sudo chown super_forge:super_forge .env.development")
+        await asyncio.sleep(15)
+        await run_command_async("sudo ls -ll")
+        logging.info("Test Task completed")
         return {"message": "Site Management Service is working"}

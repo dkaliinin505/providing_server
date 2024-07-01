@@ -71,10 +71,12 @@ def update_database_user_route():
 
 
 @server_manager_blueprint.route('/test', methods=['GET'])
-def test_route():
-    return site_management_controller.test()
+async def test_route():
+    data = await site_management_controller.test()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
-def task_status_route(task_id):
-    return task_manager.get_task_status(task_id)
+async def task_status_route(task_id):
+    status = await task_manager.get_task_status(task_id)
+    return jsonify(status)
