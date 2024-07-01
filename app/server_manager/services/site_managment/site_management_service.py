@@ -29,7 +29,7 @@ class SiteManagementService(Service):
     def delete_certbot_cert(self, data):
         return self.executor.execute('delete_certbot_cert', data)
 
-    async def test(self, data):
+    def test(self, data):
         logging.info("Test Task started")
         time.sleep(15)
         run_command("sudo cp env.example .env.development", False, False)
