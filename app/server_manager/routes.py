@@ -77,5 +77,6 @@ async def test_route():
 
 
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
-def task_status_route(task_id):
-    return task_manager.get_task_status(task_id)
+async def task_status_route(task_id):
+    status = await task_manager.get_task_status(task_id)
+    return status

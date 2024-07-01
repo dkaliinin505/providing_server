@@ -21,6 +21,6 @@ class Controller:
     def __init__(self):
         pass
 
-    def get_task_status(self, task_id):
-        status = self.task_manager.get_task_status(task_id)
+    async def get_task_status(self, task_id):
+        status = await self.task_manager.get_task_status(task_id)
         return jsonify(status)
