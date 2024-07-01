@@ -44,8 +44,10 @@ class TaskManager(metaclass=SingletonMeta):
         try:
             result = future.result()
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
+            logging.info(f"Result stored for Task ID: {task_id}")
         except Exception as e:
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
+            logging.error(f"Error for Task ID: {task_id}: {str(e)}")
 
     async def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
