@@ -25,7 +25,7 @@ class SingletonMeta(type):
 
 class TaskManager(metaclass=SingletonMeta):
     def __init__(self):
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
         self.loop = asyncio.get_event_loop()
         self.future_to_id = {}
         self.id_to_result = {}
@@ -60,6 +60,7 @@ class TaskManager(metaclass=SingletonMeta):
             result, _ = self.id_to_result[task_id]
             return result
         for future, future_id in self.future_to_id.items():
+            logging.info(f"Checking future: {future}")
             if future_id == task_id:
                 if future.done():
                     try:
