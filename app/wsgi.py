@@ -1,5 +1,6 @@
 import sys
 import os
+import asyncio
 from flask import jsonify
 
 # Add the app directory to the path
@@ -25,5 +26,12 @@ def handle_exception(e):
     return response
 
 
+async def main():
+    from app.server_manager.managers.task_manager import TaskManager  # Импортируйте TaskManager здесь
+    task_manager = TaskManager()
+    await task_manager.start_worker()
+    await app_instance.run()
+
+
 if __name__ == "__main__":
-    app_instance.run()
+    asyncio.run(main())
