@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import subprocess, json, os, sys, importlib
 import traceback
@@ -31,6 +32,44 @@ def run_command(command, return_json=False, raise_exception=True, is_logging=Fal
 
         print(f"Command output: {result.stdout}")
         return result.stdout.strip()
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        traceback.print_exc()
+        if raise_exception:
+            raise
+
+
+async def run_command_async(command, return_json=False, raise_exception=True, is_logging=False):
+    print(f"Running command: {command}")
+    try:
+        process = await asyncio.create_subprocess_shell(
+            command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            executable="/bin/bash"
+        )
+
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            if is_logging:
+                print(f"Result: {process.returncode}")
+            if len(stdout) == 0:
+                error_message = f"Command failed: {command} \n {stderr.decode().strip()}"
+            else:
+                error_message = f"Command failed: {command} \n {stdout.decode().strip()}"
+            print(error_message)
+
+            if return_json:
+                return json.dumps({'error': error_message}), 400
+            else:
+                if raise_exception:
+                    raise Exception(error_message)
+                else:
+                    print(error_message)
+                    return None
+
+        print(f"Command output: {stdout.decode().strip()}")
+        return stdout.decode().strip()
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         traceback.print_exc()
