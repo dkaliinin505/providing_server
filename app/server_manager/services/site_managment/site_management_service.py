@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import time
 
 from app.server_manager.services.server_management.commands.create_site_command import CreateSiteCommand
@@ -29,9 +30,11 @@ class SiteManagementService(Service):
         return self.executor.execute('delete_certbot_cert', data)
 
     async def test(self, data):
+        logging.info("Test Task started")
         time.sleep(15)
         run_command("sudo cp env.example .env.development", False, False)
         run_command("sudo chown super_forge:super_forge .env.development", False, False)
         time.sleep(15)
         run_command("sudo ls -ll")
+        logging.info("Test Task started")
         return {"message": "Site Management Service is working"}
