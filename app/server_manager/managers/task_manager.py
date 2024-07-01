@@ -1,19 +1,20 @@
 import asyncio
 import concurrent.futures
 import logging
-from asyncio import Lock
 from time import time
 
 
 class SingletonMeta(type):
     _instances = {}
-    _lock: Lock = Lock()
 
     def __call__(cls, *args, **kwargs):
-        with cls._lock:
-            if cls not in cls._instances:
-                instance = super().__call__(*args, **kwargs)
-                cls._instances[cls] = instance
+        """
+        Possible changes to the value of the `__init__` argument do not affect
+        the returned instance.
+        """
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
         return cls._instances[cls]
 
 
