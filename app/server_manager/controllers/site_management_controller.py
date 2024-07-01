@@ -1,6 +1,6 @@
 import asyncio
 
-from flask import jsonify
+from quart import jsonify
 
 from app.server_manager.controllers.controller import Controller
 from app.server_manager.managers.task_manager import TaskManager
