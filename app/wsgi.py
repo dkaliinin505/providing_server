@@ -1,7 +1,7 @@
 import sys
 import os
 import asyncio
-from flask import jsonify
+from quart import jsonify
 
 # Add the app directory to the path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
