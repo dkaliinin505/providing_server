@@ -54,12 +54,12 @@ class TaskManager(metaclass=SingletonMeta):
         logging.info(f"Tasks: {self.future_to_id}")
         logging.info(f"Results: {self.id_to_result}")
 
-        if task_id in self.id_to_result:
-            result, _ = self.id_to_result[task_id]
-            # If result is coroutine, return json "in_progress"
-            if asyncio.iscoroutine(result["result"]):
-                return {"task_id": task_id, "status": "in_progress"}
-            return result
+        # if task_id in self.id_to_result:
+        #     result, _ = self.id_to_result[task_id]
+        #     # If result is coroutine, return json "in_progress"
+        #     if asyncio.iscoroutine(result["result"]):
+        #         return {"task_id": task_id, "status": "in_progress"}
+        #     return result
 
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
