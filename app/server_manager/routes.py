@@ -78,5 +78,5 @@ async def test_route():
 
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
 async def task_status_route(task_id):
-    status = await task_manager.get_async_task_status(task_id)
+    status = await task_manager.get_task_status(task_id)
     return jsonify(status)

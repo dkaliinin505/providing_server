@@ -49,12 +49,13 @@ class TaskManager(metaclass=SingletonMeta):
             self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
             logging.error(f"Error for Task ID: {task_id}: {str(e)}")
 
-    async def get_async_task_status(self, task_id):
+    async def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
         logging.info(f"Results: {self.id_to_result}")
         if task_id in self.id_to_result:
             result, _ = self.id_to_result[task_id]
+            logging.info(f"Result found for Task : {result}")
             return result
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
