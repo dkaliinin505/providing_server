@@ -32,9 +32,9 @@ class TaskManager(metaclass=SingletonMeta):
             self.id_counter += 1
             return self.id_counter
 
-    async def submit_task(self, func, *args, **kwargs):
+    async def submit_task(self, func, *args):
         task_id = await self._generate_unique_id()
-        future = self.loop.run_in_executor(self.executor, func, *args, **kwargs)
+        future = self.loop.run_in_executor(self.executor, func, *args)
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
