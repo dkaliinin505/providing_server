@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 from app.server_manager.controllers.controller import Controller
 from app.server_manager.controllers.server_management_controller import ServerManagementController
@@ -79,4 +79,4 @@ async def test_route():
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)
-    return status
+    return jsonify(status)
