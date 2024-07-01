@@ -9,10 +9,6 @@ class SingletonMeta(type):
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
-        """
-        Possible changes to the value of the `__init__` argument do not affect
-        the returned instance.
-        """
         if cls not in cls._instances:
             instance = super().__call__(*args, **kwargs)
             cls._instances[cls] = instance
@@ -27,14 +23,15 @@ class TaskManager(metaclass=SingletonMeta):
         self.id_counter = 0
         self.lock = threading.Lock()
 
-    async def _generate_unique_id(self):
-        async with self.lock:
+    def _generate_unique_id(self):
+        with self.lock:
             self.id_counter += 1
             return self.id_counter
 
-    async def submit_task(self, func, *args, **kwargs):
+    async def submit_task(self, func, *args):
         task_id = self._generate_unique_id()
-        future = self.executor.submit(func, *args, **kwargs)
+        loop = asyncio.get_event_loop()
+        future = loop.run_in_executor(self.executor, func, *args)
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
