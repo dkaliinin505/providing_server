@@ -1,3 +1,5 @@
+import logging
+
 from quart import Blueprint, jsonify
 
 from app.server_manager.controllers.controller import Controller
@@ -72,7 +74,8 @@ def update_database_user_route():
 
 @server_manager_blueprint.route('/test', methods=['GET'])
 async def test_route():
-    data = await site_management_controller.test({})
+    data = await site_management_controller.test()
+    logging.info("Returned task id from controller method" + str(data))
     return jsonify(data)
 
 
