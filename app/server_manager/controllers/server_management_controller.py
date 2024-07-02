@@ -23,48 +23,48 @@ class ServerManagementController(Controller):
         self.package_installer_service = PackageInstallerService()
 
     @validate_request({'POST': GenerateDeployKeyCommandSchema})
-    def generate_deploy_key(self, data):
-        result = self.server_management_service.generate_deploy_key(data)
+    async def generate_deploy_key(self, data):
+        result = await self.server_management_service.generate_deploy_key(data)
         return jsonify(result)
 
     @validate_request({'DELETE': GenerateDeployKeyCommandSchema})
-    def delete_deploy_key(self, data):
-        result = self.server_management_service.delete_deploy_key(data)
+    async def delete_deploy_key(self, data):
+        result = await self.server_management_service.delete_deploy_key(data)
         return jsonify(result)
 
     @validate_request({'POST': CreateSiteSchema})
-    def create_site(self, data):
-        result = self.server_management_service.create_site(data)
+    async def create_site(self, data):
+        result = await self.server_management_service.create_site(data)
         return jsonify(result)
 
     @validate_request({'POST': InstallPackageSchema})
-    def install_package(self, data):
-        result = self.package_installer_service.install_package(data)
+    async def install_package(self, data):
+        result = await self.package_installer_service.install_package(data)
         return jsonify(result)
 
     @validate_request({'POST': CreateDatabaseSchema})
-    def create_database(self, data):
-        result = self.server_management_service.create_database(data)
+    async def create_database(self, data):
+        result = await self.server_management_service.create_database(data)
         return jsonify(result)
 
     @validate_request({'POST': CreateDatabaseUserSchema})
-    def create_database_user(self, data):
-        result = self.server_management_service.create_database_user(data)
+    async def create_database_user(self, data):
+        result = await self.server_management_service.create_database_user(data)
         return jsonify(result)
 
     @validate_request({'DELETE': DeleteDatabaseSchema})
-    def delete_database(self, data):
-        result = self.server_management_service.delete_database(data)
+    async def delete_database(self, data):
+        result = await self.server_management_service.delete_database(data)
         return jsonify(result)
 
     @validate_request({'DELETE': DeleteDatabaseUserSchema})
-    def delete_database_user(self, data):
-        result = self.server_management_service.delete_database_user(data)
+    async def delete_database_user(self, data):
+        result = await self.server_management_service.delete_database_user(data)
         return jsonify(result)
 
     @validate_request({'PUT': CreateDatabaseUserSchema})
-    def update_database_user(self, data):
-        result = self.server_management_service.update_database_user(data)
+    async def update_database_user(self, data):
+        result = await self.server_management_service.update_database_user(data)
         return jsonify(result)
 
     def __del__(self):

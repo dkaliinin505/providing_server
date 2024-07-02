@@ -23,8 +23,8 @@ def delete_deploy_key_route():
 
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
-def create_site_route():
-    return server_management_controller.create_site()
+async def create_site_route():
+    return await server_management_controller.create_site()
 
 
 @server_manager_blueprint.route('/install-package', methods=['POST'])

@@ -25,26 +25,26 @@ class ServerManagementService:
         self.executor.register('delete_database', DeleteDatabaseCommand({'config': {}}))
         self.executor.register('delete_database_user', DeleteDatabaseUserCommand({'config': {}}))
 
-    def generate_deploy_key(self, data):
-        return self.executor.execute('generate_deploy_key', data)
+    async def generate_deploy_key(self, data):
+        return await self.executor.execute('generate_deploy_key', data)
 
-    def delete_deploy_key(self, data):
-        return self.executor.execute('delete_deploy_key', data)
+    async def delete_deploy_key(self, data):
+        return await self.executor.execute('delete_deploy_key', data)
 
-    def create_site(self, data):
-        return self.executor.execute('create_site', data)
+    async def create_site(self, data):
+        return await self.executor.execute('create_site', data)
 
-    def create_database(self, data):
-        return self.executor.execute('create_database', data)
+    async def create_database(self, data):
+        return await self.executor.execute('create_database', data)
 
-    def create_database_user(self, data):
-        return self.executor.execute('create_database_user', data)
+    async def create_database_user(self, data):
+        return await self.executor.execute('create_database_user', data)
 
-    def update_database_user(self, data):
-        return self.executor.execute('update_database_user', data)
+    async def update_database_user(self, data):
+        return await self.executor.execute('update_database_user', data)
 
-    def delete_database(self, data):
-        return self.executor.execute('delete_database', data)
+    async def delete_database(self, data):
+        return await self.executor.execute('delete_database', data)
 
-    def delete_database_user(self, data):
-        return self.executor.execute('delete_database_user', data)
+    async def delete_database_user(self, data):
+        return await self.executor.execute('delete_database_user', data)
