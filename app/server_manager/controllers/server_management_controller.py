@@ -34,13 +34,13 @@ class ServerManagementController(Controller):
 
     @validate_request({'POST': CreateSiteSchema})
     async def create_site(self, data):
-        result = await self.server_management_service.create_site(data)
-        return jsonify(result)
+        task_id = await self.task_manager.submit_task(self.server_management_service.create_site, data)
+        return jsonify({"message": "Create Site Task started in background", "task_id": task_id}, 200)
 
     @validate_request({'POST': InstallPackageSchema})
     async def install_package(self, data):
-        result = await self.package_installer_service.install_package(data)
-        return jsonify(result)
+        task_id = await self.task_manager.submit_task(self.package_installer_service.install_package, data)
+        return jsonify({"message": "Install Package Task started in background", "task_id": task_id}, 200)
 
     @validate_request({'POST': CreateDatabaseSchema})
     async def create_database(self, data):
