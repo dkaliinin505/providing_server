@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from quart import Blueprint, jsonify
 
 from app.server_manager.controllers.controller import Controller
 from app.server_manager.controllers.server_management_controller import ServerManagementController
