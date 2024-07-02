@@ -20,13 +20,13 @@ class SiteManagementService(Service):
         self.executor.register('create_certbot_cert', CreateCertBotCertificateCommand({'config': {}}))
         self.executor.register('delete_certbot_cert', DeleteCertBotCertCommand({'config': {}}))
 
-    def deploy_project(self, data):
+    async def deploy_project(self, data):
         return self.executor.execute('deploy_project', data)
 
-    def create_certbot_cert(self, data):
+    async def create_certbot_cert(self, data):
         return self.executor.execute('create_certbot_cert', data)
 
-    def delete_certbot_cert(self, data):
+    async def delete_certbot_cert(self, data):
         return self.executor.execute('delete_certbot_cert', data)
 
     async def test(self, data):
