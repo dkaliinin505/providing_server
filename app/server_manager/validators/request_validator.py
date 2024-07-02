@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from flask import request, jsonify
+from quart import request, jsonify
 from marshmallow import ValidationError
 import os
 import requests
