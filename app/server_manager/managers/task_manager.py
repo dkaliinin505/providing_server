@@ -28,9 +28,16 @@ class TaskManager(metaclass=SingletonMeta):
             self.id_counter += 1
             return self.id_counter
 
-    def submit_task(self, func, *args, **kwargs):
+    async def submit_task(self, func, *args, **kwargs):
         task_id = self._generate_unique_id()
-        future = self.executor.submit(func, *args, **kwargs)
+        loop = asyncio.get_event_loop()
+
+        # Run the task in executor and ensure it handles async functions
+        if asyncio.iscoroutinefunction(func):
+            future = loop.run_in_executor(self.executor, lambda: asyncio.run(func(*args, **kwargs)))
+        else:
+            future = loop.run_in_executor(self.executor, func, *args, **kwargs)
+
         self.future_to_id[future] = task_id
         logging.info(f"Task submitted with ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
