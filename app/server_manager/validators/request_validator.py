@@ -22,7 +22,7 @@ def validate_request(schema_classes):
 
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        async def decorated_function(*args, **kwargs):
             logger.debug("Entering decorator")
 
             if app_type != 'dev':
@@ -47,7 +47,7 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 logger.debug(f"Validator: {validator}")
 
-                data = get_request_data(method)
+                data = await get_request_data(method)
 
                 logger.debug(f"Data: {data}")
 
@@ -68,18 +68,18 @@ def validate_request(schema_classes):
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
-            return f(*args, **kwargs)
+            return await f(*args, **kwargs)
 
         return decorated_function
 
     return decorator
 
 
-def get_request_data(method):
+async def get_request_data(method):
     if method == 'DELETE' or method == 'GET':
         return request.args.to_dict()
     else:
-        return request.get_json()
+        return await request.get_json()
 
 
 def validate_data(validator, data):
