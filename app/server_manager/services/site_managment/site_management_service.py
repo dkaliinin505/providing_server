@@ -32,8 +32,8 @@ class SiteManagementService(Service):
     async def test(self, data):
         logging.info("Test Task started")
         await asyncio.sleep(15)
-        await run_command_async("sudo cp env.example .env.development")
-        await run_command_async("sudo chown super_forge:super_forge .env.development")
+        await run_command_async("sudo cp env.example .env.development", False, False)
+        await run_command_async("sudo chown super_forge:super_forge .env.development",False, False)
         await asyncio.sleep(15)
         await run_command_async("sudo ls -ll")
         logging.info("Test Task completed")
