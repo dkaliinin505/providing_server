@@ -33,18 +33,18 @@ def install_package_route():
 
 
 @server_manager_blueprint.route('/deploy-project', methods=['POST'])
-def deploy_project_route():
-    return site_management_controller.deploy_project()
+async def deploy_project_route():
+    return await site_management_controller.deploy_project()
 
 
 @server_manager_blueprint.route('/create-certbot-cert', methods=['POST'])
-def create_certbot_cert_route():
-    return site_management_controller.create_certbot_cert()
+async def create_certbot_cert_route():
+    return await site_management_controller.create_certbot_cert()
 
 
 @server_manager_blueprint.route('/delete-certbot-cert', methods=['DELETE'])
-def delete_certbot_cert_route():
-    return site_management_controller.delete_certbot_cert()
+async def delete_certbot_cert_route():
+    return await site_management_controller.delete_certbot_cert()
 
 
 @server_manager_blueprint.route('/create-database', methods=['POST'])
