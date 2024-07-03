@@ -32,7 +32,7 @@ class ServerManagementService:
         return self.executor.execute('delete_deploy_key', data)
 
     async def create_site(self, data):
-        return self.executor.execute('create_site', data)
+        return await self.executor.execute('create_site', data)
 
     async def create_database(self, data):
         return self.executor.execute('create_database', data)
