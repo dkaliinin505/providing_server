@@ -17,7 +17,7 @@ class CreateSiteCommand(Command):
 
     async def execute(self, data):
         self.config = data
-        logging.debug(f"Config: {self.config}")
+        logging.debug(f"Config in execute method: {self.config}")
         await self.create_fastcgi_params()
         await self.generate_dhparams()
         await self.write_nginx_server_block()
@@ -76,7 +76,8 @@ class CreateSiteCommand(Command):
         await run_command_async(f'sudo mv /tmp/nginx_server_block.conf /etc/nginx/sites-available/{domain}')
 
     async def add_tls_for_ubuntu(self):
-        ubuntu_version = await run_command_async("lsb_release -rs").strip()
+        ubuntu_version = await run_command_async("lsb_release -rs")
+        ubuntu_version = ubuntu_version.strip()
         domain = self.config.get('domain')
         if version_to_int(ubuntu_version) >= version_to_int("20.04"):
             print(f"Server on Ubuntu {ubuntu_version}")
