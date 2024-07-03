@@ -1,9 +1,10 @@
+import aiofiles
+import asyncio
 import logging
 import os
 from pathlib import Path
-import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, version_to_int
+from utils.util import run_command_async, version_to_int, file_exists
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -19,11 +20,17 @@ class CreateSiteCommand(Command):
         self.config = data
         logging.debug(f"Config in execute method: {self.config}")
         await self.create_fastcgi_params()
+        logging.debug("FastCGI params created")
         await self.generate_dhparams()
+        logging.debug("DHParams generated")
         await self.write_nginx_server_block()
+        logging.debug("Nginx server block written")
         await self.add_tls_for_ubuntu()
+        logging.debug("TLS added for Ubuntu")
         await self.create_nginx_config_directories()
+        logging.debug("Nginx config directories created")
         await self.enable_nginx_sites()
+        logging.debug("Nginx sites enabled")
         await self.write_redirector()
         await self.restart_services()
 
@@ -44,7 +51,7 @@ class CreateSiteCommand(Command):
         await run_command_async('sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
 
     async def generate_dhparams(self):
-        if not os.path.isfile('/etc/nginx/dhparams.pem'):
+        if not await run_command_async("[ -f /etc/nginx/dhparams.pem ] && echo 'exists' || echo 'missing'") == 'exists':
             await run_command_async("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
     async def write_nginx_server_block(self):
@@ -82,7 +89,7 @@ class CreateSiteCommand(Command):
         if version_to_int(ubuntu_version) >= version_to_int("20.04"):
             print(f"Server on Ubuntu {ubuntu_version}")
             config_file_path = f"/etc/nginx/sites-available/{domain}"
-            if os.path.exists(config_file_path):
+            if await file_exists(config_file_path):
                 await run_command_async(
                     f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" {config_file_path}')
             else:

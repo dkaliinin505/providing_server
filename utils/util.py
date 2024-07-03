@@ -4,6 +4,8 @@ import subprocess, json, os, sys, importlib
 import traceback
 import venv
 
+import aiofiles
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -51,6 +53,14 @@ async def run_command_async(command, raise_exception=True):
             raise Exception(f"Command '{command}' failed with error: {stderr.decode()}")
         return None
     return stdout.decode()
+
+
+async def file_exists(filepath):
+    try:
+        async with aiofiles.open(filepath, 'r'):
+            return True
+    except FileNotFoundError:
+        return False
 
 
 def install_package(package_name):
