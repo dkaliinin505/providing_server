@@ -1,8 +1,9 @@
 import logging
 import os
 from pathlib import Path
+import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command, version_to_int
+from utils.util import run_command_async, version_to_int
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -15,7 +16,6 @@ class CreateSiteCommand(Command):
         print(f"Config: {config}")
 
     async def execute(self, data):
-
         self.config = data
         logging.debug(f"Config: {self.config}")
         await self.create_fastcgi_params()
@@ -34,18 +34,18 @@ class CreateSiteCommand(Command):
         template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
         template_path = template_directory / 'fastcgi_params_template.conf'
 
-        with open(template_path, 'r') as template_file:
-            fastcgi_params = template_file.read()
+        async with aiofiles.open(template_path, 'r') as template_file:
+            fastcgi_params = await template_file.read()
 
         # Write the content to the fastcgi_params file using a safer approach to handle quotes
-        with open('/tmp/fastcgi_params', 'w') as temp_file:
-            temp_file.write(fastcgi_params)
+        async with aiofiles.open('/tmp/fastcgi_params', 'w') as temp_file:
+            await temp_file.write(fastcgi_params)
 
-        run_command('sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
+        await run_command_async('sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
 
     async def generate_dhparams(self):
         if not os.path.isfile('/etc/nginx/dhparams.pem'):
-            run_command("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
+            await run_command_async("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
     async def write_nginx_server_block(self):
         domain = self.config.get('domain')
@@ -62,39 +62,40 @@ class CreateSiteCommand(Command):
         template_path = (template_directory / 'nginx_template.conf').resolve()
 
         # Read the template file
-        with open(template_path, 'r') as template_file:
-            nginx_template = template_file.read()
+        async with aiofiles.open(template_path, 'r') as template_file:
+            nginx_template = await template_file.read()
 
         # Replace placeholders with actual values
         nginx_config = nginx_template.replace('{{domain}}', domain).replace('{{root_path}}', root_path)
 
         # Write the config to a temporary file
-        with open('/tmp/nginx_server_block.conf', 'w') as f:
-            f.write(nginx_config)
+        async with aiofiles.open('/tmp/nginx_server_block.conf', 'w') as f:
+            await f.write(nginx_config)
 
         # Move the temporary file to the final location
-        run_command(f'sudo mv /tmp/nginx_server_block.conf /etc/nginx/sites-available/{domain}')
+        await run_command_async(f'sudo mv /tmp/nginx_server_block.conf /etc/nginx/sites-available/{domain}')
 
     async def add_tls_for_ubuntu(self):
-        ubuntu_version = run_command("lsb_release -rs").strip()
+        ubuntu_version = await run_command_async("lsb_release -rs").strip()
         domain = self.config.get('domain')
         if version_to_int(ubuntu_version) >= version_to_int("20.04"):
             print(f"Server on Ubuntu {ubuntu_version}")
             config_file_path = f"/etc/nginx/sites-available/{domain}"
             if os.path.exists(config_file_path):
-                run_command(f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" {config_file_path}')
+                await run_command_async(
+                    f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" {config_file_path}')
             else:
                 raise Exception(f"File {config_file_path} does not exist.")
 
     async def create_nginx_config_directories(self):
-        run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/before")
-        run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/after")
-        run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/server")
+        await run_command_async(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/before")
+        await run_command_async(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/after")
+        await run_command_async(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/server")
 
     async def enable_nginx_sites(self):
-        run_command(f"sudo rm -f /etc/nginx/sites-enabled/{self.config['domain']}")
-        run_command(f"sudo rm -f /etc/nginx/sites-enabled/www.{self.config['domain']}")
-        run_command(
+        await run_command_async(f"sudo rm -f /etc/nginx/sites-enabled/{self.config['domain']}")
+        await run_command_async(f"sudo rm -f /etc/nginx/sites-enabled/www.{self.config['domain']}")
+        await run_command_async(
             f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
     async def write_redirector(self):
@@ -106,20 +107,20 @@ class CreateSiteCommand(Command):
         if not template_path.is_file():
             raise FileNotFoundError(f"Template file not found: {template_path}")
 
-        with template_path.open('r') as template_file:
-            redirector_config = template_file.read()
+        async with template_path.open('r') as template_file:
+            redirector_config = await template_file.read()
 
         # Replace placeholders with actual values
         redirector_config = redirector_config.replace('{domain}', domain)
 
-        with open('/tmp/nginx_redirector.conf', 'w') as f:
-            f.write(redirector_config)
+        async with aiofiles.open('/tmp/nginx_redirector.conf', 'w') as f:
+            await f.write(redirector_config)
 
-        run_command(
+        await run_command_async(
             f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
     async def restart_services(self):
-        run_command("sudo service nginx reload")
+        await run_command_async("sudo service nginx reload")
         php_fpm_versions = [
             "php8.3-fpm",
             "php8.2-fpm",
@@ -135,5 +136,5 @@ class CreateSiteCommand(Command):
         ]
 
         for version in php_fpm_versions:
-            if run_command(f"pgrep {version}", raise_exception=False):
-                run_command(f"sudo service {version} restart")
+            if await run_command_async(f"pgrep {version}", raise_exception=False):
+                await run_command_async(f"sudo service {version} restart")
