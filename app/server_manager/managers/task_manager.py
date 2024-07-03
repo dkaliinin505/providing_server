@@ -20,7 +20,7 @@ class TaskManager(metaclass=SingletonMeta):
         self.id_to_result = {}
         self.id_counter = 0
         self.lock = asyncio.Lock()
-        self.worker_count = 2
+        self.worker_count = 1
 
     async def _generate_unique_id(self):
         async with self.lock:

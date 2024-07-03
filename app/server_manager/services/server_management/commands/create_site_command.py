@@ -14,22 +14,22 @@ class CreateSiteCommand(Command):
         self.current_dir = Path(__file__).resolve().parent
         print(f"Config: {config}")
 
-    def execute(self, data):
+    async def execute(self, data):
 
         self.config = data
         logging.debug(f"Config: {self.config}")
-        self.create_fastcgi_params()
-        self.generate_dhparams()
-        self.write_nginx_server_block()
-        self.add_tls_for_ubuntu()
-        self.create_nginx_config_directories()
-        self.enable_nginx_sites()
-        self.write_redirector()
-        self.restart_services()
+        await self.create_fastcgi_params()
+        await self.generate_dhparams()
+        await self.write_nginx_server_block()
+        await self.add_tls_for_ubuntu()
+        await self.create_nginx_config_directories()
+        await self.enable_nginx_sites()
+        await self.write_redirector()
+        await self.restart_services()
 
         return {"message": "Website server configuration created and applied successfully"}
 
-    def create_fastcgi_params(self):
+    async def create_fastcgi_params(self):
         # Path to the template file
         template_directory = Path(__file__).resolve().parent / '..' / '..' / '..' / 'templates' / 'nginx'
         template_path = template_directory / 'fastcgi_params_template.conf'
@@ -43,11 +43,11 @@ class CreateSiteCommand(Command):
 
         run_command('sudo mv /tmp/fastcgi_params /etc/nginx/fastcgi_params')
 
-    def generate_dhparams(self):
+    async def generate_dhparams(self):
         if not os.path.isfile('/etc/nginx/dhparams.pem'):
             run_command("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
-    def write_nginx_server_block(self):
+    async def write_nginx_server_block(self):
         domain = self.config.get('domain')
         root_path = self.config.get('root_path', f'/home/super_forge/{domain}/public')
 
@@ -75,7 +75,7 @@ class CreateSiteCommand(Command):
         # Move the temporary file to the final location
         run_command(f'sudo mv /tmp/nginx_server_block.conf /etc/nginx/sites-available/{domain}')
 
-    def add_tls_for_ubuntu(self):
+    async def add_tls_for_ubuntu(self):
         ubuntu_version = run_command("lsb_release -rs").strip()
         domain = self.config.get('domain')
         if version_to_int(ubuntu_version) >= version_to_int("20.04"):
@@ -86,18 +86,18 @@ class CreateSiteCommand(Command):
             else:
                 raise Exception(f"File {config_file_path} does not exist.")
 
-    def create_nginx_config_directories(self):
+    async def create_nginx_config_directories(self):
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/before")
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/after")
         run_command(f"sudo mkdir -p /etc/nginx/forge-conf/{self.config['domain']}/server")
 
-    def enable_nginx_sites(self):
+    async def enable_nginx_sites(self):
         run_command(f"sudo rm -f /etc/nginx/sites-enabled/{self.config['domain']}")
         run_command(f"sudo rm -f /etc/nginx/sites-enabled/www.{self.config['domain']}")
         run_command(
             f"sudo ln -s /etc/nginx/sites-available/{self.config['domain']} /etc/nginx/sites-enabled/{self.config['domain']}")
 
-    def write_redirector(self):
+    async def write_redirector(self):
         domain = self.config['domain']
         # Path to the template file
         template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
@@ -118,7 +118,7 @@ class CreateSiteCommand(Command):
         run_command(
             f'sudo mv /tmp/nginx_redirector.conf /etc/nginx/forge-conf/{self.config["domain"]}/before/redirect.conf')
 
-    def restart_services(self):
+    async def restart_services(self):
         run_command("sudo service nginx reload")
         php_fpm_versions = [
             "php8.3-fpm",
