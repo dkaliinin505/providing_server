@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
@@ -18,9 +17,9 @@ class CreateSiteCommand(Command):
     async def execute(self, data):
         from app import app_instance
         self.config = data
-        logging.debug(f"Config: {self.config}")
+        logging.debug(f"Config in CreateSiteCommand : {self.config}")
 
-        with app_instance.app.app_context():
+        async with app_instance.app.app_context():
             await self.create_fastcgi_params()
             await self.generate_dhparams()
             await self.write_nginx_server_block()
