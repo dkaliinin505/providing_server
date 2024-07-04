@@ -13,6 +13,7 @@ class PackageInstallerService:
         self.executor.register('mysql', MySQLCommand({'config': {}}))
         self.executor.register('redis', RedisCommand({'config': {}}))
 
-    def install_package(self, data):
+    async def install_package(self, data):
         package_name = data.get('package_name')
-        return self.executor.execute(package_name, data)
+        data = await self.executor.execute(package_name, data)
+        return data

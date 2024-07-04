@@ -13,8 +13,10 @@ site_management_controller = SiteManagementController()
 
 
 @server_manager_blueprint.route('/generate-deploy-key', methods=['POST'])
-def generate_deploy_key_route():
-    return server_management_controller.generate_deploy_key()
+async def generate_deploy_key_route():
+    data = await server_management_controller.generate_deploy_key()
+    logging.info("Returned task id from controller method" + str(data))
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/delete-deploy-key', methods=['DELETE'])

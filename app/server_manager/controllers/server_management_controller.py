@@ -26,13 +26,15 @@ class ServerManagementController(Controller):
 
     @validate_request({'POST': GenerateDeployKeyCommandSchema})
     async def generate_deploy_key(self, data):
-        result = await self.server_management_service.generate_deploy_key(data)
+        result = await self.task_manager.submit_task(self.server_management_service.generate_deploy_key, data)
+        logging.info(f"Generate Deploy Key Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     @validate_request({'DELETE': GenerateDeployKeyCommandSchema})
     async def delete_deploy_key(self, data):
-        result = await self.server_management_service.delete_deploy_key(data)
-        return jsonify(result)
+        result = await self.task_manager.submit_task(self.server_management_service.delete_deploy_key, data)
+        logging.info(f"Delete Deploy Key Task in ServerManagementController started in background with task_id: {result}")
+        return {"message": "Delete Deploy Key Task started in background", "task_id": result}
 
     @validate_request({'POST': CreateSiteSchema})
     async def create_site(self, data):
@@ -42,32 +44,38 @@ class ServerManagementController(Controller):
 
     @validate_request({'POST': InstallPackageSchema})
     async def install_package(self, data):
-        task_id = await self.task_manager.submit_task(self.package_installer_service.install_package, data)
-        return jsonify({"message": "Install Package Task started in background", "task_id": task_id}, 200)
+        result = await self.task_manager.submit_task(self.package_installer_service.install_package, data)
+        logging.info(f"Install Package Task in ServerManagementController started in background with task_id: {result}")
+        return {"message": "Install Package Task started in background", "task_id": result}
 
     @validate_request({'POST': CreateDatabaseSchema})
     async def create_database(self, data):
-        result = await self.server_management_service.create_database(data)
+        result = await self.task_manager.submit_task(self.server_management_service.create_database, data)
+        logging.info(f"Create Database Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     @validate_request({'POST': CreateDatabaseUserSchema})
     async def create_database_user(self, data):
-        result = await self.server_management_service.create_database_user(data)
+        result = await self.task_manager.submit_task(self.server_management_service.create_database_user, data)
+        logging.info(f"Create Database User Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     @validate_request({'DELETE': DeleteDatabaseSchema})
     async def delete_database(self, data):
-        result = await self.server_management_service.delete_database(data)
+        result = await self.task_manager.submit_task(self.server_management_service.delete_database, data)
+        logging.info(f"Delete Database Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     @validate_request({'DELETE': DeleteDatabaseUserSchema})
     async def delete_database_user(self, data):
-        result = await self.server_management_service.delete_database_user(data)
+        result = await self.task_manager.submit_task(self.server_management_service.delete_database_user, data)
+        logging.info(f"Delete Database User Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     @validate_request({'PUT': CreateDatabaseUserSchema})
     async def update_database_user(self, data):
-        result = await self.server_management_service.update_database_user(data)
+        result = await self.task_manager.submit_task(self.server_management_service.update_database_user, data)
+        logging.info(f"Update Database User Task in ServerManagementController started in background with task_id: {result}")
         return jsonify(result)
 
     def __del__(self):

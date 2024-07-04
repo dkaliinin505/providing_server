@@ -16,6 +16,7 @@ class SiteManagementService(Service):
 
     def __init__(self):
         super().__init__()
+        self.executor = SiteManagementExecutor()
         self.executor.register('deploy_project', DeployProjectCommand({'config': {}}))
         self.executor.register('create_certbot_cert', CreateCertBotCertificateCommand({'config': {}}))
         self.executor.register('delete_certbot_cert', DeleteCertBotCertCommand({'config': {}}))

@@ -13,11 +13,13 @@ from app.server_manager.services.server_management.commands.mysql.delete_databas
 from app.server_manager.services.server_management.commands.mysql.update_database_user_command import \
     UpdateDatabaseUserCommand
 from app.server_manager.services.server_management.invoker import ServerManagementExecutor
+from app.server_manager.services.service import Service
 
 
-class ServerManagementService:
+class ServerManagementService(Service):
 
     def __init__(self):
+        super().__init__()
         self.task_manager = TaskManager()
         self.executor = ServerManagementExecutor()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
@@ -30,7 +32,9 @@ class ServerManagementService:
         self.executor.register('delete_database_user', DeleteDatabaseUserCommand({'config': {}}))
 
     async def generate_deploy_key(self, data):
-        return self.executor.execute('generate_deploy_key', data)
+        data = await self.executor.execute('generate_deploy_key', data)
+        logging.info(f"Generate Deploy Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
     async def delete_deploy_key(self, data):
         return self.executor.execute('delete_deploy_key', data)

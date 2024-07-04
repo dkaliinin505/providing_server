@@ -3,7 +3,7 @@ from app.server_manager.services.server_management.invoker import ServerManageme
 
 class Service:
     def __init__(self):
-        self.executor = ServerManagementExecutor()
+        self.executor = None
 
     def register_commands(self):
         raise NotImplementedError("Subclasses should implement this method to register their commands.")
