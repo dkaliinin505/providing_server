@@ -1,7 +1,6 @@
-import os
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, file_exists
+from utils.util import run_command_async, file_exists, dir_exists
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -22,7 +21,7 @@ class GenerateDeployKeyCommand(Command):
 
         # Create .ssh directory if it doesn't exist
         ssh_dir = '/home/super_forge/.ssh'
-        if not await file_exists(ssh_dir):
+        if not await dir_exists(ssh_dir):
             await run_command_async(f'sudo -u super_forge mkdir -p {ssh_dir}')
             await run_command_async(f'sudo -u super_forge chmod 700 {ssh_dir}')
         else:

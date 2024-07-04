@@ -5,6 +5,7 @@ import traceback
 import venv
 
 import aiofiles
+import aiofiles.os
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -60,6 +61,17 @@ async def file_exists(filepath):
         async with aiofiles.open(filepath, 'r'):
             return True
     except FileNotFoundError:
+        return False
+
+
+async def dir_exists(dirpath):
+    try:
+        if await aiofiles.os.path.isdir(dirpath):
+            return True
+        else:
+            return False
+    except Exception as e:
+        logging.error(f"Error checking if directory exists: {e}")
         return False
 
 
