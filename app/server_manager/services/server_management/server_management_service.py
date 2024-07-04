@@ -36,9 +36,9 @@ class ServerManagementService:
         return self.executor.execute('delete_deploy_key', data)
 
     async def create_site(self, data):
-        task_id = await self.task_manager.submit_task(self.executor.execute, 'create_site', data)
-        logging.info(f"Create Site Task in ServerManagementService started in background with task_id: {task_id}")
-        return task_id
+        data = await self.executor.execute('create_site', data)
+        logging.info(f"Create Site Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
     async def create_database(self, data):
         return self.executor.execute('create_database', data)
