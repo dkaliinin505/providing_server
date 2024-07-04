@@ -38,7 +38,7 @@ class ServerManagementController(Controller):
     async def create_site(self, data):
         result = await self.task_manager.submit_task(self.server_management_service.create_site, data)
         logging.info(f"Create Site Task in ServerManagementController started in background with task_id: {result}")
-        return result
+        return {"message": "Create Site Task started in background", "task_id": result}
 
     @validate_request({'POST': InstallPackageSchema})
     async def install_package(self, data):
