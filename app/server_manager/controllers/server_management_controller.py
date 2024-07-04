@@ -28,7 +28,7 @@ class ServerManagementController(Controller):
     async def generate_deploy_key(self, data):
         result = await self.task_manager.submit_task(self.server_management_service.generate_deploy_key, data)
         logging.info(f"Generate Deploy Key Task in ServerManagementController started in background with task_id: {result}")
-        return jsonify(result)
+        return {"message": "Generate Deploy Key Task started in background", "task_id": result}
 
     @validate_request({'DELETE': GenerateDeployKeyCommandSchema})
     async def delete_deploy_key(self, data):

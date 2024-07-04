@@ -72,7 +72,7 @@ class TaskManager(metaclass=SingletonMeta):
             if asyncio.iscoroutine(result["result"]):
                 return {"task_id": task_id, "status": "in_progress"}
             return result
-
+        logging.info("Trying to find task in Future")
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
                 if future.done():
