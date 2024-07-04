@@ -37,7 +37,9 @@ class ServerManagementService(Service):
         return data
 
     async def delete_deploy_key(self, data):
-        return self.executor.execute('delete_deploy_key', data)
+        data = await self.executor.execute('delete_deploy_key', data)
+        logging.info(f"Delete Deploy Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
     async def create_site(self, data):
         data = await self.executor.execute('create_site', data)
