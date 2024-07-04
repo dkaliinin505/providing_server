@@ -7,6 +7,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
 class GenerateDeployKeyCommand(Command):
     def __init__(self, config):
         self.config = config
