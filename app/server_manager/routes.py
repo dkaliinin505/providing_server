@@ -24,11 +24,9 @@ def delete_deploy_key_route():
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
 async def create_site_route():
-    from app import app_instance
-    async with app_instance.app.app_context():
-        data = await server_management_controller.create_site()
-        logging.info("Returned task id from controller method: " + str(data))
-        return data
+    data = await server_management_controller.create_site()
+    logging.info("Returned task id from controller method" + str(data))
+    return data
 
 
 @server_manager_blueprint.route('/install-package', methods=['POST'])

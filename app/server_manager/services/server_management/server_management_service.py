@@ -1,3 +1,6 @@
+import logging
+
+from app.server_manager.managers.task_manager import TaskManager
 from app.server_manager.services.server_management.commands.create_site_command import CreateSiteCommand
 from app.server_manager.services.server_management.commands.delete_deploy_key_command import DeleteDeployKeyCommand
 from app.server_manager.services.server_management.commands.generate_deploy_key_command import GenerateDeployKeyCommand
@@ -15,6 +18,7 @@ from app.server_manager.services.server_management.invoker import ServerManageme
 class ServerManagementService:
 
     def __init__(self):
+        self.task_manager = TaskManager()
         self.executor = ServerManagementExecutor()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
@@ -32,7 +36,9 @@ class ServerManagementService:
         return self.executor.execute('delete_deploy_key', data)
 
     async def create_site(self, data):
-        return await self.executor.execute('create_site', data)
+        task_id = self.task_manager.submit_task(self.executor.execute, 'create_site', data)
+        logging.info(f"Create Site Task started in background with task_id: {task_id}")
+        return task_id
 
     async def create_database(self, data):
         return self.executor.execute('create_database', data)

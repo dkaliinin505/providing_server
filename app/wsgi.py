@@ -1,3 +1,4 @@
+import logging
 import sys
 import os
 import asyncio
@@ -13,6 +14,7 @@ from app.exceptions.http_exception import ProvidingServerHTTPException
 @app_instance.app.errorhandler(Exception)
 def handle_exception(e):
     # If the exception is a custom one, use its status code and message
+    logging.error(f"Exception: {e}")
     if isinstance(e, ProvidingServerHTTPException):
         response = jsonify(e.to_dict())
         response.status_code = e.status_code
