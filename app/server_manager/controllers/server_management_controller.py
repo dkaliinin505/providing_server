@@ -1,6 +1,6 @@
 import logging
 
-from flask import jsonify
+from quart import jsonify
 
 from app.server_manager.controllers.controller import Controller
 from app.server_manager.services.package_installer.package_installer_service import PackageInstallerService
@@ -37,7 +37,7 @@ class ServerManagementController(Controller):
     @validate_request({'POST': CreateSiteSchema})
     async def create_site(self, data):
         result = await self.server_management_service.create_site(data)
-        logging.info(f"Create Site Task started in background with task_id: {result}")
+        logging.info(f"Create Site Task in ServerManagementController started in background with task_id: {result}")
         return jsonify({"message": "Create Site Task started in background", "task_id": data}, 200)
 
     @validate_request({'POST': InstallPackageSchema})
