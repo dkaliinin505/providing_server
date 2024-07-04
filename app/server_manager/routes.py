@@ -20,8 +20,10 @@ async def generate_deploy_key_route():
 
 
 @server_manager_blueprint.route('/delete-deploy-key', methods=['DELETE'])
-def delete_deploy_key_route():
-    return server_management_controller.delete_deploy_key()
+async def delete_deploy_key_route():
+    data = await server_management_controller.delete_deploy_key()
+    logging.info("Returned task id from controller method" + str(data))
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
