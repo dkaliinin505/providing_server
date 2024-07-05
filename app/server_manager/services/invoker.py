@@ -3,7 +3,7 @@ import asyncio
 from app.server_manager.interfaces.invoker_interface import Invoker
 
 
-class SiteManagementExecutor(Invoker):
+class CommandExecutor(Invoker):
     def __init__(self):
         self.commands = {}
 
