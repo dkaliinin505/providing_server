@@ -14,28 +14,22 @@ site_management_controller = SiteManagementController()
 
 @server_manager_blueprint.route('/generate-deploy-key', methods=['POST'])
 async def generate_deploy_key_route():
-    data = await server_management_controller.generate_deploy_key()
-    logging.info("Returned task id from controller method" + str(data))
-    return jsonify(data)
+    return await server_management_controller.generate_deploy_key()
 
 
 @server_manager_blueprint.route('/delete-deploy-key', methods=['DELETE'])
 async def delete_deploy_key_route():
-    data = await server_management_controller.delete_deploy_key()
-    logging.info("Returned task id from controller method" + str(data))
-    return jsonify(data)
+    return await server_management_controller.delete_deploy_key()
 
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
 async def create_site_route():
-    data = await server_management_controller.create_site()
-    logging.info("Returned task id from controller method" + str(data))
-    return jsonify(data)
+    return await server_management_controller.create_site()
 
 
 @server_manager_blueprint.route('/install-package', methods=['POST'])
-def install_package_route():
-    return server_management_controller.install_package()
+async def install_package_route():
+    return await server_management_controller.install_package()
 
 
 @server_manager_blueprint.route('/deploy-project', methods=['POST'])
