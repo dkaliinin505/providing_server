@@ -21,17 +21,17 @@ class SiteManagementController(Controller):
     @validate_request({'POST': DeployProjectSchema})
     async def deploy_project(self, data):
         task_id = await self.task_manager.submit_task(self.site_management_service.deploy_project, data)
-        return jsonify({"message": "Deploy Project Task started in background", "task_id": task_id}), 200
+        return {"message": "Deploy Project Task started in background", "task_id": task_id}
 
     @validate_request({'POST': CreateCertBotCertificateSchema})
     async def create_certbot_cert(self, data):
         task_id = await self.task_manager.submit_task(self.site_management_service.create_certbot_cert, data)
-        return jsonify({"message": "Create Certbot Certificate Task started in background", "task_id": task_id}), 200
+        return {"message": "Create Certbot Certificate Task started in background", "task_id": task_id}
 
     @validate_request({'DELETE': DeleteCertBotCertificateSchema})
     async def delete_certbot_cert(self, data):
         task_id = await self.task_manager.submit_task(self.site_management_service.delete_certbot_cert, data)
-        return jsonify({"message": "Delete Certbot Certificate Task started in background", "task_id": task_id}), 200
+        return {"message": "Delete Certbot Certificate Task started in background", "task_id": task_id}
 
     @validate_request({'GET': RequestSchema})
     async def test(self, data):

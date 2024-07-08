@@ -14,37 +14,44 @@ site_management_controller = SiteManagementController()
 
 @server_manager_blueprint.route('/generate-deploy-key', methods=['POST'])
 async def generate_deploy_key_route():
-    return await server_management_controller.generate_deploy_key()
+    data = await server_management_controller.generate_deploy_key()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/delete-deploy-key', methods=['DELETE'])
 async def delete_deploy_key_route():
-    return await server_management_controller.delete_deploy_key()
+    data = await server_management_controller.delete_deploy_key()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/create-site', methods=['POST'])
 async def create_site_route():
-    return await server_management_controller.create_site()
+    data = await server_management_controller.create_site()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/install-package', methods=['POST'])
 async def install_package_route():
-    return await server_management_controller.install_package()
+    data = await server_management_controller.install_package()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/deploy-project', methods=['POST'])
 async def deploy_project_route():
-    return await site_management_controller.deploy_project()
+    data = await site_management_controller.deploy_project()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/create-certbot-cert', methods=['POST'])
 async def create_certbot_cert_route():
-    return await site_management_controller.create_certbot_cert()
+    data = site_management_controller.create_certbot_cert()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/delete-certbot-cert', methods=['DELETE'])
 async def delete_certbot_cert_route():
-    return await site_management_controller.delete_certbot_cert()
+    data = await site_management_controller.delete_certbot_cert()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/create-database', methods=['POST'])
