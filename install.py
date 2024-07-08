@@ -90,14 +90,15 @@ def setup_server(current_directory, env_name):
     print('Setting up swap file')
     swap_size = "1G"
     swap_file = "/swapfile"
-    run_command(f"sudo fallocate -l {swap_size} {swap_file}")
-    run_command(f"sudo chmod 600 {swap_file}")
-    run_command(f"sudo mkswap {swap_file}")
-    run_command(f"sudo swapon {swap_file}")
-    run_command(f"echo '{swap_file} none swap sw 0 0' | sudo tee -a /etc/fstab")
-    # Verify the swap file
-    run_command("sudo swapon --show")
-    run_command("free -h")
+    if not os.path.exists(swap_file):
+        run_command(f"sudo fallocate -l {swap_size} {swap_file}")
+        run_command(f"sudo chmod 600 {swap_file}")
+        run_command(f"sudo mkswap {swap_file}")
+        run_command(f"sudo swapon {swap_file}")
+        run_command(f"echo '{swap_file} none swap sw 0 0' | sudo tee -a /etc/fstab")
+        # Verify the swap file
+        run_command("sudo swapon --show")
+        run_command("free -h")
 
     if not os.path.exists("/home/super_forge/.ssh"):
         os.makedirs("/home/super_forge/.ssh")
