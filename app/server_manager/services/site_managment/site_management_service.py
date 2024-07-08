@@ -7,7 +7,7 @@ from app.server_manager.services.site_managment.commands.create_certbot_cert_com
     CreateCertBotCertificateCommand
 from app.server_manager.services.site_managment.commands.delete_certbot_cert_command import DeleteCertBotCertCommand
 from app.server_manager.services.site_managment.commands.deploy_project_command import DeployProjectCommand
-from utils.util import run_command_async
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 
 
 class SiteManagementService(Service):

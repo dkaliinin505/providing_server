@@ -2,7 +2,8 @@ import logging
 from pathlib import Path
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, version_to_int, check_file_exists
+from utils.util import version_to_int
+from utils.async_util import run_command_async, check_file_exists
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

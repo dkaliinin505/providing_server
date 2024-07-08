@@ -1,6 +1,6 @@
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, check_file_exists, dir_exists
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 import logging
 
 logging.basicConfig(level=logging.DEBUG)

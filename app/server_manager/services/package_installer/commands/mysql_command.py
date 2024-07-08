@@ -3,7 +3,8 @@ import os
 import aiofiles
 import asyncio
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, is_wsl
+from utils.util import is_wsl
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 from utils.env_util import update_env_variable, async_load_env, async_update_env_variable
 
 logging.basicConfig(level=logging.DEBUG)

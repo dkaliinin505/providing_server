@@ -7,9 +7,8 @@ from pathlib import Path
 import aiofiles
 
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, check_file_exists, dir_exists
 from utils.env_util import async_get_env_variable, async_load_env, async_update_env_variable
-
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 

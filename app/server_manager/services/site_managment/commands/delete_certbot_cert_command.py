@@ -3,7 +3,7 @@ import re
 import shutil
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
