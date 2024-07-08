@@ -1,6 +1,6 @@
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, file_exists, dir_exists
+from utils.util import run_command_async, check_file_exists, dir_exists
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -37,7 +37,7 @@ class GenerateDeployKeyCommand(Command):
         await run_command_async(f'sudo chmod 600 /home/super_forge/.ssh/{domain}-config')
 
         # Generate SSH key if it doesn't exist
-        if not await file_exists(ssh_key_path):
+        if not await check_file_exists(ssh_key_path):
             await run_command_async(f'sudo -u super_forge ssh-keygen -t rsa -b 4096 -f {ssh_key_path} -N ""')
             await run_command_async(f'sudo -u super_forge chmod 600 {ssh_key_path}')
             await run_command_async(f'sudo -u super_forge chmod 644 {ssh_key_pub_path}')

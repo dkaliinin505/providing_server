@@ -56,7 +56,7 @@ async def run_command_async(command, raise_exception=True):
     return stdout.decode()
 
 
-async def file_exists(filepath):
+async def check_file_exists(filepath):
     try:
         async with aiofiles.open(filepath, 'r'):
             return True

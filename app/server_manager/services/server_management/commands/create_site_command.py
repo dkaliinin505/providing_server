@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, version_to_int, file_exists
+from utils.util import run_command_async, version_to_int, check_file_exists
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class CreateSiteCommand(Command):
         logging.debug("FastCGI params created")
 
     async def generate_dhparams(self):
-        if not await file_exists('/etc/nginx/dhparams.pem'):
+        if not await check_file_exists('/etc/nginx/dhparams.pem'):
             await run_command_async("sudo openssl dhparam -out /etc/nginx/dhparams.pem 2048")
 
     async def write_nginx_server_block(self):
@@ -79,7 +79,7 @@ class CreateSiteCommand(Command):
         if version_to_int(ubuntu_version) >= version_to_int("20.04"):
             print(f"Server on Ubuntu {ubuntu_version}")
             config_file_path = f"/etc/nginx/sites-available/{domain}"
-            if await file_exists(config_file_path):
+            if await check_file_exists(config_file_path):
                 await run_command_async(
                     f'sudo sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/g" {config_file_path}')
             else:
@@ -104,7 +104,7 @@ class CreateSiteCommand(Command):
         template_directory = self.current_dir / '..' / '..' / '..' / 'templates' / 'nginx'
         template_path = (template_directory / 'nginx_redirector_template.conf').resolve()
 
-        if not await file_exists(template_path):
+        if not await check_file_exists(template_path):
             raise FileNotFoundError(f"Template file not found: {template_path}")
 
         async with aiofiles.open(template_path, 'r') as template_file:

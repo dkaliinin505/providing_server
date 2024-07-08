@@ -7,7 +7,7 @@ from pathlib import Path
 import aiofiles
 
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command_async, file_exists, dir_exists
+from utils.util import run_command_async, check_file_exists, dir_exists
 from utils.env_util import async_get_env_variable, async_load_env, async_update_env_variable
 
 logging.basicConfig(level=logging.DEBUG)
@@ -40,7 +40,7 @@ class DeployProjectCommand(Command):
             env_file_path = os.path.join(site_path, '.env')
         logger.info(f"Checking env file path {env_file_path}")
         if await dir_exists(site_path):
-            if await file_exists(env_file_path):
+            if await check_file_exists(env_file_path):
                 # Load the .env file and check the APP_KEY
                 app_key = await async_get_env_variable('APP_KEY', env_file_path)
                 logger.info(f"APP_KEY: {app_key}")
@@ -103,7 +103,7 @@ class DeployProjectCommand(Command):
             os.chdir(site_path)
 
         # Check if composer.lock file exists
-        if await file_exists(os.path.join(site_path, 'composer.lock')):
+        if await check_file_exists(os.path.join(site_path, 'composer.lock')):
             await run_command_async('rm -f composer.lock')
 
         await run_command_async(
@@ -116,7 +116,7 @@ class DeployProjectCommand(Command):
         laravel_version = self.get_laravel_version(site_path)
         env_file_path = os.path.join(site_path, '.env')
 
-        if await file_exists(os.path.join(site_path, '.env.example')):
+        if await check_file_exists(os.path.join(site_path, '.env.example')):
             shutil.copyfile(os.path.join(site_path, '.env.example'), env_file_path)
         else:
             env_content = self.generate_env_content(laravel_version)
@@ -210,7 +210,7 @@ class DeployProjectCommand(Command):
                 print(f"Failed to create the database {db_name}.")
                 return
 
-        if await file_exists(os.path.join(site_path, 'artisan')):
+        if await check_file_exists(os.path.join(site_path, 'artisan')):
             try:
                 await run_command_async(f'php8.3 {os.path.join(site_path, "artisan")} migrate --force')
             except Exception as e:
@@ -250,5 +250,5 @@ class DeployProjectCommand(Command):
             os.chdir(os.path.join(site_path, nested_folder))
         else:
             os.chdir(site_path)
-        if await file_exists(os.path.join(site_path, 'package.json')):
+        if await check_file_exists(os.path.join(site_path, 'package.json')):
             await run_command_async('npm install')
