@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from quart import request, jsonify, Response
+from quart import request, jsonify, make_response
 from marshmallow import ValidationError
 import os
 import requests
@@ -53,7 +53,7 @@ def validate_request(schema_classes):
 
                 errors = validate_data(validator, data)
                 if errors:
-                    return {'errors': errors}
+                    return make_response({'errors': errors}), 400
 
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
@@ -68,11 +68,7 @@ def validate_request(schema_classes):
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
-
-            result = await f(*args, **kwargs)
-            if isinstance(result, Response):
-                return result
-            return jsonify(result)
+            return await f(*args, **kwargs)
 
         return decorated_function
 
