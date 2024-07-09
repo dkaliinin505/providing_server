@@ -11,3 +11,5 @@ class UpdateDatabaseUserCommand(Command):
         await create_user(self.config)
         if 'db_privileges' in self.config:
             await grant_privileges(self.config)
+
+        return {"message": f"Database user updated successfully: {self.config.get('db_user')}"}

@@ -12,6 +12,8 @@ class DeleteDatabaseCommand(Command):
         await self.config.update(data)
         await self.delete_database()
 
+        return {"message": f"Database deleted successfully: {self.config.get('db_name')}"}
+
     async def delete_database(self):
         db_root_password = async_get_env_variable('DB_PASSWORD')
         db_name = self.config.get('db_name')

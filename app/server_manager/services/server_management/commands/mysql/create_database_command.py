@@ -16,6 +16,8 @@ class CreateDatabaseCommand(Command):
             if 'db_privileges' in self.config:
                 await grant_privileges(self.config)
 
+        return {"message": f"Database created successfully: {self.config.get('db_name')}"}
+
     async def create_database(self):
         db_name = self.config.get('db_name')
         db_root_password = async_get_env_variable('MYSQL_ROOT_PASSWORD')

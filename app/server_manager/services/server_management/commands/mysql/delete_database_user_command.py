@@ -11,6 +11,8 @@ class DeleteDatabaseUserCommand(Command):
         await self.config.update(data)
         await self.delete_database_user()
 
+        return {"message": f"Database user deleted successfully: {self.config.get('db_user')}"}
+
     async def delete_database_user(self):
         db_root_password = async_get_env_variable('DB_PASSWORD')
         db_user = self.config.get('db_user')
@@ -18,7 +20,7 @@ class DeleteDatabaseUserCommand(Command):
 
         commands = [
             f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'%';\"",
-            f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'%';\""
+            f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'{db_host}';\""
         ]
         for command in commands:
             run_command_async(command)

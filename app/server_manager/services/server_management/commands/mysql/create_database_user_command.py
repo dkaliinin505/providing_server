@@ -12,3 +12,5 @@ class CreateDatabaseUserCommand(Command):
         if 'db_name' in self.config:
             await grant_privileges(self.config)
 
+        return {"message": f"Database user created successfully: {self.config.get('db_user')}"}
+
