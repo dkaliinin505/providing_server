@@ -61,7 +61,6 @@ def validate_request(schema_classes):
                     response = jsonify({'errors': errors})
                     response.status_code = 400
                     logger.debug(f"Validation Response: {response}")
-                    return response
 
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
@@ -69,14 +68,12 @@ def validate_request(schema_classes):
                     if not config_validator:
                         response = jsonify({'errors': 'Invalid package name'})
                         response.status_code = 400
-                        return response
 
                     config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         logger.debug(f"Config validation errors: {config_errors}")
                         response = jsonify({'errors': config_errors})
                         response.status_code = 400
-                        return response
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
