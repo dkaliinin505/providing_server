@@ -6,4 +6,3 @@ class CreateDatabaseSchema(Schema):
     create_user = fields.Bool(missing=False)
     db_user = fields.Str()
     db_user_password = fields.Str()
-    db_host = fields.Str(missing='%')

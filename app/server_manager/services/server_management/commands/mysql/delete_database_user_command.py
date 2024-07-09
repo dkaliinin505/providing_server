@@ -17,7 +17,7 @@ class DeleteDatabaseUserCommand(Command):
         db_host = self.config.get('db_host', '%')
 
         commands = [
-            f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'{db_host}'; DROP USER IF EXISTS '{db_user}'@'%';\"",
+            f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'%';\"",
             f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'%';\""
         ]
         for command in commands:
