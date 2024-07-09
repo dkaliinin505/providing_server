@@ -1,3 +1,5 @@
+import logging
+
 from app.server_manager.interfaces.command_interface import Command
 from utils.async_util import run_command_async
 from utils.env_util import async_get_env_variable
@@ -9,6 +11,7 @@ class DeleteDatabaseUserCommand(Command):
 
     async def execute(self, data):
         await self.config.update(data)
+        logging.info(f"Delete Database User Command started with data: {self.config}")
         await self.delete_database_user()
 
         return {"message": f"Database user deleted successfully: {self.config.get('db_user')}"}
