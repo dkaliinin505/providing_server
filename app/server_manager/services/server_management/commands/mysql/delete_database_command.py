@@ -15,7 +15,7 @@ class DeleteDatabaseCommand(Command):
         return {"message": f"Database deleted successfully: {self.config.get('db_name')}"}
 
     async def delete_database(self):
-        db_root_password = async_get_env_variable('DB_PASSWORD')
+        db_root_password = await async_get_env_variable('DB_PASSWORD')
         db_name = self.config.get('db_name')
 
         command = f"mysql --user='root' --password='{db_root_password}' -e \"DROP DATABASE IF EXISTS {db_name};\""

@@ -8,13 +8,13 @@ class DeleteDatabaseUserCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        self.config = data.get('config', self.config)
+        await self.config.update(data)
         await self.delete_database_user()
 
         return {"message": f"Database user deleted successfully: {self.config.get('db_user')}"}
 
     async def delete_database_user(self):
-        db_root_password = async_get_env_variable('DB_PASSWORD')
+        db_root_password = await async_get_env_variable('DB_PASSWORD')
         db_user = self.config.get('db_user')
         db_host = self.config.get('db_host', '%')
 
