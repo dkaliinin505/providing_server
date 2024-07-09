@@ -10,7 +10,7 @@ class DeleteDatabaseUserCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        await self.config.update(data)
+        self.config.update(data)
         logging.info(f"Delete Database User Command started with data: {self.config}")
         await self.delete_database_user()
 
