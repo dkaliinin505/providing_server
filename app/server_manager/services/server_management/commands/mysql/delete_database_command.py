@@ -9,7 +9,7 @@ class DeleteDatabaseCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        self.config = data.get('config', self.config)
+        self.config = data
         await self.delete_database()
 
         return {"message": f"Database deleted successfully: {self.config.get('db_name')}"}
