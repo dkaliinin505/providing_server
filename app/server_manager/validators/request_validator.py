@@ -51,7 +51,7 @@ def validate_request(schema_classes):
 
                 logger.debug(f"Data: {data}")
 
-                errors = validate_data(validator, data)
+                errors = await validate_data(validator, data)
                 if errors:
                     response = make_response(jsonify({'errors': errors}), 400)
                     return response
@@ -84,7 +84,7 @@ async def get_request_data(method):
         return await request.get_json()
 
 
-def validate_data(validator, data):
+async def validate_data(validator, data):
     errors = validator.validate(data)
     if errors:
         logger.debug(f"Validation errors: {errors}")
