@@ -77,6 +77,7 @@ def validate_request(schema_classes):
 
 async def get_request_data(method):
     if method == 'DELETE' or method == 'GET':
+        logger.debug("GET or DELETE request")
         return request.args.to_dict()
     else:
         return await request.get_json()

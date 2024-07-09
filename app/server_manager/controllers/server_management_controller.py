@@ -64,7 +64,7 @@ class ServerManagementController(Controller):
     async def delete_database(self, data):
         task_id = await self.task_manager.submit_task(self.server_management_service.delete_database, data)
         logging.info(f"Delete Database Task in ServerManagementController started in background with task_id: {task_id}")
-        return {"message": "Database delete task started in background", "task_id":task_id}
+        return {"message": "Database delete task started in background", "task_id": task_id}
 
     @validate_request({'DELETE': DeleteDatabaseUserSchema})
     async def delete_database_user(self, data):
