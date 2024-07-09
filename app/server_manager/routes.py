@@ -5,6 +5,9 @@ from quart import Blueprint, jsonify
 from app.server_manager.controllers.controller import Controller
 from app.server_manager.controllers.server_management_controller import ServerManagementController
 from app.server_manager.controllers.site_management_controller import SiteManagementController
+from app.server_manager.validators import validate_request
+from app.server_manager.validators.schemas.server_management.mysql.create_database_user_schema import \
+    CreateDatabaseUserSchema
 
 server_manager_blueprint = Blueprint('server_manager', __name__)
 task_manager = Controller().task_manager
@@ -61,6 +64,7 @@ async def create_database_route():
 
 
 @server_manager_blueprint.route('/create-database-user', methods=['POST'])
+@validate_request({'POST': CreateDatabaseUserSchema})
 async def create_database_user_route():
     data = await server_management_controller.create_database_user()
     return jsonify(data)

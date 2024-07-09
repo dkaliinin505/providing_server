@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from quart import request, jsonify, make_response, Response
+from quart import request, jsonify, make_response
 from marshmallow import ValidationError
 import os
 import requests
@@ -30,13 +30,13 @@ def validate_request(schema_classes):
                 authorization_header = request.headers.get('Authorization')
                 if not authorization_header:
                     logger.debug("Authorization header is missing")
-                    return await make_response(jsonify({'errors': 'Authorization header is missing'}), 401)
+                    return jsonify({'errors': 'Authorization header is missing'}), 401
 
                 # Key validation
                 response = requests.get(key_validation_url, headers={'Authorization': authorization_header})
                 if response.status_code != 200:
                     logger.debug("Invalid authorization token")
-                    return await make_response(jsonify({'errors': 'Invalid authorization token'}), 401)
+                    return jsonify({'errors': 'Invalid authorization token'}), 401
 
             method = request.method
             logger.debug(f"HTTP Method: {method}")
@@ -54,18 +54,18 @@ def validate_request(schema_classes):
                 errors = validate_data(validator, data)
                 if errors:
                     logger.debug(f"Validation errors: {errors}")
-                    return await make_response(jsonify({'errors': errors}), 400)
+                    return jsonify({'errors': errors}), 400
 
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
                     config_validator = get_config_validator(validator, package_name)
                     if not config_validator:
-                        return await make_response(jsonify({'errors': 'Invalid package name'}), 400)
+                        return jsonify({'errors': 'Invalid package name'}), 400
 
                     config_errors = config_validator.validate(data.get('config', {}))
                     if config_errors:
                         logger.debug(f"Config validation errors: {config_errors}")
-                        return await make_response(jsonify({'errors': config_errors}), 400)
+                        return jsonify({'errors': config_errors}), 400
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")

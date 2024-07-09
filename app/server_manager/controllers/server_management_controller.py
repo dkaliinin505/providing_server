@@ -54,7 +54,6 @@ class ServerManagementController(Controller):
         logging.info(f"Create Database Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "Create database started in background", "task_id": task_id}
 
-    @validate_request({'POST': CreateDatabaseUserSchema})
     async def create_database_user(self, data):
         task_id = await self.task_manager.submit_task(self.server_management_service.create_database_user, data)
         logging.info(f"Create Database User Task in ServerManagementController started in background with task_id: {task_id}")
