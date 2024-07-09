@@ -22,5 +22,5 @@ class CreateDatabaseCommand(Command):
         db_name = self.config.get('db_name')
         db_root_password = await async_get_env_variable('DB_PASSWORD')
 
-        command = f'mysql --user="root" --password="{db_root_password}" -e "CREATE DATABASE IF NOT EXISTS \\"{db_name}\\" CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
+        command = f'mysql --user="root" --password="{db_root_password}" -e "CREATE DATABASE IF NOT EXISTS "{db_name}" CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
         await run_command_async(command)
