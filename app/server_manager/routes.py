@@ -55,28 +55,33 @@ async def delete_certbot_cert_route():
 
 
 @server_manager_blueprint.route('/create-database', methods=['POST'])
-def create_database_route():
-    return server_management_controller.create_database()
+async def create_database_route():
+    data = await server_management_controller.create_database()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/create-database-user', methods=['POST'])
-def create_database_user_route():
-    return server_management_controller.create_database_user()
+async def create_database_user_route():
+    data = await server_management_controller.create_database_user()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/delete-database', methods=['DELETE'])
-def delete_database_route():
-    return server_management_controller.delete_database()
+async def delete_database_route():
+    data = await server_management_controller.delete_database()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/delete-database-user', methods=['DELETE'])
-def delete_database_user_route():
-    return server_management_controller.delete_database_user()
+async def delete_database_user_route():
+    data = await server_management_controller.delete_database_user()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/update-database-user', methods=['PUT'])
-def update_database_user_route():
-    return server_management_controller.update_database_user()
+async def update_database_user_route():
+    data = await server_management_controller.update_database_user()
+    return jsonify(data)
 
 
 @server_manager_blueprint.route('/test', methods=['GET'])
