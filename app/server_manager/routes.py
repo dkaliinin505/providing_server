@@ -65,9 +65,9 @@ async def create_database_route():
 
 @server_manager_blueprint.route('/create-database-user', methods=['POST'])
 @validate_request({'POST': CreateDatabaseUserSchema})
-async def create_database_user_route():
-    data = await server_management_controller.create_database_user()
-    return jsonify(data)
+async def create_database_user_route(data):
+    result = await server_management_controller.create_database_user(data)
+    return jsonify(result)
 
 
 @server_manager_blueprint.route('/delete-database', methods=['DELETE'])
