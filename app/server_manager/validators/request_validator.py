@@ -53,8 +53,7 @@ def validate_request(schema_classes):
 
                 errors = await validate_data(validator, data)
                 if errors:
-                    response = make_response(jsonify({'errors': errors}), 400)
-                    return response
+                    jsonify({'errors': errors}), 400
 
                 if isinstance(validator, InstallPackageSchema):
                     package_name = data.get('package_name')
