@@ -23,8 +23,9 @@ async def grant_privileges(config):
     db_user = config.get('db_user')
     db_privileges = config.get('db_privileges')
     db_root_password = async_get_env_variable('DB_PASSWORD')
+    privileges_str = ', '.join(db_privileges)
 
-    grant_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {db_privileges} ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
+    grant_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
     await run_command_async(grant_privileges_command)
 
     flush_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "FLUSH PRIVILEGES;"'
