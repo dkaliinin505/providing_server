@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from quart import request, jsonify
+from quart import request, jsonify, Response
 from marshmallow import ValidationError
 import os
 import requests
@@ -15,7 +15,7 @@ def validate_request(schema_classes):
     """
     schema_classes: dict
         A dictionary where keys are HTTP methods (GET, POST, etc.)
-        и values are schema classes for validation.
+        and values are schema classes for validation.
     """
     key_validation_url = os.getenv('KEY_VALIDATION_URL')
     app_type = os.getenv('APP_TYPE', 'dev')
@@ -68,7 +68,11 @@ def validate_request(schema_classes):
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
-            return await f(*args, **kwargs)
+
+            result = await f(*args, **kwargs)
+            if isinstance(result, Response):
+                return result
+            return jsonify(result)
 
         return decorated_function
 
