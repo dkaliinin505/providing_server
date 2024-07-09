@@ -1,5 +1,6 @@
 from app.server_manager.interfaces.command_interface import Command
 from utils.async_util import run_command_async
+from utils.env_util import async_get_env_variable
 
 
 class DeleteDatabaseUserCommand(Command):
@@ -11,7 +12,7 @@ class DeleteDatabaseUserCommand(Command):
         await self.delete_database_user()
 
     async def delete_database_user(self):
-        db_root_password = self.config.get('db_root_password')
+        db_root_password = async_get_env_variable('DB_PASSWORD')
         db_user = self.config.get('db_user')
         db_host = self.config.get('db_host', '%')
 
