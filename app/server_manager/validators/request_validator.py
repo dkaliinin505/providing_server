@@ -87,6 +87,7 @@ def validate_data(validator, data):
     errors = validator.validate(data)
     if errors:
         logger.debug(f"Validation errors: {errors}")
+        logger.debug(f"Type of errors: {type(errors)}")
     return errors
 
 
