@@ -11,11 +11,11 @@ async def create_user(config):
     create_user_command = f'mysql --user="root" --password="{db_root_password}" -e "CREATE USER \'{db_user}\'@\'%\' IDENTIFIED BY \'{db_password}\';"'
     await run_command_async(create_user_command)
 
-    grant_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "GRANT ALL PRIVILEGES ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
-    await run_command_async(grant_privileges_command)
+    #grant_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "GRANT ALL PRIVILEGES ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
+    #await run_command_async(grant_privileges_command)
 
-    flush_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "FLUSH PRIVILEGES;"'
-    await run_command_async(flush_privileges_command)
+    #flush_privileges_command = f'mysql --user="root" --password="{db_root_password}" -e "FLUSH PRIVILEGES;"'
+    #await run_command_async(flush_privileges_command)
 
 
 async def grant_privileges(config):
