@@ -6,12 +6,12 @@ async def create_user(config):
     db_user = config.get('db_user')
     db_password = config.get('db_user_password')
     db_root_password = await async_get_env_variable('DB_PASSWORD')
-    remote_ip = config.get('db_host')
+    db_host = await async_get_env_variable('HOST')
 
     commands = [
-        f'DROP USER IF EXISTS \'{db_user}\'@\'{remote_ip}\';',
+        f'DROP USER IF EXISTS \'{db_user}\'@\'{db_host}\';',
         f'DROP USER IF EXISTS \'{db_user}\'@\'%\';',
-        f'CREATE USER \'{db_user}\'@\'{remote_ip}\' IDENTIFIED BY \'{db_password}\';',
+        f'CREATE USER \'{db_user}\'@\'{db_host}\' IDENTIFIED BY \'{db_password}\';',
         f'CREATE USER \'{db_user}\'@\'%\' IDENTIFIED BY \'{db_password}\';'
     ]
 

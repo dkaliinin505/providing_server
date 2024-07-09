@@ -1,3 +1,5 @@
+import logging
+
 from app.server_manager.interfaces.command_interface import Command
 from utils.db_util import grant_privileges, create_user
 from utils.env_util import get_env_variable, async_get_env_variable
@@ -12,8 +14,10 @@ class CreateDatabaseCommand(Command):
         self.config = data
         await self.create_database()
         if self.config.get('create_user', False):
+            logging.info(f"Create Database User Command started with data: {self.config}")
             await create_user(self.config)
             if 'db_privileges' in self.config:
+                logging.info(f"Granting privileges to user: {self.config.get('db_user')}")
                 await grant_privileges(self.config)
 
         return {"message": f"Database created successfully: {self.config.get('db_name')}"}
