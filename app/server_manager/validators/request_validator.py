@@ -60,6 +60,7 @@ def validate_request(schema_classes):
                     logger.debug(f"Validation errors: {errors}")
                     response = jsonify({'errors': errors})
                     response.status_code = 400
+                    logger.debug(f"Validation Response: {response}")
                     return response
 
                 if isinstance(validator, InstallPackageSchema):
