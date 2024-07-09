@@ -22,18 +22,22 @@ async def create_user(config):
 
 
 async def grant_privileges(config):
-    db_name = config.get('db_name')
+    db_names = config.get('db_name', [])
     db_user = config.get('db_user')
     db_privileges = config.get('db_privileges', ['SELECT'])
     db_root_password = await async_get_env_variable('DB_PASSWORD')
-    db_host = config.get('db_host', '%')
+    db_host = await async_get_env_variable('HOST')
 
     privileges_str = ', '.join(db_privileges)
 
-    grant_privileges_command_ip = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'{db_host}\';"'
-    await run_command_async(grant_privileges_command_ip)
+    if isinstance(db_names, str):
+        db_names = [db_names]
 
-    grant_privileges_command_wildcard = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
-    await run_command_async(grant_privileges_command_wildcard)
+    for db_name in db_names:
+        grant_privileges_command_ip = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'{db_host}\';"'
+        await run_command_async(grant_privileges_command_ip)
+
+        grant_privileges_command_wildcard = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
+        await run_command_async(grant_privileges_command_wildcard)
 
     await run_command_async(f'mysql --user="root" --password="{db_root_password}" -e "FLUSH PRIVILEGES;"')
