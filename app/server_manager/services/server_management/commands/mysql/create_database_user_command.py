@@ -7,7 +7,7 @@ class CreateDatabaseUserCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        self.config.update(data)
+        self.config = data.get('config', self.config)
         await create_user(self.config)
         if 'db_name' in self.config:
             await grant_privileges(self.config)

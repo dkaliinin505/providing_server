@@ -9,7 +9,7 @@ class DeleteDatabaseCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        await self.config.update(data)
+        self.config = data.get('config', self.config)
         await self.delete_database()
 
         return {"message": f"Database deleted successfully: {self.config.get('db_name')}"}
@@ -19,4 +19,4 @@ class DeleteDatabaseCommand(Command):
         db_name = self.config.get('db_name')
 
         command = f"mysql --user='root' --password='{db_root_password}' -e \"DROP DATABASE IF EXISTS {db_name};\""
-        run_command_async(command)
+        await run_command_async(command)

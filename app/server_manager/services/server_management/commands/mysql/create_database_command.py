@@ -9,7 +9,7 @@ class CreateDatabaseCommand(Command):
         self.config = config
 
     async def execute(self, data):
-        self.config.update(data)
+        self.config = data.get('config', self.config)
         await self.create_database()
         if self.config.get('create_user', False):
             await create_user(self.config)
