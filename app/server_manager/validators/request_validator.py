@@ -54,6 +54,7 @@ def validate_request(schema_classes):
                 errors = validate_data(validator, data)
                 if errors:
                     response = jsonify({'errors': errors})
+                    logger.debug(f"Response: {response}")
                     response.status_code = 400
                     return response
 
