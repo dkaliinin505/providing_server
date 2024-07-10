@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import aiofiles
+from aiofiles import os
 
 
 async def run_command_async(command, raise_exception=True):
