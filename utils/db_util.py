@@ -34,10 +34,16 @@ async def grant_privileges(config):
         db_names = [db_names]
 
     for db_name in db_names:
-        grant_privileges_command_ip = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'{db_host}\';"'
+        grant_privileges_command_ip = (
+            f'mysql --user="root" --password="{db_root_password}" '
+            f'-e "GRANT {privileges_str} ON {db_name}.* TO \'{db_user}\'@\'{db_host}\';"'
+        )
         await run_command_async(grant_privileges_command_ip)
 
-        grant_privileges_command_wildcard = f'mysql --user="root" --password="{db_root_password}" -e "GRANT {privileges_str} ON `{db_name}`.* TO \'{db_user}\'@\'%\';"'
+        grant_privileges_command_wildcard = (
+            f'mysql --user="root" --password="{db_root_password}" '
+            f'-e "GRANT {privileges_str} ON {db_name}.* TO \'{db_user}\'@\'%\';"'
+        )
         await run_command_async(grant_privileges_command_wildcard)
 
     await run_command_async(f'mysql --user="root" --password="{db_root_password}" -e "FLUSH PRIVILEGES;"')
