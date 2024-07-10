@@ -20,5 +20,3 @@ from app.server_manager.validators.schemas.site_management.delete_certbot_cert_s
     DeleteCertBotCertificateSchema
 from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
-
-server_manager_blueprint = Blueprint('server_manager', __name__)
