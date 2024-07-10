@@ -96,10 +96,10 @@ async def update_database_user_route(data):
 
 @server_manager_blueprint.route('/test', methods=['GET'])
 @validate_request({'GET': RequestSchema})
-async def test_route():
-    data = await site_management_controller.test()
-    logging.info("Returned task id from controller method" + str(data))
-    return jsonify(data)
+async def test_route(data):
+    result = await site_management_controller.test(data)
+    logging.info("Returned task id from controller method" + str(result))
+    return jsonify(result)
 
 
 @server_manager_blueprint.route('/task-status/<int:task_id>', methods=['GET'])
