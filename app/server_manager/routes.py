@@ -1,8 +1,8 @@
 import logging
 
-from quart import jsonify, Blueprint
+from quart import Blueprint, jsonify
 
-from imports import *
+from .imports import *
 
 server_manager_blueprint = Blueprint('server_manager', __name__)
 task_manager = Controller().task_manager
