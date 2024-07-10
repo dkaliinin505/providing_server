@@ -1,6 +1,6 @@
 import logging
 
-from quart import Blueprint, jsonify
+from quart import jsonify, Blueprint
 
 from __init__ import *
 
