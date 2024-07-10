@@ -19,7 +19,7 @@ class DeleteDatabaseUserCommand(Command):
     async def delete_database_user(self):
         db_root_password = await async_get_env_variable('DB_PASSWORD')
         db_user = self.config.get('db_user')
-        db_host = self.config.get('db_host', '%')
+        db_host = await async_get_env_variable('HOST', '%')
 
         commands = [
             f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'%';\"",
