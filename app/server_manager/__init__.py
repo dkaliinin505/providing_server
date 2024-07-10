@@ -1,21 +1,3 @@
-from app.server_manager.services.server_management.server_management_service import ServerManagementService
-from app.server_manager.controllers.controller import Controller
-from app.server_manager.controllers.server_management_controller import ServerManagementController
-from app.server_manager.controllers.site_management_controller import SiteManagementController
-from app.server_manager.validators import validate_request
-from app.server_manager.validators.schemas.install_package_schema import InstallPackageSchema
-from app.server_manager.validators.schemas.server_management.create_site_config_schema import CreateSiteSchema
-from app.server_manager.validators.schemas.server_management.generate_deploy_key_config_schema import \
-    GenerateDeployKeyCommandSchema
-from app.server_manager.validators.schemas.server_management.mysql.create_database_schema import CreateDatabaseSchema
-from app.server_manager.validators.schemas.server_management.mysql.create_database_user_schema import \
-    CreateDatabaseUserSchema
-from app.server_manager.validators.schemas.server_management.mysql.delete_database_schema import DeleteDatabaseSchema
-from app.server_manager.validators.schemas.server_management.mysql.delete_database_user_config import \
-    DeleteDatabaseUserSchema
-from app.server_manager.validators.schemas.site_management.create_certbot_cert_schema import \
-    CreateCertBotCertificateSchema
-from app.server_manager.validators.schemas.site_management.delete_certbot_cert_schema import \
-    DeleteCertBotCertificateSchema
-from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
-from app.server_manager.validators.schemas.validation_schema import RequestSchema
+from flask import Blueprint
+
+server_manager_blueprint = Blueprint('server_manager', __name__)
