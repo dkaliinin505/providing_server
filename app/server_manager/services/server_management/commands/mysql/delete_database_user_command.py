@@ -26,4 +26,5 @@ class DeleteDatabaseUserCommand(Command):
             f"mysql --user='root' --password='{db_root_password}' -e \"DROP USER IF EXISTS '{db_user}'@'%'; DROP USER IF EXISTS '{db_user}'@'{db_host}';\""
         ]
         for command in commands:
+            logging.info("Command is running: " + command)
             await run_command_async(command)
