@@ -48,7 +48,7 @@ async def deploy_project_route(data):
 @server_manager_blueprint.route('/create-certbot-cert', methods=['POST'])
 @validate_request({'POST': CreateCertBotCertificateSchema})
 async def create_certbot_cert_route(data):
-    result = site_management_controller.create_certbot_cert(data)
+    result = await site_management_controller.create_certbot_cert(data)
     return jsonify(result)
 
 
