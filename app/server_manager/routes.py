@@ -115,4 +115,4 @@ async def task_status_route(task_id):
         case "error":
             status_code = 400
 
-    return jsonify(status, status_code)
+    return jsonify(status), status_code
