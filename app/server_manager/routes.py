@@ -106,4 +106,13 @@ async def test_route(data):
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)
     logging.info(f"Status for Task ID {task_id}: {status}")
-    return jsonify(status)
+    status_code = 500
+    match status.get("status"):
+        case "completed":
+            status_code = 200
+        case "in_progress":
+            status_code = 202
+        case "error":
+            status_code = 400
+
+    return jsonify(status, status_code)
