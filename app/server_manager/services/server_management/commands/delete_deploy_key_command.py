@@ -1,6 +1,5 @@
-import os
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 
 
 class DeleteDeployKeyCommand(Command):
@@ -8,7 +7,7 @@ class DeleteDeployKeyCommand(Command):
         self.config = config
         print(f"Config: {config}")
 
-    def execute(self, data):
+    async def execute(self, data):
         self.config = data
         domain = self.config.get('domain')
         # SSH key path
@@ -16,13 +15,13 @@ class DeleteDeployKeyCommand(Command):
         ssh_key_pub_path = f'{ssh_key_path}.pub'
 
         # Delete the config file for the GitHub
-        if os.path.exists(f'{ssh_key_path}-config'):
-            run_command(f'sudo -u super_forge rm -f {ssh_key_path}-config')
+        if await check_file_exists(f'{ssh_key_path}-config'):
+            await run_command_async(f'sudo -u super_forge rm -f {ssh_key_path}-config')
 
         # Check if the key files exist and delete them
-        if os.path.exists(ssh_key_path):
-            run_command(f'sudo -u super_forge rm -f {ssh_key_path}')
-            run_command(f'sudo -u super_forge rm -f {ssh_key_pub_path}')
+        if await check_file_exists(ssh_key_path):
+            await run_command_async(f'sudo -u super_forge rm -f {ssh_key_path}')
+            await run_command_async(f'sudo -u super_forge rm -f {ssh_key_pub_path}')
             message = "SSH key deleted successfully"
         else:
             message = "SSH key not found"

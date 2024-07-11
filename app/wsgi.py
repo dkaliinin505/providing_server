@@ -1,6 +1,8 @@
+import logging
 import sys
 import os
-from flask import jsonify
+import asyncio
+from quart import jsonify
 
 # Add the app directory to the path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -12,6 +14,7 @@ from app.exceptions.http_exception import ProvidingServerHTTPException
 @app_instance.app.errorhandler(Exception)
 def handle_exception(e):
     # If the exception is a custom one, use its status code and message
+    logging.error(f"Exception: {e}")
     if isinstance(e, ProvidingServerHTTPException):
         response = jsonify(e.to_dict())
         response.status_code = e.status_code
@@ -25,5 +28,12 @@ def handle_exception(e):
     return response
 
 
+async def main():
+    from app.server_manager.managers.task_manager import TaskManager
+    task_manager = TaskManager()
+    await task_manager.start_worker()
+    await app_instance.run()
+
+
 if __name__ == "__main__":
-    app_instance.run()
+    asyncio.run(main())

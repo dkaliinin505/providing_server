@@ -1,7 +1,5 @@
 import asyncio
-import concurrent.futures
 import logging
-import threading
 from time import time
 
 
@@ -17,55 +15,72 @@ class SingletonMeta(type):
 
 class TaskManager(metaclass=SingletonMeta):
     def __init__(self):
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+        self.task_queue = asyncio.Queue()
         self.future_to_id = {}
         self.id_to_result = {}
         self.id_counter = 0
-        self.lock = threading.Lock()
+        self.lock = asyncio.Lock()
+        self.worker_count = 1
 
-    def _generate_unique_id(self):
-        with self.lock:
+    async def _generate_unique_id(self):
+        async with self.lock:
             self.id_counter += 1
             return self.id_counter
 
-    def submit_task(self, func, *args, **kwargs):
-        task_id = self._generate_unique_id()
-        future = self.executor.submit(func, *args, **kwargs)
+    async def submit_task(self, func, *args, **kwargs):
+        task_id = await self._generate_unique_id()
+        future = asyncio.get_event_loop().create_future()
         self.future_to_id[future] = task_id
+
+        await self.task_queue.put((future, func, args, kwargs))
         logging.info(f"Task submitted with ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
-        future.add_done_callback(self._task_done_callback)
+
         return task_id
 
-    def _task_done_callback(self, future):
-        task_id = self.future_to_id.pop(future)
-        logging.info(f"Task completed with ID: {task_id}")
-        try:
-            result = future.result()
-            self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
-            logging.info(f"Result stored for Task ID: {task_id}")
-        except Exception as e:
-            self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
-            logging.error(f"Error for Task ID: {task_id}: {str(e)}")
+    async def worker(self):
+        logging.info("Worker is running")
+        while True:
+            future, func, args, kwargs = await self.task_queue.get()
+            task_id = self.future_to_id[future]
+            try:
+                if asyncio.iscoroutinefunction(func):
+                    result = await func(*args, **kwargs)
+                else:
+                    result = func(*args, **kwargs)
+                future.set_result(result)
+                self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
+                logging.info(f"Task completed with ID: {task_id}")
+            except Exception as e:
+                future.set_exception(e)
+                self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
+                logging.error(f"Error for Task ID: {task_id}: {str(e)}")
+            finally:
+                self.task_queue.task_done()
 
-    def get_task_status(self, task_id):
+    async def start_worker(self):
+        for _ in range(self.worker_count):
+            asyncio.create_task(self.worker())
+
+    async def get_task_status(self, task_id):
         logging.info(f"Getting status for Task ID: {task_id}")
         logging.info(f"Tasks: {self.future_to_id}")
         logging.info(f"Results: {self.id_to_result}")
-        if task_id in self.id_to_result:
-            result, _ = self.id_to_result[task_id]
-            return result
+        logging.info("Trying to find task in Future")
         for future, future_id in self.future_to_id.items():
             if future_id == task_id:
                 if future.done():
                     try:
                         result = future.result()
+                        if asyncio.iscoroutine(result):
+                            result = await result
                         self.id_to_result[task_id] = (
                             {"task_id": task_id, "status": "completed", "result": result}, time())
                         return {"task_id": task_id, "status": "completed", "result": result}
                     except Exception as e:
-                        self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
-                        return {"task_id": task_id, "status": "error", "error": str(e)}
+                        self.id_to_result[task_id] = (
+                            {"task_id": task_id, "status": "error", "result": {"message": str(e)}}, time())
+                        return {"task_id": task_id, "status": "error", "result": {"message": str(e)}}
                 else:
-                    return {"task_id": task_id, "status": "in_progress"}
+                    return {"task_id": task_id, "status": "in_progress", "result": {"message": "Task in progress"}}
         return {"message": "Task ID not found"}

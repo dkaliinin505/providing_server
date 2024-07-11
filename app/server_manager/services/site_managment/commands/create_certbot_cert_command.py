@@ -1,5 +1,6 @@
+import asyncio
 from app.server_manager.interfaces.command_interface import Command
-from utils.util import run_command
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 
 
 class CreateCertBotCertificateCommand(Command):
@@ -7,26 +8,26 @@ class CreateCertBotCertificateCommand(Command):
         self.config = config
         print(f"Config: {config}")
 
-    def execute(self, data):
+    async def execute(self, data):
         self.config = data
-        self.check_and_install_certbot()
+        await self.check_and_install_certbot()
         try:
-            self.create_ssl_certificate()
-            run_command("sudo systemctl restart nginx")
+            await self.create_ssl_certificate()
+            await run_command_async("sudo systemctl restart nginx")
             return {"message": f"SSL certificate created successfully for domain: {self.config.get('domain')}"}
         except Exception as e:
             return {f"Failed to create SSL certificate: {str(e)}"}
 
-    def create_ssl_certificate(self):
+    async def create_ssl_certificate(self):
         domain = self.config.get('domain')
         email = self.config.get('email')
         certbot_command = f"sudo certbot --nginx -d {domain} --non-interactive --agree-tos -m {email}"
-        run_command(certbot_command)
+        await run_command_async(certbot_command)
 
-    def check_and_install_certbot(self):
+    async def check_and_install_certbot(self):
         try:
-            run_command("certbot --version")
+            await run_command_async("certbot --version")
         except Exception:
             print("Certbot not found. Installing...")
-            run_command("sudo apt update")
-            run_command("sudo apt install -y certbot python3-certbot-nginx")
+            await run_command_async("sudo apt update")
+            await run_command_async("sudo apt install -y certbot python3-certbot-nginx")

@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from flask import request, jsonify
+from quart import request, jsonify, make_response
 from marshmallow import ValidationError
 import os
 import requests
@@ -15,14 +15,14 @@ def validate_request(schema_classes):
     """
     schema_classes: dict
         A dictionary where keys are HTTP methods (GET, POST, etc.)
-        и values are schema classes for validation.
+        and values are schema classes for validation.
     """
     key_validation_url = os.getenv('KEY_VALIDATION_URL')
     app_type = os.getenv('APP_TYPE', 'dev')
 
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        async def decorated_function(*args, **kwargs):
             logger.debug("Entering decorator")
 
             if app_type != 'dev':
@@ -47,12 +47,13 @@ def validate_request(schema_classes):
                 validator = schema_class()
                 logger.debug(f"Validator: {validator}")
 
-                data = get_request_data(method)
+                data = await get_request_data(method)
 
                 logger.debug(f"Data: {data}")
 
                 errors = validate_data(validator, data)
                 if errors:
+                    logger.debug(f"Validation errors: {errors}")
                     return jsonify({'errors': errors}), 400
 
                 if isinstance(validator, InstallPackageSchema):
@@ -68,18 +69,20 @@ def validate_request(schema_classes):
 
                 kwargs['data'] = data
                 logger.debug(f"kwargs['data']: {kwargs['data']}")
-            return f(*args, **kwargs)
+
+            return await f(*args, **kwargs)
 
         return decorated_function
 
     return decorator
 
 
-def get_request_data(method):
-    if method == 'DELETE' or method == 'GET':
+async def get_request_data(method):
+    if method in ['DELETE', 'GET']:
+        logger.debug("GET or DELETE request")
         return request.args.to_dict()
     else:
-        return request.get_json()
+        return await request.get_json()
 
 
 def validate_data(validator, data):

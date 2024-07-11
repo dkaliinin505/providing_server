@@ -1,5 +1,3 @@
-from flask import jsonify
-
 from app.server_manager.managers.task_manager import TaskManager
 
 

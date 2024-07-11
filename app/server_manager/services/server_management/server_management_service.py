@@ -1,3 +1,6 @@
+import logging
+
+from app.server_manager.managers.task_manager import TaskManager
 from app.server_manager.services.server_management.commands.create_site_command import CreateSiteCommand
 from app.server_manager.services.server_management.commands.delete_deploy_key_command import DeleteDeployKeyCommand
 from app.server_manager.services.server_management.commands.generate_deploy_key_command import GenerateDeployKeyCommand
@@ -9,13 +12,15 @@ from app.server_manager.services.server_management.commands.mysql.delete_databas
     DeleteDatabaseUserCommand
 from app.server_manager.services.server_management.commands.mysql.update_database_user_command import \
     UpdateDatabaseUserCommand
-from app.server_manager.services.server_management.invoker import ServerManagementExecutor
+from app.server_manager.services.invoker import CommandExecutor
+from app.server_manager.services.service import Service
 
 
-class ServerManagementService:
+class ServerManagementService(Service):
 
     def __init__(self):
-        self.executor = ServerManagementExecutor()
+        super().__init__()
+        self.task_manager = TaskManager()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
         self.executor.register('delete_deploy_key', DeleteDeployKeyCommand({'config': {}}))
@@ -25,26 +30,42 @@ class ServerManagementService:
         self.executor.register('delete_database', DeleteDatabaseCommand({'config': {}}))
         self.executor.register('delete_database_user', DeleteDatabaseUserCommand({'config': {}}))
 
-    def generate_deploy_key(self, data):
-        return self.executor.execute('generate_deploy_key', data)
+    async def generate_deploy_key(self, data):
+        data = await self.executor.execute('generate_deploy_key', data)
+        logging.info(f"Generate Deploy Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def delete_deploy_key(self, data):
-        return self.executor.execute('delete_deploy_key', data)
+    async def delete_deploy_key(self, data):
+        data = await self.executor.execute('delete_deploy_key', data)
+        logging.info(f"Delete Deploy Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def create_site(self, data):
-        return self.executor.execute('create_site', data)
+    async def create_site(self, data):
+        data = await self.executor.execute('create_site', data)
+        logging.info(f"Create Site Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def create_database(self, data):
-        return self.executor.execute('create_database', data)
+    async def create_database(self, data):
+        data = await self.executor.execute('create_database', data)
+        logging.info(f"Create Database Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def create_database_user(self, data):
-        return self.executor.execute('create_database_user', data)
+    async def create_database_user(self, data):
+        data = await self.executor.execute('create_database_user', data)
+        logging.info(f"Create Database User Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def update_database_user(self, data):
-        return self.executor.execute('update_database_user', data)
+    async def update_database_user(self, data):
+        data = await self.executor.execute('update_database_user', data)
+        logging.info(f"Update Database User Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def delete_database(self, data):
-        return self.executor.execute('delete_database', data)
+    async def delete_database(self, data):
+        data = await self.executor.execute('delete_database', data)
+        logging.info(f"Delete Database Task in ServerManagementService started in background with task_id: {data}")
+        return data
 
-    def delete_database_user(self, data):
-        return self.executor.execute('delete_database_user', data)
+    async def delete_database_user(self, data):
+        data = await self.executor.execute('delete_database_user', data)
+        logging.info(f"Delete Database User Task in ServerManagementService started in background with task_id: {data}")
+        return data
