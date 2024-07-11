@@ -78,8 +78,9 @@ class TaskManager(metaclass=SingletonMeta):
                             {"task_id": task_id, "status": "completed", "result": result}, time())
                         return {"task_id": task_id, "status": "completed", "result": result}
                     except Exception as e:
-                        self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
-                        return {"task_id": task_id, "status": "error", "error": str(e)}
+                        self.id_to_result[task_id] = (
+                        {"task_id": task_id, "status": "error", "result": {"message": str(e)}}, time())
+                        return {"task_id": task_id, "status": "error", "result": {"message": str(e)}}
                 else:
                     return {"task_id": task_id, "status": "in_progress"}
         return {"message": "Task ID not found"}
