@@ -5,8 +5,8 @@ Alpha version of the project. The project is a server that provides a RESTful AP
 ## Table of Contents
 
 - [Installation](#installation)
+- [After-Installation Step](#after-installation-step)
 - [Usage](#usage)
-- [Features](#features)
 - [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [License](#license)
@@ -29,8 +29,23 @@ python3 install.py
 {your_path}/providing_server/providing_env/bin/python install.py
 ```
 
+## After-Installation Step
+
 Also, you need to open port 5000,80,443 on your server, or you're hosting.
-This will install the project and all its dependencies. After that you can use this service via your public IP. 
+This will install the project and all its dependencies. After that you can use this service via your public IP.
+
+Edit the .env File
+You also need to edit the .env file and update the HOST key with the public address of your server.
+
+Open the .env file and make the following changes:
+    
+```
+# .env
+HOST=your_public_server_ip
+```
+Replace `your_public_server_ip` with the actual public IP address of your server. This step is crucial for ensuring that the service is accessible via your public IP.
+
+By following these instructions, you'll have the project installed and configured correctly on your server.
 
 ## Usage
 After installing the project, the server is managed as a Linux service named providingServer. Below are some commands to manage the service and use the provided API.
@@ -127,21 +142,7 @@ This will return the status of the task with the specified `task_id`.
 
 You can use other commands and endpoints provided by the server to manage various aspects of your server. Refer to the API Documentation section for more details.
 
-## Features
-
-(Describe the main features of your project)
-
 ## API Documentation
 
-### Endpoint: /create-database-user
-**Method:** POST  
-**Description:** Creates a new database user.  
-**Payload:**
-```json
-{
-    "db_user": "new_user",
-    "db_user_password": "user_password",
-    "db_privileges": ["ALL PRIVILEGES"],
-    "db_host": "3.73.182.116"
-}
-```
+Follow this [link](https://app.swaggerhub.com/apis-docs/DP101196/Super_forge/1.0.0-oas3) to see the API documentation on SwaggerHub.
+
