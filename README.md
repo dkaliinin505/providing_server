@@ -31,10 +31,9 @@ python3 install.py
 
 ## After-Installation Step
 
-Also, you need to open port 5000,80,443 on your server, or you're hosting.
-This will install the project and all its dependencies. After that you can use this service via your public IP.
+Also, you need to open ports `5000,80,443` on your server, or hosting.
+After that you can use this service via your public IP.
 
-Edit the .env File
 You also need to edit the .env file and update the HOST key with the public address of your server.
 
 Open the .env file and make the following changes:
