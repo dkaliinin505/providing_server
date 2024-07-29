@@ -1,6 +1,6 @@
 import asyncio
 import logging
-
+import aiohttp
 import aiofiles
 from aiofiles import os
 
@@ -36,3 +36,17 @@ async def dir_exists(dirpath):
     except Exception as e:
         logging.error(f"Error checking if directory exists: {e}")
         return False
+
+
+async def send_post_request_async(data):
+    url = os.getenv("CALLBACK_URL")  # Получение URL из .env файла
+    if not url:
+        raise Exception("CALLBACK_URL not set in .env file")
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, json=data) as response:
+                response.raise_for_status()  # Проверка на HTTP ошибки
+                return await response.json()
+        except aiohttp.ClientError as e:
+            print(f"Request failed: {e}")
+            return None

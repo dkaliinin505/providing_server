@@ -3,6 +3,8 @@ import subprocess, json, os, sys, importlib
 import traceback
 import venv
 
+import requests
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -212,3 +214,15 @@ def set_permissions_dynamically():
 
 def version_to_int(version):
     return int("".join(version.split(".")))
+
+
+def send_post_request(data, url):
+    if not url:
+        raise Exception("CALLBACK_URL not set in .env file")
+    try:
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        return None

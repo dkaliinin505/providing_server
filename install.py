@@ -1,7 +1,7 @@
 import os
 from utils.util import run_command, module_exists, ensure_package_installed, user_exists, create_systemd_service, \
     check_service_exists, create_virtualenv, activate_virtualenv, install_requirements, install_python_venv, \
-    set_permissions_dynamically
+    set_permissions_dynamically, send_post_request
 
 
 #
@@ -205,6 +205,8 @@ def setup_server(current_directory, env_name):
         create_systemd_service(service_name, env_path, service_script_path)
     else:
         print(f"Service {service_name} already exists.")
+
+    send_post_request({"ip_address" : os.getenv("HOST"), "status": "done"}, os.getenv("CALLBACK_URL"))
 
 
 if __name__ == "__main__":
