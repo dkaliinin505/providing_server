@@ -5,7 +5,7 @@ import asyncio
 from app.server_manager.interfaces.command_interface import Command
 from utils.util import is_wsl
 from utils.async_util import run_command_async, check_file_exists, dir_exists
-from utils.env_util import update_env_variable, async_load_env, async_update_env_variable
+from utils.env_util import update_env_variable, async_load_env, async_update_env_variable, async_get_env_variable
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class MySQLCommand(Command):
             await run_command_async("sudo apt-get update")
 
         # Set The Automated Root Password
-        db_password = self.config.get('db_password', 'default_password')
+        db_password = await async_get_env_variable('DB_PASSWORD')
         await run_command_async(
             f"echo 'mysql-community-server mysql-community-server/data-dir select \"\"' | sudo debconf-set-selections")
         await run_command_async(
