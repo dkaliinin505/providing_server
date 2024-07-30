@@ -44,11 +44,15 @@ async def send_post_request_async(data):
     url = await async_get_env_variable("CALLBACK_URL")
     if not url:
         raise Exception("CALLBACK_URL not set in .env file")
+
+    logging.info(f"Sending POST request to {url} with data: {data}")
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, json=data) as response:
                 response.raise_for_status()
+                logging.info(f"Request successful, response: {await response.json()}")
                 return await response.json()
         except aiohttp.ClientError as e:
-            print(f"Request failed: {e}")
+            logging.error(f"Request failed: {e}")
             return None
