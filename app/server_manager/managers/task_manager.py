@@ -55,7 +55,7 @@ class TaskManager(metaclass=SingletonMeta):
                 self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
                 logging.info(f"Task completed with ID: {task_id}")
 
-                ip_address = await async_get_env_variable("IP_ADDRESS")
+                ip_address = await async_get_env_variable("HOST")
                 # Send callback after task completion
                 try:
                     response = await send_post_request_async({
