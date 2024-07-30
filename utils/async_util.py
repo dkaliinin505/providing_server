@@ -4,6 +4,8 @@ import aiohttp
 import aiofiles
 from aiofiles import os
 
+from utils.env_util import async_get_env_variable
+
 
 async def run_command_async(command, raise_exception=True):
     process = await asyncio.create_subprocess_shell(
@@ -39,13 +41,13 @@ async def dir_exists(dirpath):
 
 
 async def send_post_request_async(data):
-    url = os.getenv("CALLBACK_URL")  # Получение URL из .env файла
+    url = await async_get_env_variable("CALLBACK_URL")
     if not url:
         raise Exception("CALLBACK_URL not set in .env file")
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, json=data) as response:
-                response.raise_for_status()  # Проверка на HTTP ошибки
+                response.raise_for_status()
                 return await response.json()
         except aiohttp.ClientError as e:
             print(f"Request failed: {e}")

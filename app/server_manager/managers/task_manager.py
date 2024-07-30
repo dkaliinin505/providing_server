@@ -2,6 +2,9 @@ import asyncio
 import logging
 from time import time
 
+from utils.async_util import send_post_request_async
+from utils.env_util import async_get_env_variable
+
 
 class SingletonMeta(type):
     _instances = {}
@@ -51,6 +54,15 @@ class TaskManager(metaclass=SingletonMeta):
                 future.set_result(result)
                 self.id_to_result[task_id] = ({"task_id": task_id, "status": "completed", "result": result}, time())
                 logging.info(f"Task completed with ID: {task_id}")
+
+                ip_address = await async_get_env_variable("IP_ADDRESS")
+                # Send callback after task completion
+                await send_post_request_async({
+                    "task_id": task_id,
+                    "ip_address": ip_address,
+                    "status": "done"
+                })
+
             except Exception as e:
                 future.set_exception(e)
                 self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
