@@ -138,7 +138,7 @@ class MySQLCommand(Command):
         await self.create_and_grant_permissions(db_password, 'super_forge')
 
     async def create_and_grant_permissions(self, db_password, username):
-        remote_ip = self.config.get('remote_ip', '3.78.19.112')
+        remote_ip = await async_get_env_variable("HOST")
         commands = [
             f'CREATE USER \'{username}\'@\'{remote_ip}\' IDENTIFIED BY \'{db_password}\';',
             f'CREATE USER \'{username}\'@\'%\' IDENTIFIED BY \'{db_password}\';',
