@@ -57,11 +57,15 @@ class TaskManager(metaclass=SingletonMeta):
 
                 ip_address = await async_get_env_variable("IP_ADDRESS")
                 # Send callback after task completion
-                await send_post_request_async({
-                    "task_id": task_id,
-                    "ip_address": ip_address,
-                    "status": "done"
-                })
+                try:
+                    response = await send_post_request_async({
+                        "task_id": task_id,
+                        "ip_address": ip_address,
+                        "status": "done"
+                    })
+                    logging.info(f"Callback response: {response}")
+                except Exception as e:
+                    logging.error(f"Failed to send callback: {e}")
 
             except Exception as e:
                 future.set_exception(e)
