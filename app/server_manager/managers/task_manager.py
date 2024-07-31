@@ -66,11 +66,7 @@ class TaskManager(metaclass=SingletonMeta):
                     callback_data["deploy_key"] = ssh_key
                 # Send callback after task completion
                 try:
-                    response = await send_post_request_async({
-                        "task_id": task_id,
-                        "ip_address": ip_address,
-                        "status": "done"
-                    })
+                    response = await send_post_request_async(callback_data)
                     logging.info(f"Callback response: {response}")
                 except Exception as e:
                     logging.error(f"Failed to send callback: {e}")
