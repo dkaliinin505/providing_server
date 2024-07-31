@@ -56,6 +56,14 @@ class TaskManager(metaclass=SingletonMeta):
                 logging.info(f"Task completed with ID: {task_id}")
 
                 ip_address = await async_get_env_variable("HOST")
+                ssh_key = result.get("public_key")
+                callback_data = {
+                    "task_id": task_id,
+                    "ip_address": ip_address,
+                    "status": "done"
+                }
+                if ssh_key:
+                    callback_data["deploy_key"] = ssh_key
                 # Send callback after task completion
                 try:
                     response = await send_post_request_async({
