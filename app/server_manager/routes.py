@@ -31,7 +31,7 @@ async def create_site_route(data):
     return jsonify(result)
 
 
-@server_manager_blueprint.route('/delete-site', methods=['POST'])
+@server_manager_blueprint.route('/delete-site', methods=['DELETE'])
 @validate_request({'DELETE': DeleteCertBotCertificateSchema})
 async def delete_site_route(data):
     result = await server_management_controller.delete_site(data)
