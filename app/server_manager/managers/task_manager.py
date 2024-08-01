@@ -70,24 +70,25 @@ class TaskManager(metaclass=SingletonMeta):
                     logging.info(f"Callback response: {response}")
                 except Exception as e:
                     # Send callback with error status
-                    ip_address = await async_get_env_variable("HOST")
-                    callback_data = {
-                        "task_id": task_id,
-                        "ip_address": ip_address,
-                        "error_message": str(e),
-                        "status": "error"
-                    }
-
-                    try:
-                        await send_post_request_async(callback_data)
-                    except Exception as callback_error:
-                        logging.error(f"Failed to send callback: {callback_error}")
-
                     logging.error(f"Failed to send callback: {e}")
 
             except Exception as e:
                 future.set_exception(e)
                 self.id_to_result[task_id] = ({"task_id": task_id, "status": "error", "error": str(e)}, time())
+
+                ip_address = await async_get_env_variable("HOST")
+                callback_data = {
+                    "task_id": task_id,
+                    "ip_address": ip_address,
+                    "error_message": str(e),
+                    "status": "error"
+                }
+
+                try:
+                    await send_post_request_async(callback_data)
+                except Exception as callback_error:
+                    logging.error(f"Failed to send callback: {callback_error}")
+
                 logging.error(f"Error for Task ID: {task_id}: {str(e)}")
             finally:
                 self.task_queue.task_done()
