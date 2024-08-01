@@ -3,6 +3,7 @@ import logging
 from app.server_manager.managers.task_manager import TaskManager
 from app.server_manager.services.server_management.commands.create_site_command import CreateSiteCommand
 from app.server_manager.services.server_management.commands.delete_deploy_key_command import DeleteDeployKeyCommand
+from app.server_manager.services.server_management.commands.delete_site_command import DeleteSiteCommand
 from app.server_manager.services.server_management.commands.generate_deploy_key_command import GenerateDeployKeyCommand
 from app.server_manager.services.server_management.commands.mysql.create_database_command import CreateDatabaseCommand
 from app.server_manager.services.server_management.commands.mysql.create_database_user_command import \
@@ -22,6 +23,7 @@ class ServerManagementService(Service):
         super().__init__()
         self.task_manager = TaskManager()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
+        self.executor.register('delete_site', DeleteSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
         self.executor.register('delete_deploy_key', DeleteDeployKeyCommand({'config': {}}))
         self.executor.register('create_database', CreateDatabaseCommand({'config': {}}))
@@ -43,6 +45,11 @@ class ServerManagementService(Service):
     async def create_site(self, data):
         data = await self.executor.execute('create_site', data)
         logging.info(f"Create Site Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def delete_site(self, data):
+        data = await self.executor.execute('delete_site', data)
+        logging.info(f"Delete Site Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def create_database(self, data):

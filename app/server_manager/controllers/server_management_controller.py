@@ -28,6 +28,11 @@ class ServerManagementController(Controller):
         logging.info(f"Create Site Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "Create Site Task started in background", "task_id": task_id}
 
+    async def delete_site(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.delete_site, data)
+        logging.info(f"Delete Site Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Delete Site Task started in background", "task_id": task_id}
+
     async def install_package(self, data):
         task_id = await self.task_manager.submit_task(self.package_installer_service.install_package, data)
         logging.info(f"Install Package Task in ServerManagementController started in background with task_id: {task_id}")
