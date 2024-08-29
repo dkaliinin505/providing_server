@@ -20,6 +20,9 @@ def setup_server(current_directory, env_name):
     if os.path.exists("/root/.superforge-provisioned"):
         raise Exception("This server has already been provisioned by Super Forge.")
 
+    send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Began provisioning server"},
+                      os.getenv("CALLBACK_SERVER_STATUS_URL"))
+
     print('Starting to update server')
     if not os.path.exists("/root/.ssh"):
         os.makedirs("/root/.ssh")
@@ -99,6 +102,8 @@ def setup_server(current_directory, env_name):
         # Verify the swap file
         run_command("sudo swapon --show")
         run_command("free -h")
+
+    send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Configured Swap"}, os.getenv("CALLBACK_SERVER_STATUS_URL"))
 
     if not os.path.exists("/home/super_forge/.ssh"):
         os.makedirs("/home/super_forge/.ssh")
