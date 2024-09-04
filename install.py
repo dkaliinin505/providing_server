@@ -21,7 +21,7 @@ def setup_server(current_directory, env_name):
         raise Exception("This server has already been provisioned by Super Forge.")
 
     send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Began provisioning server"},
-                      os.getenv("CALLBACK_SERVER_STATUS_URL"))
+                      os.getenv("CALLBACK_URL"))
 
     print('Starting to update server')
     if not os.path.exists("/root/.ssh"):
@@ -103,7 +103,7 @@ def setup_server(current_directory, env_name):
         run_command("sudo swapon --show")
         run_command("free -h")
 
-    send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Configured Swap"}, os.getenv("CALLBACK_SERVER_STATUS_URL"))
+    send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Configured Swap"}, os.getenv("CALLBACK_URL"))
 
     if not os.path.exists("/home/super_forge/.ssh"):
         os.makedirs("/home/super_forge/.ssh")
@@ -211,7 +211,7 @@ def setup_server(current_directory, env_name):
     else:
         print(f"Service {service_name} already exists.")
 
-    send_post_request({"ip_address" : os.getenv("HOST"), "status": "done"}, os.getenv("CALLBACK_URL"))
+    send_post_request({"ip_address": os.getenv("HOST"), "status": "done", "message": "Installation complete"}, os.getenv("CALLBACK_URL"))
 
 
 if __name__ == "__main__":
