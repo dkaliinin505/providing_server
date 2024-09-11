@@ -2,6 +2,7 @@ import asyncio
 import logging
 import aiohttp
 import aiofiles
+import re
 from aiofiles import os
 
 from utils.env_util import async_get_env_variable
@@ -56,3 +57,10 @@ async def send_post_request_async(data):
         except aiohttp.ClientError as e:
             logging.error(f"Request failed: {e}")
             return None
+
+
+async def extract_error_message(error_message: str):
+    match = re.search(r"failed with error:(.*)", error_message)
+    if match:
+        return match.group(1).strip()
+    return error_message

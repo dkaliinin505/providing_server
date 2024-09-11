@@ -2,7 +2,7 @@ import asyncio
 import logging
 from time import time
 
-from utils.async_util import send_post_request_async
+from utils.async_util import send_post_request_async, extract_error_message
 from utils.env_util import async_get_env_variable
 
 
@@ -81,7 +81,7 @@ class TaskManager(metaclass=SingletonMeta):
                 callback_data = {
                     "task_id": task_id,
                     "ip_address": ip_address,
-                    "error_message": str(e),
+                    "error_message": await extract_error_message(str(e)),
                     "status": "error"
                 }
 
