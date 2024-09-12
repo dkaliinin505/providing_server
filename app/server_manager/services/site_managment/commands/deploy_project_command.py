@@ -45,6 +45,8 @@ class DeployProjectCommand(Command):
         logger.info(f"Checking env file path {env_file_path}")
         if await dir_exists(site_path):
             if await check_file_exists(env_file_path):
+                logger.info(f"Environment file exists at {env_file_path}")
+                logger.info(f"Loading the environment variables from {env_file_path}")
                 # Load the .env file and check the APP_KEY
                 app_key = await async_get_env_variable('APP_KEY', env_file_path)
                 logger.info(f"APP_KEY: {app_key}")
