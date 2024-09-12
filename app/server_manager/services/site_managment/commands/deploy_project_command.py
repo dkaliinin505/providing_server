@@ -30,7 +30,8 @@ class DeployProjectCommand(Command):
         nested_folder = self.config.get('nested_folder', 'app')
 
         # Ensure the parent directory exists
-        await run_command_async(f"mkdir -p {site_path}")
+        # await run_command_async(f"mkdir -p {site_path}")
+        os.makedirs(site_path, exist_ok=True)
 
         # Before cloning the repository, check if the site already exists and running
         if is_nested_structure:
