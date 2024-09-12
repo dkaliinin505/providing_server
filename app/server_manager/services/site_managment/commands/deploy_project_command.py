@@ -36,7 +36,7 @@ class DeployProjectCommand(Command):
         logger.info(f"Site path to be created: {site_path}")
 
         logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
-        aiofiles.os.makedirs(site_path, exist_ok=True)
+        await aiofiles.os.makedirs(site_path, exist_ok=True)
 
         # Before cloning the repository, check if the site already exists and running
         if is_nested_structure:
