@@ -44,6 +44,8 @@ class DeployProjectCommand(Command):
             env_file_path = os.path.join(site_path, '.env')
         logger.info(f"Checking env file path {env_file_path}")
         if await dir_exists(site_path):
+            logger.info(f"Site path exists at {site_path}")
+            logger.info(f"Checking if the environment file exists at {env_file_path}")
             if await check_file_exists(env_file_path):
                 logger.info(f"Environment file exists at {env_file_path}")
                 logger.info(f"Loading the environment variables from {env_file_path}")
