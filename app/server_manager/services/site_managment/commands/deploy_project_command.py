@@ -29,6 +29,24 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
+        if await dir_exists(site_path):
+            if not os.listdir(site_path):
+                logger.info(f"Directory {site_path} exists but is empty, proceeding with deployment.")
+            else:
+                if is_nested_structure:
+                    env_file_path = os.path.join(site_path, nested_folder, '.env')
+                else:
+                    env_file_path = os.path.join(site_path, '.env')
+
+                logger.info(f"Checking if environment file exists at {env_file_path}")
+                if await check_file_exists(env_file_path):
+                    logger.info(f"Environment file exists at {env_file_path}")
+                    app_key = await async_get_env_variable('APP_KEY', env_file_path)
+                    logger.info(f"APP_KEY: {app_key}")
+                    if app_key:
+                        logger.info(f"The site at {site_path} is already running with APP_KEY set.")
+                        return {"message": "Site is already running."}
+
         logger.info(f"Cleaning contents of the site path: {site_path}")
         await self.clear_directory(site_path)
 
@@ -36,25 +54,6 @@ class DeployProjectCommand(Command):
 
         logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
         await aiofiles.os.makedirs(site_path, exist_ok=True)
-
-        # Before cloning the repository, check if the site already exists and running
-        if is_nested_structure:
-            env_file_path = os.path.join(site_path, nested_folder, '.env')
-        else:
-            env_file_path = os.path.join(site_path, '.env')
-        logger.info(f"Checking env file path {env_file_path}")
-        if await dir_exists(site_path):
-            logger.info(f"Site path exists at {site_path}")
-            logger.info(f"Checking if the environment file exists at {env_file_path}")
-            if await check_file_exists(env_file_path):
-                logger.info(f"Environment file exists at {env_file_path}")
-                logger.info(f"Loading the environment variables from {env_file_path}")
-                # Load the .env file and check the APP_KEY
-                app_key = await async_get_env_variable('APP_KEY', env_file_path)
-                logger.info(f"APP_KEY: {app_key}")
-                if app_key:
-                    print(f"The site at {site_path} is already running with APP_KEY set.")
-                    return {"message": "Site is already running."}
 
         # Clone The Repository Into The Site
         await self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
