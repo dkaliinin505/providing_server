@@ -21,6 +21,7 @@ class DeleteSiteCommand(Command):
         await self.remove_nginx_config_files()
         await self.remove_nginx_config_directories()
         await self.restart_services()
+        await self.remove_directory(f"/home/super_forge/{self.config['domain']}")
 
         return {"message": "Website server configuration removed successfully"}
 
@@ -50,6 +51,13 @@ class DeleteSiteCommand(Command):
         domain = self.config['domain']
         await run_command_async(f"sudo rm -rf /etc/nginx/forge-conf/{domain}")
         logging.debug(f"Nginx config directories for {domain} removed")
+
+    async def remove_directory(self, directory):
+        if await check_file_exists(directory):
+            await run_command_async(f"sudo rm -rf {directory}")
+            logging.debug(f"Directory {directory} removed")
+        else:
+            logging.warning(f"Directory {directory} does not exist")
 
     async def restart_services(self):
         await run_command_async("sudo service nginx reload")
