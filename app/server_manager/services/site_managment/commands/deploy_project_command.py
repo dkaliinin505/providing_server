@@ -29,18 +29,20 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
-        logger.info(f"Removing site path: {site_path} if exists")
+        logger.info(f"Site path to be created: {site_path}")
 
-        # Remove the current site directory if it exists
-        await run_command_async(f"rm -rf {site_path}", raise_exception=False)
-
-        logger.info(f"Creating site path: {site_path}")
+        logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
 
         try:
-            await aiofiles.os.makedirs(site_path, exist_ok=True)
-            logger.info(f"Successfully created site path: {site_path}")
+            if os.path.exists(site_path):
+                logger.info(f"Directory already exists, removing: {site_path}")
+                await run_command_async(f"rm -rf {site_path}", raise_exception=False)
+
+            logger.info(f"Creating directory: {site_path}")
+            os.makedirs(site_path, exist_ok=True)
+            logger.info(f"Directory successfully created: {site_path}")
         except Exception as e:
-            logger.error(f"Failed to create site path: {site_path}, error: {str(e)}")
+            logger.error(f"Error creating directory: {site_path}, error: {str(e)}")
             raise
 
         # Before cloning the repository, check if the site already exists and running
