@@ -53,7 +53,7 @@ class DeployProjectCommand(Command):
         logger.info(f"Site path to be created: {site_path}")
 
         logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
-        await aiofiles.os.makedirs(site_path, exist_ok=True)
+        # await aiofiles.os.makedirs(site_path, exist_ok=True)
 
         # Clone The Repository Into The Site
         await self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
