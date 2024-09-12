@@ -4,7 +4,7 @@ import shutil
 import json
 from pathlib import Path
 
-import aiofiles,os
+import aiofiles.os
 
 from app.server_manager.interfaces.command_interface import Command
 from utils.env_util import async_get_env_variable, async_load_env, async_update_env_variable
@@ -29,11 +29,19 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
-        # Remove the current site directory if it exists (ignoring errors if it doesn't exist)
+        logger.info(f"Removing site path: {site_path} if exists")
+
+        # Remove the current site directory if it exists
         await run_command_async(f"rm -rf {site_path}", raise_exception=False)
-        # Ensure the parent directory exists
-        # await run_command_async(f"mkdir -p {site_path}")
-        await aiofiles.os.makedirs(site_path, exist_ok=True)
+
+        logger.info(f"Creating site path: {site_path}")
+
+        try:
+            await aiofiles.os.makedirs(site_path, exist_ok=True)
+            logger.info(f"Successfully created site path: {site_path}")
+        except Exception as e:
+            logger.error(f"Failed to create site path: {site_path}, error: {str(e)}")
+            raise
 
         # Before cloning the repository, check if the site already exists and running
         if is_nested_structure:
