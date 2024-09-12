@@ -1,8 +1,9 @@
 import logging
+import shutil
 from pathlib import Path
 import aiofiles
 from app.server_manager.interfaces.command_interface import Command
-from utils.async_util import run_command_async, check_file_exists
+from utils.async_util import run_command_async, check_file_exists, dir_exists
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -53,8 +54,8 @@ class DeleteSiteCommand(Command):
         logging.debug(f"Nginx config directories for {domain} removed")
 
     async def remove_directory(self, directory):
-        if await check_file_exists(directory):
-            await run_command_async(f"sudo rm -rf {directory}")
+        if await dir_exists(directory):
+            shutil.rmtree(directory)
             logging.debug(f"Directory {directory} removed")
         else:
             logging.warning(f"Directory {directory} does not exist")
