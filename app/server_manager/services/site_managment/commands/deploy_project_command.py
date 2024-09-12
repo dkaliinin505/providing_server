@@ -85,9 +85,9 @@ class DeployProjectCommand(Command):
 
     async def clone_repository(self, repository_url, branch, site_path, ssh_command, is_nested_structure,
                                nested_folder):
+        logger.info(f"Current working directory: {os.getcwd()}")
         git_command = f'git clone --depth 1 --single-branch -c core.sshCommand="{ssh_command}" -b {branch} {repository_url} {site_path}'
         await run_command_async(git_command)
-        return
         os.chdir(site_path)
         await run_command_async(f'git config core.sshCommand "{ssh_command}"')
         await run_command_async('git submodule update --init --recursive')
