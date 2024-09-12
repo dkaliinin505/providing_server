@@ -49,9 +49,9 @@ class DeployProjectCommand(Command):
                     print(f"The site at {site_path} is already running with APP_KEY set.")
                     return {"message": "Site is already running."}
 
-        # Remove The Current Site Directory if it exists
-        if await dir_exists(site_path):
-            shutil.rmtree(site_path)
+        # # Remove The Current Site Directory if it exists
+        # if await dir_exists(site_path):
+        #     shutil.rmtree(site_path)
 
         # Clone The Repository Into The Site
         await self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
