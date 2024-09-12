@@ -32,18 +32,7 @@ class DeployProjectCommand(Command):
         logger.info(f"Site path to be created: {site_path}")
 
         logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
-
-        try:
-            if os.path.exists(site_path):
-                logger.info(f"Directory already exists, removing: {site_path}")
-                await run_command_async(f"rm -rf {site_path}", raise_exception=False)
-
-            logger.info(f"Creating directory: {site_path}")
-            os.makedirs(site_path, exist_ok=True)
-            logger.info(f"Directory successfully created: {site_path}")
-        except Exception as e:
-            logger.error(f"Error creating directory: {site_path}, error: {str(e)}")
-            raise
+        aiofiles.os.makedirs(site_path, exist_ok=True)
 
         # Before cloning the repository, check if the site already exists and running
         if is_nested_structure:
