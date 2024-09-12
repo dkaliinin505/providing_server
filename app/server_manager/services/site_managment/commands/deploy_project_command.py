@@ -29,6 +29,10 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
+        # Remove The Current Site Directory if it exists
+        if await dir_exists(site_path):
+            shutil.rmtree(site_path)
+
         logger.info(f"Site path to be created: {site_path}")
 
         logger.info(f"Current user: {os.geteuid()}, group: {os.getegid()}")
@@ -48,10 +52,6 @@ class DeployProjectCommand(Command):
                 if app_key:
                     print(f"The site at {site_path} is already running with APP_KEY set.")
                     return {"message": "Site is already running."}
-
-        # # Remove The Current Site Directory if it exists
-        # if await dir_exists(site_path):
-        #     shutil.rmtree(site_path)
 
         # Clone The Repository Into The Site
         await self.clone_repository(repository_url, branch, site_path, ssh_command, is_nested_structure, nested_folder)
