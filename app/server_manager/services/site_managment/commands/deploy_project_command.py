@@ -88,14 +88,14 @@ class DeployProjectCommand(Command):
                                nested_folder):
         git_command = f'git clone --depth 1 --single-branch -c core.sshCommand="{ssh_command}" -b {branch} {repository_url} {site_path}'
         await run_command_async(git_command)
-        os.chdir(site_path)
-        await run_command_async(f'git config core.sshCommand "{ssh_command}"')
-        await run_command_async('git submodule update --init --recursive')
+
+        await run_command_async(f'git -C {site_path} config core.sshCommand "{ssh_command}"')
+        await run_command_async(f'git -C {site_path} submodule update --init --recursive')
+
         if is_nested_structure:
             nested_path = os.path.join(site_path, nested_folder)
             if not await dir_exists(nested_path):
                 raise Exception(f"Nested path {nested_path} does not exist.")
-            os.chdir(nested_path)
 
     async def install_composer_dependencies(self, site_path, is_nested_structure, nested_folder):
         if is_nested_structure:
