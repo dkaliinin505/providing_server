@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 from time import time
 
 from utils.async_util import send_post_request_async, extract_error_message
@@ -21,14 +22,11 @@ class TaskManager(metaclass=SingletonMeta):
         self.task_queue = asyncio.Queue()
         self.future_to_id = {}
         self.id_to_result = {}
-        self.id_counter = 0
         self.lock = asyncio.Lock()
         self.worker_count = 1
 
     async def _generate_unique_id(self):
-        async with self.lock:
-            self.id_counter += 1
-            return self.id_counter
+        return str(uuid.uuid4())
 
     async def submit_task(self, func, *args, **kwargs):
         task_id = await self._generate_unique_id()
