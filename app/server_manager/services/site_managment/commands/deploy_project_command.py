@@ -4,7 +4,7 @@ import shutil
 import json
 from pathlib import Path
 
-import aiofiles
+import aiofiles,os
 
 from app.server_manager.interfaces.command_interface import Command
 from utils.env_util import async_get_env_variable, async_load_env, async_update_env_variable
@@ -33,7 +33,7 @@ class DeployProjectCommand(Command):
         await run_command_async(f"rm -rf {site_path}", raise_exception=False)
         # Ensure the parent directory exists
         # await run_command_async(f"mkdir -p {site_path}")
-        os.makedirs(site_path, exist_ok=True)
+        await aiofiles.os.makedirs(site_path, exist_ok=True)
 
         # Before cloning the repository, check if the site already exists and running
         if is_nested_structure:
