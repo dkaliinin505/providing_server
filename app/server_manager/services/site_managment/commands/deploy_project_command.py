@@ -29,9 +29,8 @@ class DeployProjectCommand(Command):
         is_nested_structure = self.config.get('is_nested_structure', False)
         nested_folder = self.config.get('nested_folder', 'app')
 
-        # Remove The Current Site Directory if it exists
-        if await dir_exists(site_path):
-            shutil.rmtree(site_path)
+        logger.info(f"Cleaning contents of the site path: {site_path}")
+        await self.clear_directory(site_path)
 
         logger.info(f"Site path to be created: {site_path}")
 
@@ -88,14 +87,26 @@ class DeployProjectCommand(Command):
                                nested_folder):
         git_command = f'git clone --depth 1 --single-branch -c core.sshCommand="{ssh_command}" -b {branch} {repository_url} {site_path}'
         await run_command_async(git_command)
-
-        await run_command_async(f'git -C {site_path} config core.sshCommand "{ssh_command}"')
-        await run_command_async(f'git -C {site_path} submodule update --init --recursive')
-
+        os.chdir(site_path)
+        await run_command_async(f'git config core.sshCommand "{ssh_command}"')
+        await run_command_async('git submodule update --init --recursive')
         if is_nested_structure:
             nested_path = os.path.join(site_path, nested_folder)
             if not await dir_exists(nested_path):
                 raise Exception(f"Nested path {nested_path} does not exist.")
+            os.chdir(nested_path)
+
+    async def clear_directory(self, path):
+        if await dir_exists(path):
+            for filename in os.listdir(path):
+                file_path = os.path.join(path, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(f'Failed to delete {file_path}. Reason: {e}')
 
     async def install_composer_dependencies(self, site_path, is_nested_structure, nested_folder):
         if is_nested_structure:
