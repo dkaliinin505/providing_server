@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
+from marshmallow import Schema, fields, validates_schema, ValidationError, pre_load
 
 
 class CreateDatabaseSchema(Schema):
@@ -7,6 +7,14 @@ class CreateDatabaseSchema(Schema):
     db_user = fields.Str(validate=fields.Length(min=6, max=32))
     db_user_password = fields.Str(validate=fields.Length(min=6, max=32))
     db_privileges = fields.List(fields.Str(validate=fields.Length(min=1, max=64)), missing=['ALL PRIVILEGES'])
+
+    @pre_load
+    def remove_empty_strings(self, data, **kwargs):
+        if 'db_user' in data and data['db_user'] == '':
+            data['db_user'] = None
+        if 'db_user_password' in data and data['db_user_password'] == '':
+            data['db_user_password'] = None
+        return data
 
     @validates_schema
     def validate_user_creation(self, data, **kwargs):
