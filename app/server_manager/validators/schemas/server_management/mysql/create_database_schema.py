@@ -4,8 +4,8 @@ from marshmallow import Schema, fields, validates_schema, ValidationError, pre_l
 class CreateDatabaseSchema(Schema):
     db_name = fields.Str(required=True, validate=fields.Length(min=1, max=32))
     create_user = fields.Bool(missing=False)
-    db_user = fields.Str(validate=fields.Length(min=6, max=32), allow_none=True)  # Разрешаем None
-    db_user_password = fields.Str(validate=fields.Length(min=6, max=32), allow_none=True)  # Разрешаем None
+    db_user = fields.Str(validate=fields.Length(min=6, max=32), allow_none=True)
+    db_user_password = fields.Str(validate=fields.Length(min=6, max=32), allow_none=True)
     db_privileges = fields.List(fields.Str(validate=fields.Length(min=1, max=64)), missing=['ALL PRIVILEGES'])
 
     @pre_load
