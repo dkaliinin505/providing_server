@@ -1,4 +1,5 @@
 import logging
+import os
 from quart import Quart
 from app.server_manager.routes import server_manager_blueprint
 from dotenv import load_dotenv
@@ -12,7 +13,7 @@ class App:
         self.app.register_blueprint(server_manager_blueprint)
 
     async def run(self):
-        await self.app.run_task(host='0.0.0.0', port=5000)
+        await self.app.run_task(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
 
 
 app_instance = App()

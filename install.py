@@ -137,7 +137,7 @@ def setup_server(current_directory, env_name):
         run_command('ufw allow 22')
         run_command('ufw allow 80')
         run_command('ufw allow 443')
-        run_command(f'ufw allow 5000')
+        run_command(f'ufw allow {os.getenv("PORT", "5000")}')
         run_command('ufw --force enable')
     else:
         print("Module nf_conntrack not found. Skipping UFW setup.")
