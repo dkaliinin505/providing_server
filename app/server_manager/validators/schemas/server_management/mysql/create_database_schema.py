@@ -16,3 +16,6 @@ class CreateDatabaseSchema(Schema):
             if not data.get('db_user_password'):
                 raise ValidationError('db_user_password is required when create_user is true',
                                       field_name='db_user_password')
+        else:
+            data.pop('db_user', None)
+            data.pop('db_user_password', None)
