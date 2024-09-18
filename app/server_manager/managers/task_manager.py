@@ -54,7 +54,14 @@ class TaskManager(metaclass=SingletonMeta):
                 logging.info(f"Task completed with ID: {task_id}")
 
                 ip_address = await async_get_env_variable("HOST")
-                ssh_key = result.get("public_key")
+
+                if isinstance(result, dict):
+                    ssh_key = result.get("public_key")
+                    message = result.get("message", "")
+                else:
+                    ssh_key = None
+                    message = str(result)
+
                 callback_data = {
                     "task_id": task_id,
                     "ip_address": ip_address,
