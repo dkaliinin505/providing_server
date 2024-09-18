@@ -66,7 +66,7 @@ class TaskManager(metaclass=SingletonMeta):
                     "task_id": task_id,
                     "ip_address": ip_address,
                     "status": "done",
-                    "message": result['message'],
+                    "message": message,
                 }
                 if ssh_key:
                     callback_data["deploy_key"] = ssh_key
