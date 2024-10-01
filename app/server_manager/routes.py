@@ -109,6 +109,34 @@ async def test_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/create-queue-worker', methods=['POST'])
+@validate_request({'POST': CreateQueueWorkerSchema})
+async def create_queue_worker_route(data):
+    result = await site_management_controller.create_queue_worker(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/delete-queue-worker', methods=['DELETE'])
+@validate_request({'DELETE': DeleteQueueWorkerSchema})
+async def delete_queue_worker_route(data):
+    result = await site_management_controller.delete_queue_worker(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/restart-queue-worker', methods=['POST'])
+@validate_request({'POST': RestartQueueWorkerSchema})
+async def restart_queue_worker_route(data):
+    result = await site_management_controller.restart_queue_worker(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/get-queue-worker-logs', methods=['GET'])
+@validate_request({'GET': GetQueueWorkerLogsSchema})
+async def get_queue_worker_logs_route(data):
+    result = await site_management_controller.get_queue_worker_logs(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

@@ -20,3 +20,8 @@ from app.server_manager.validators.schemas.site_management.delete_certbot_cert_s
 from app.server_manager.validators.schemas.site_management.deploy_project_config_schema import DeployProjectSchema
 from app.server_manager.validators.schemas.validation_schema import RequestSchema
 from app.server_manager.validators.schemas.server_management.delete_site_config_schema import DeleteSiteSchema
+
+from app.server_manager.validators.schemas.site_management.queue.create_queue_worker_schema import CreateQueueWorkerSchema
+from app.server_manager.validators.schemas.site_management.queue.delete_queue_worker_schema import DeleteQueueWorkerSchema
+from app.server_manager.validators.schemas.site_management.queue.get_queue_worker_logs_schema import GetQueueWorkerLogsSchema
+from app.server_manager.validators.schemas.site_management.queue.restart_queue_worker_schema import RestartQueueWorkerSchema
