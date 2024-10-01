@@ -31,7 +31,7 @@ class CreateQueueWorkerCommand(Command):
     async def create_supervisor_conf(self):
         worker_id = self.config.get('worker_id')
         artisan_path = self.config.get('artisan_path')
-        user = self.config.get('user', 'forge')
+        user = self.config.get('user', 'super_forge')
         queue = self.config.get('queue', 'default')
         sleep = self.config.get('sleep', 10)
         timeout = self.config.get('timeout', 60)
