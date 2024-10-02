@@ -57,10 +57,12 @@ class TaskManager(metaclass=SingletonMeta):
 
                 if isinstance(result, dict):
                     ssh_key = result.get("public_key")
+                    data = result.get("data")
                     message = result.get("message", "")
                 else:
                     ssh_key = None
                     message = str(result)
+                    data = None
 
                 callback_data = {
                     "task_id": task_id,
@@ -68,6 +70,8 @@ class TaskManager(metaclass=SingletonMeta):
                     "status": "done",
                     "message": message,
                 }
+                if data:
+                    callback_data["data"] = data
                 if ssh_key:
                     callback_data["deploy_key"] = ssh_key
                 # Send callback after task completion
