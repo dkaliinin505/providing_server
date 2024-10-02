@@ -38,7 +38,7 @@ class CreateQueueWorkerCommand(Command):
         delay = self.config.get('delay', 10)
         memory = self.config.get('memory', 256)
         tries = self.config.get('tries', 1)
-        log_dir = Path(f"/home/{user}/.forge")
+        log_dir = Path(f"/home/{user}/logs")
         supervisor_conf_dir = Path("/etc/supervisor/conf.d")
 
         conf_content = f"""
