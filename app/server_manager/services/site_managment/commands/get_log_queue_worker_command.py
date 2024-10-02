@@ -16,7 +16,7 @@ class GetQueueWorkerLogsCommand(Command):
     async def execute(self, data):
         self.config = data
         worker_id = self.config.get('worker_id')
-        log_dir = Path(f"/home/{self.config.get('user', 'super_forge')}/logs")
+        log_dir = Path(f"/home/{self.config.get('user', 'super_forge')}/.logs")
         log_file = Path(log_dir) / f"worker-{worker_id}.log"
         if await check_file_exists(log_file):
             async with aiofiles.open(log_file, 'r') as log_file:
