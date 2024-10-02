@@ -41,6 +41,10 @@ class CreateQueueWorkerCommand(Command):
         log_dir = Path(f"/home/{user}/.logs")
         supervisor_conf_dir = Path("/etc/supervisor/conf.d")
 
+        if not log_dir.exists():
+            log_dir.mkdir(parents=True, exist_ok=True)
+            logging.debug(f"Log directory created at {log_dir}")
+
         conf_content = f"""
         [program:worker-{worker_id}]
         command=php8.3 {artisan_path} queue:work database --sleep={sleep} --daemon --quiet --timeout={timeout} --delay={delay} --memory={memory} --tries={tries} --force --queue="{queue}"
