@@ -22,7 +22,7 @@ class GetQueueWorkerLogsCommand(Command):
             async with aiofiles.open(log_file, 'r') as log_file:
                 logs = await log_file.read()
                 logging.debug(f"Logs for worker {log_file}: {logs}")
-                return {"message": "Logs Retrieved Successfully", "data": logs}
+                return {"message": f"Logs for worker {worker_id} retrieved successfully", "data": logs}
         else:
             logging.error(f"Log file for worker {log_file} not found.")
             return {"error": f"Log file for worker {log_file} not found."}
