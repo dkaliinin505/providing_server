@@ -144,6 +144,13 @@ async def get_queue_worker_info_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/get-workers-status', methods=['GET'])
+@validate_request({'GET': RequestSchema})
+async def get_workers_status_route(data):
+    result = await site_management_controller.get_workers_status(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)
