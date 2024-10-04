@@ -10,6 +10,7 @@ from app.server_manager.services.site_managment.commands.delete_certbot_cert_com
 from app.server_manager.services.site_managment.commands.delete_queue_worker_command import DeleteQueueWorkerCommand
 from app.server_manager.services.site_managment.commands.deploy_project_command import DeployProjectCommand
 from app.server_manager.services.site_managment.commands.get_log_queue_worker_command import GetQueueWorkerLogsCommand
+from app.server_manager.services.site_managment.commands.get_queue_worker_info_command import GetQueueWorkerInfoCommand
 from app.server_manager.services.site_managment.commands.reboot_queue_worker_command import RestartQueueWorkerCommand
 from utils.async_util import run_command_async, check_file_exists, dir_exists
 
@@ -25,6 +26,7 @@ class SiteManagementService(Service):
         self.executor.register('delete_queue_worker', DeleteQueueWorkerCommand({'config': {}}))
         self.executor.register('restart_queue_worker', RestartQueueWorkerCommand({'config': {}}))
         self.executor.register('get_queue_worker_logs', GetQueueWorkerLogsCommand({'config': {}}))
+        self.executor.register('get_queue_worker_info', GetQueueWorkerInfoCommand({'config': {}}))
 
     async def deploy_project(self, data):
         data = await self.executor.execute('deploy_project', data)
@@ -59,6 +61,11 @@ class SiteManagementService(Service):
     async def get_queue_worker_logs(self, data):
         data = await self.executor.execute('get_queue_worker_logs', data)
         logging.info(f"Get Queue Worker Logs Task in SiteManagementService started in background with task_id: {data}")
+        return data
+
+    async def get_queue_worker_info(self, data):
+        data = await self.executor.execute('get_queue_worker_info', data)
+        logging.info(f"Get Queue Worker Info Task in SiteManagementService started in background with task_id: {data}")
         return data
 
     async def test(self, data):

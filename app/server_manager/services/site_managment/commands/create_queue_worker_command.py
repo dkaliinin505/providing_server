@@ -32,7 +32,8 @@ class CreateQueueWorkerCommand(Command):
         worker_id = self.config.get('worker_id')
         artisan_path = self.config.get('artisan_path')
         user = self.config.get('user', 'super_forge')
-        queue = self.config.get('queue', 'database')
+        connection = self.config.get('connection', 'database')
+        queue = self.config.get('queue', 'default')
         sleep = self.config.get('sleep', 10)
         timeout = self.config.get('timeout', 60)
         delay = self.config.get('delay', 10)
@@ -47,7 +48,7 @@ class CreateQueueWorkerCommand(Command):
 
         conf_content = f"""
         [program:worker-{worker_id}]
-        command=php8.3 {artisan_path} queue:work database --sleep={sleep} --daemon --quiet --timeout={timeout} --delay={delay} --memory={memory} --tries={tries} --force --queue="{queue}"
+        command=php8.3 {artisan_path} queue:work {connection} --sleep={sleep} --daemon --quiet --timeout={timeout} --delay={delay} --memory={memory} --tries={tries} --force --queue="{queue}"
 
         process_name=%(program_name)s_%(process_num)02d
         autostart=true

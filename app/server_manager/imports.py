@@ -25,3 +25,4 @@ from app.server_manager.validators.schemas.site_management.queue.create_queue_wo
 from app.server_manager.validators.schemas.site_management.queue.delete_queue_worker_schema import DeleteQueueWorkerSchema
 from app.server_manager.validators.schemas.site_management.queue.get_queue_worker_logs_schema import GetQueueWorkerLogsSchema
 from app.server_manager.validators.schemas.site_management.queue.restart_queue_worker_schema import RestartQueueWorkerSchema
+from app.server_manager.validators.schemas.site_management.queue.get_queue_worker_info_schema import GetQueueWorkerInfoSchema
