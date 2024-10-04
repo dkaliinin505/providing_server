@@ -16,7 +16,7 @@ class CreateCertBotCertificateCommand(Command):
             await run_command_async("sudo systemctl restart nginx")
             return {"message": f"SSL certificate created successfully for domain: {self.config.get('domain')}"}
         except Exception as e:
-            return {f"Failed to create SSL certificate: {str(e)}"}
+            raise Exception(f"Failed to create SSL certificate: {str(e)}")
 
     async def create_ssl_certificate(self):
         domain = self.config.get('domain')
