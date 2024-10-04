@@ -29,7 +29,7 @@ class GetSupervisorStatusCommand(Command):
                 return {"error": "Failed to get supervisor status", "details": stderr.decode()}
 
             workers = self.parse_status_output(stdout.decode())
-            return {"message": "Queue workers status retrieved successfully", "workers": workers}
+            return {"message": "Queue workers status retrieved successfully", "data": workers}
 
         except Exception as e:
             logging.error(f"Error getting supervisor status: {str(e)}")
