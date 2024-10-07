@@ -21,6 +21,7 @@ class PullProjectCommand(Command):
         self.setup_fpmlock()
         self.source_env_file()
         self.run_user_commands(self.config.get('user_script'))
+        return {"message": f"Project {self.config.get('site')} pulled successfully."}
 
     async def check_ubuntu_version(self):
         logger.info("Checking Ubuntu version...")
@@ -46,7 +47,7 @@ class PullProjectCommand(Command):
 
     async def run_user_commands(self, commands_string: str):
         logger.info("Running user-provided commands...")
-        os.chdir(f"/home/super_forge/{self.config.get('site_path')}")
+        os.chdir(f"/home/super_forge/{self.config.get('site')}")
 
         commands = commands_string.split('\n')
 
