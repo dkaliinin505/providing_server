@@ -20,6 +20,7 @@ class PullProjectCommand(Command):
         await self.check_ubuntu_version()
         await self.setup_fpmlock()
         await self.source_env_file()
+        await self.configure_ssh_command()
         await self.run_user_commands(self.config.get('user_script'))
         return {"message": f"Project {self.config.get('site')} pulled successfully."}
 
@@ -53,6 +54,14 @@ class PullProjectCommand(Command):
             git_remote_command = f"git remote set-url origin git@github.com:{github_username}/{repository_name}.git"
             logger.debug(f"Setting Git remote URL: {git_remote_command}")
             await run_command_async(git_remote_command)
+
+    async def configure_ssh_command(self):
+        # Configure SSH command to use the correct SSH config for the domain
+        domain = self.config.get('site')
+        ssh_config_path = f"/home/super_forge/.ssh/{domain}-config"
+        ssh_command = f'export GIT_SSH_COMMAND="ssh -F {ssh_config_path}"'
+        logger.debug(f"Setting SSH command for Git: {ssh_command}")
+        await run_command_async(ssh_command)
 
     async def run_user_commands(self, commands_string: str):
         logger.debug("Running user-provided commands...")
