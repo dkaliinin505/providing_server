@@ -15,7 +15,7 @@ class PullProjectCommand(Command):
         self.config = config
         self.fpm_lock_path = "/tmp/fpmlock"
 
-    def execute(self, data):
+    async def execute(self, data):
         self.config = data
         self.check_ubuntu_version()
         self.setup_fpmlock()
