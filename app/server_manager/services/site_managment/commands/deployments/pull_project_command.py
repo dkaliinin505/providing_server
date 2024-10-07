@@ -17,10 +17,10 @@ class PullProjectCommand(Command):
 
     async def execute(self, data):
         self.config = data
-        self.check_ubuntu_version()
-        self.setup_fpmlock()
-        self.source_env_file()
-        self.run_user_commands(self.config.get('user_script'))
+        await self.check_ubuntu_version()
+        await self.setup_fpmlock()
+        await self.source_env_file()
+        await self.run_user_commands(self.config.get('user_script'))
         return {"message": f"Project {self.config.get('site')} pulled successfully."}
 
     async def check_ubuntu_version(self):
