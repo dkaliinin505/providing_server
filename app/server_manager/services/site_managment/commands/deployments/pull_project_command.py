@@ -54,7 +54,6 @@ class PullProjectCommand(Command):
         for command in commands:
             command = command.strip()
             if command:
-                command = command.replace('$FORGE_SITE', self.config.get('site_path', 'master'))
                 command = command.replace('$FORGE_SITE_BRANCH', self.config.get('site_branch', 'master'))
                 command = command.replace('$FORGE_COMPOSER', self.config.get('composer', 'php8.3 /usr/local/bin/composer'))
                 command = command.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
