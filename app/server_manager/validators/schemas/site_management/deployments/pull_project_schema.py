@@ -7,6 +7,8 @@ class PullProjectSchema(Schema):
     composer = fields.Str(required=True, validate=validate.Length(min=1, max=200))
     site_branch = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     site = fields.Str(required=True, validate=validate.Length(min=1, max=200))
+    github_username = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    repository_name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     user_script = fields.Str(required=True)
 
     @validates_schema

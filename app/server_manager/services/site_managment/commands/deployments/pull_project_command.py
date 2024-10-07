@@ -45,9 +45,20 @@ class PullProjectCommand(Command):
         logger.debug(f"Sourcing environment file from {self.config.get('site_path')}...")
         await run_command_async(f"set -o allexport; source {self.config.get('site_path')}/.env; set +o allexport")
 
+    async def set_git_remote_url(self):
+        github_username = self.config.get('github_username')
+        repository_name = self.config.get('repository_name')
+
+        if github_username and repository_name:
+            git_remote_command = f"git remote set-url origin git@github.com:{github_username}/{repository_name}.git"
+            logger.debug(f"Setting Git remote URL: {git_remote_command}")
+            await run_command_async(git_remote_command)
+
     async def run_user_commands(self, commands_string: str):
         logger.debug("Running user-provided commands...")
         os.chdir(f"/home/super_forge/{self.config.get('site')}")
+
+        await self.set_git_remote_url()
 
         commands = commands_string.split('\n')
 
