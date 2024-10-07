@@ -6,6 +6,7 @@ class PullProjectSchema(Schema):
     php_fpm = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     composer = fields.Str(required=True, validate=validate.Length(min=1, max=200))
     site_branch = fields.Str(required=True, validate=validate.Length(min=1, max=100))
+    site_path = fields.Str(required=True, validate=validate.Length(min=1, max=200))
     user_script = fields.Str(required=True)
 
     @validates_schema

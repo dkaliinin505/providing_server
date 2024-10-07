@@ -1,4 +1,6 @@
 import asyncio
+import os
+
 from app.server_manager.interfaces.command_interface import Command
 from utils.async_util import run_command_async, check_file_exists, dir_exists
 import logging
@@ -44,12 +46,14 @@ class PullProjectCommand(Command):
 
     async def run_user_commands(self, commands_string: str):
         logger.info("Running user-provided commands...")
+        os.chdir(f"/home/super_forge/{self.config.get('site_path')}")
 
         commands = commands_string.split('\n')
 
         for command in commands:
             command = command.strip()
             if command:
+                command = command.replace('$FORGE_SITE_BRANCH', self.config.get('site_path', 'master'))
                 command = command.replace('$FORGE_SITE_BRANCH', self.config.get('site_branch', 'master'))
                 command = command.replace('$FORGE_COMPOSER', self.config.get('composer', 'php8.3 /usr/local/bin/composer'))
                 command = command.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
