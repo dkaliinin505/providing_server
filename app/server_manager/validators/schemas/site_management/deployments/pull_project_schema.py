@@ -13,5 +13,5 @@ class PullProjectSchema(Schema):
     def validate_script(self, data, **kwargs):
         if 'git pull' not in data.get('user_script', ''):
             raise ValidationError('user_script must contain a git pull command.')
-        if 'composer install' not in data.get('user_script', ''):
-            raise ValidationError('user_script must contain a composer install command.')
+        # if 'composer install' not in data.get('user_script', ''):
+        #     raise ValidationError('user_script must contain a composer install command.')
