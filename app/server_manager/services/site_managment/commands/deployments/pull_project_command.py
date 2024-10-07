@@ -24,29 +24,29 @@ class PullProjectCommand(Command):
         return {"message": f"Project {self.config.get('site')} pulled successfully."}
 
     async def check_ubuntu_version(self):
-        logger.info("Checking Ubuntu version...")
+        logger.debug("Checking Ubuntu version...")
         ubuntu_version = await run_command_async("lsb_release -rs")
         forge_version_check = lambda v: int("".join([f"{int(x):03}" for x in v.split(".")]))
         current_version = forge_version_check(ubuntu_version.strip())
 
         if current_version <= forge_version_check("16.04"):
-            logger.warning(f"Your server is running an older version of Ubuntu ({ubuntu_version.strip()}).")
-            logger.warning("We recommend provisioning a new server and migrating your sites.")
+            logger.debug(f"Your server is running an older version of Ubuntu ({ubuntu_version.strip()}).")
+            logger.debug("We recommend provisioning a new server and migrating your sites.")
             return
 
     async def setup_fpmlock(self):
-        logger.info("Setting up FPM lock file...")
+        logger.debug("Setting up FPM lock file...")
         fpm_lock = Path(self.fpm_lock_path)
         if not fpm_lock.exists():
             fpm_lock.touch()
             fpm_lock.chmod(0o666)
 
     async def source_env_file(self):
-        logger.info(f"Sourcing environment file from {self.config.get('site_path')}...")
+        logger.debug(f"Sourcing environment file from {self.config.get('site_path')}...")
         await run_command_async(f"set -o allexport; source {self.config.get('site_path')}/.env; set +o allexport")
 
     async def run_user_commands(self, commands_string: str):
-        logger.info("Running user-provided commands...")
+        logger.debug("Running user-provided commands...")
         os.chdir(f"/home/super_forge/{self.config.get('site')}")
 
         commands = commands_string.split('\n')
@@ -60,6 +60,6 @@ class PullProjectCommand(Command):
                 command = command.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
                 command = command.replace('$FORGE_PHP', self.config.get('php', 'php8.3'))
 
-                logger.info(f"Executing command: {command}")
+                logger.debug(f"Executing command: {command}")
                 await run_command_async(command)
 
