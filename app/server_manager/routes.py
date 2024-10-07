@@ -150,6 +150,12 @@ async def get_workers_status_route(data):
     result = await site_management_controller.get_workers_status(data)
     return jsonify(result)
 
+@server_manager_blueprint.route('/pull-project', methods=['POST'])
+@validate_request({'POST': PullProjectSchema})
+async def pull_project_route(data):
+    result = await site_management_controller.pull_project(data)
+    return jsonify(result)
+
 
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):

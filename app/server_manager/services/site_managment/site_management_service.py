@@ -9,6 +9,7 @@ from app.server_manager.services.site_managment.commands.create_queue_worker_com
 from app.server_manager.services.site_managment.commands.delete_certbot_cert_command import DeleteCertBotCertCommand
 from app.server_manager.services.site_managment.commands.delete_queue_worker_command import DeleteQueueWorkerCommand
 from app.server_manager.services.site_managment.commands.deploy_project_command import DeployProjectCommand
+from app.server_manager.services.site_managment.commands.deployments.pull_project_command import PullProjectCommand
 from app.server_manager.services.site_managment.commands.get_log_queue_worker_command import GetQueueWorkerLogsCommand
 from app.server_manager.services.site_managment.commands.get_queue_worker_info_command import GetQueueWorkerInfoCommand
 from app.server_manager.services.site_managment.commands.get_workers_status_command import GetSupervisorStatusCommand
@@ -29,6 +30,7 @@ class SiteManagementService(Service):
         self.executor.register('get_queue_worker_logs', GetQueueWorkerLogsCommand({'config': {}}))
         self.executor.register('get_queue_worker_info', GetQueueWorkerInfoCommand({'config': {}}))
         self.executor.register('get_workers_status', GetSupervisorStatusCommand({'config': {}}))
+        self.executor.register('pull_project', PullProjectCommand({'config': {}})) #PullProjectCommand
 
     async def deploy_project(self, data):
         data = await self.executor.execute('deploy_project', data)
@@ -73,6 +75,11 @@ class SiteManagementService(Service):
     async def get_workers_status(self, data):
         data = await self.executor.execute('get_workers_status', data)
         logging.info(f"Get Workers Status Task in SiteManagementService started in background with task_id: {data}")
+        return data
+
+    async def pull_project(self, data):
+        data = await self.executor.execute('pull_project', data)
+        logging.info(f"Pull Project Task in SiteManagementService started in background with task_id: {data}")
         return data
 
     async def test(self, data):

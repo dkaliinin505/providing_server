@@ -45,6 +45,10 @@ class SiteManagementController(Controller):
         task_id = await self.task_manager.submit_task(self.site_management_service.get_workers_status, data)
         return {"message": "Get Workers Status Task started in background", "task_id": task_id}
 
+    async def pull_project(self, data):
+        task_id = await self.task_manager.submit_task(self.site_management_service.pull_project, data)
+        return {"message": "Pull Project Task started in background", "task_id": task_id}
+
     async def test(self, data):
         task_id = await self.task_manager.submit_task(self.site_management_service.test, data)
         logging.info(f"Test Task started in background with task_id: {task_id}")
