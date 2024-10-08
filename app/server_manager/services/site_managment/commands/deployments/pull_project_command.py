@@ -70,7 +70,10 @@ class PullProjectCommand(Command):
         os.chdir(f"/home/super_forge/{self.config.get('site')}")
 
         await self.set_git_remote_url()
-
+        commands_string = commands_string.replace('$FORGE_SITE_BRANCH', self.config.get('site_branch', 'master'))
+        commands_string = commands_string.replace('$FORGE_COMPOSER', self.config.get('composer', '/usr/local/bin/composer'))
+        commands_string = commands_string.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
+        commands_string = commands_string.replace('$FORGE_PHP', self.config.get('php', 'php8.3'))
         script_path = f"/tmp/{self.config.get('site')}_deploy.sh"
 
         async with aiofiles.open(script_path, 'w') as script_file:
