@@ -1,6 +1,8 @@
 import asyncio
 import os
 
+import aiofiles
+
 from app.server_manager.interfaces.command_interface import Command
 from utils.async_util import run_command_async, check_file_exists, dir_exists
 import logging
@@ -69,16 +71,17 @@ class PullProjectCommand(Command):
 
         await self.set_git_remote_url()
 
-        commands = commands_string.split('\n')
+        script_path = f"/tmp/{self.config.get('site')}_deploy.sh"
 
-        for command in commands:
-            command = command.strip()
-            if command:
-                command = command.replace('$FORGE_SITE_BRANCH', self.config.get('site_branch', 'master'))
-                command = command.replace('$FORGE_COMPOSER', self.config.get('composer', 'php8.3 /usr/local/bin/composer'))
-                command = command.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
-                command = command.replace('$FORGE_PHP', self.config.get('php', 'php8.3'))
+        async with aiofiles.open(script_path, 'w') as script_file:
+            await script_file.write(commands_string)
 
-                logger.debug(f"Executing command: {command}")
-                await run_command_async(command)
+        # Make the script executable
+        await run_command_async(f'chmod +x {script_path}')
+
+        # Run the script
+        await run_command_async(script_path)
+
+        # Clean up the script after execution
+        await run_command_async(f'rm {script_path}')
 
