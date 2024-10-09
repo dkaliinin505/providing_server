@@ -76,5 +76,12 @@ async def extract_error_message(error_message: str):
 
 
 async def remove_ansi_escape_codes(text: str):
-    ansi_escape_pattern = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    ansi_escape_pattern = re.compile(
+        r'(?:\x1B[@-Z\\-_]|\x1B\[[0-?]*[ -/]*[@-~])'  # ESC sequences
+        r'|\x1B\[[0-9;]*[A-Za-z]'  # CSI sequences
+        r'|\x1B\(.[a-zA-Z]'  # OS Command sequences
+        r'|\x1B\]8;;[^ ]+ '  # Hyperlinks
+        r'|\x1B]2;.*?\x07',  # Window title sequences
+        flags=re.VERBOSE
+    )
     return ansi_escape_pattern.sub('', text)

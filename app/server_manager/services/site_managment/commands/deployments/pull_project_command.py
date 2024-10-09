@@ -87,18 +87,22 @@ class PullProjectCommand(Command):
         try:
             logger.debug(f"Executing deployment script: {script_path}")
             output = await run_command_async(script_path, capture_output=True)
-            if isinstance(output, str):
-                output = await remove_ansi_escape_codes(output)
-            else:
-                logger.warning("Output is not a string, converting to string.")
+
+            # Ensure output is processed as a string
+            if not isinstance(output, str):
                 output = str(output)
-                output = await remove_ansi_escape_codes(output)
+
+            # Remove any ANSI escape codes from the output
+            output = await remove_ansi_escape_codes(output)
+
             logger.debug(f"Deployment script output: {output}")
+
         except Exception as e:
             logger.error(f"Error executing deployment script: {str(e)}")
             output = f"Error: {str(e)}"
 
-        # Clean up the script after execution
-        await run_command_async(f'rm {script_path}')
+        finally:
+            # Clean up the script after execution
+            await run_command_async(f'rm {script_path}')
 
         return output
