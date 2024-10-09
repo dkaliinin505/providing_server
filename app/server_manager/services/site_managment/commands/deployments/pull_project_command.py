@@ -4,7 +4,7 @@ import os
 import aiofiles
 
 from app.server_manager.interfaces.command_interface import Command
-from utils.async_util import run_command_async, check_file_exists, dir_exists
+from utils.async_util import run_command_async, check_file_exists, dir_exists, remove_ansi_escape_codes
 import logging
 from pathlib import Path
 
@@ -24,7 +24,7 @@ class PullProjectCommand(Command):
         await self.source_env_file()
         await self.configure_ssh_command()
         data = await self.run_user_commands(self.config.get('user_script'))
-        return {"message": f"Project {self.config.get('site')} pulled successfully.", "data" : data}
+        return {"message": f"Project {self.config.get('site')} pulled successfully.", "data": data}
 
     async def check_ubuntu_version(self):
         logger.debug("Checking Ubuntu version...")
@@ -87,6 +87,7 @@ class PullProjectCommand(Command):
         try:
             logger.debug(f"Executing deployment script: {script_path}")
             output = await run_command_async(script_path, capture_output=True)
+            output = await remove_ansi_escape_codes(output)
             logger.debug(f"Deployment script output: {output}")
         except Exception as e:
             logger.error(f"Error executing deployment script: {str(e)}")
@@ -96,4 +97,3 @@ class PullProjectCommand(Command):
         await run_command_async(f'rm {script_path}')
 
         return output
-

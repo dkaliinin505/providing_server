@@ -73,3 +73,8 @@ async def extract_error_message(error_message: str):
     if match:
         return match.group(1).strip()
     return error_message
+
+
+async def remove_ansi_escape_codes(text: str):
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
