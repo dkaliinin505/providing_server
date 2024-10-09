@@ -1,4 +1,5 @@
 import asyncio
+import codecs
 import logging
 import aiohttp
 import aiofiles
@@ -83,7 +84,17 @@ async def extract_error_message(error_message: str):
 
 async def remove_ansi_escape_codes(text: str) -> str:
     logger.debug(f"Removing ANSI escape codes from: {text[:100]}...")
+    # Decode the escaped sequences
+    try:
+        text = codecs.decode(text, 'unicode_escape')
+    except UnicodeDecodeError as e:
+        logger.error(f"Error decoding text: {e}")
+        # Handle the error or return the original text
+        return text
+
+    # Original ANSI escape code regex
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     clean_text = ansi_escape.sub('', text)
     logger.debug(f"Cleaned text: {clean_text[:100]}...")
+
     return clean_text
