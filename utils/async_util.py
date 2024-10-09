@@ -6,6 +6,8 @@ import re
 from aiofiles import os
 
 from utils.env_util import async_get_env_variable
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 async def run_command_async(command, raise_exception=True, capture_output=False):
@@ -79,13 +81,9 @@ async def extract_error_message(error_message: str):
     return error_message
 
 
-async def remove_ansi_escape_codes(text: str):
-    ansi_escape_pattern = re.compile(
-        r'(?:\x1B[@-Z\\-_]|\x1B\[[0-?]*[ -/]*[@-~])'  # ESC sequences
-        r'|\x1B\[[0-9;]*[A-Za-z]'  # CSI sequences
-        r'|\x1B\(.[a-zA-Z]'  # OS Command sequences
-        r'|\x1B\]8;;[^ ]+ '  # Hyperlinks
-        r'|\x1B]2;.*?\x07',  # Window title sequences
-        flags=re.VERBOSE
-    )
-    return ansi_escape_pattern.sub('', text)
+async def remove_ansi_escape_codes(text: str) -> str:
+    logger.debug(f"Removing ANSI escape codes from: {text[:100]}...")
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    clean_text = ansi_escape.sub('', text)
+    logger.debug(f"Cleaned text: {clean_text[:100]}...")
+    return clean_text
