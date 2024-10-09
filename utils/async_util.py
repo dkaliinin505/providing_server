@@ -23,6 +23,10 @@ async def run_command_async(command, raise_exception=True, capture_output=False)
         if raise_exception:
             raise Exception(error_message)
         if capture_output:
+            ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+            stdout_decoded = ansi_escape.sub('', stdout_decoded)
+            stderr_decoded = ansi_escape.sub('', stderr_decoded)
+
             return stdout_decoded, stderr_decoded
         return None
 
