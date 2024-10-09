@@ -23,8 +23,8 @@ class PullProjectCommand(Command):
         await self.setup_fpmlock()
         await self.source_env_file()
         await self.configure_ssh_command()
-        await self.run_user_commands(self.config.get('user_script'))
-        return {"message": f"Project {self.config.get('site')} pulled successfully."}
+        data = await self.run_user_commands(self.config.get('user_script'))
+        return {"message": f"Project {self.config.get('site')} pulled successfully.", "data" : data}
 
     async def check_ubuntu_version(self):
         logger.debug("Checking Ubuntu version...")
@@ -71,7 +71,8 @@ class PullProjectCommand(Command):
 
         await self.set_git_remote_url()
         commands_string = commands_string.replace('$FORGE_SITE_BRANCH', self.config.get('site_branch', 'master'))
-        commands_string = commands_string.replace('$FORGE_COMPOSER', self.config.get('composer', '/usr/local/bin/composer'))
+        commands_string = commands_string.replace('$FORGE_COMPOSER',
+                                                  self.config.get('composer', '/usr/local/bin/composer'))
         commands_string = commands_string.replace('$FORGE_PHP_FPM', self.config.get('php_fpm', 'php8.3-fpm'))
         commands_string = commands_string.replace('$FORGE_PHP', self.config.get('php', 'php8.3'))
         script_path = f"/tmp/{self.config.get('site')}_deploy.sh"
@@ -82,9 +83,17 @@ class PullProjectCommand(Command):
         # Make the script executable
         await run_command_async(f'chmod +x {script_path}')
 
-        # Run the script
-        await run_command_async(script_path)
+        # Run the script and capture output
+        try:
+            logger.debug(f"Executing deployment script: {script_path}")
+            output = await run_command_async(script_path, capture_output=True)
+            logger.debug(f"Deployment script output: {output}")
+        except Exception as e:
+            logger.error(f"Error executing deployment script: {str(e)}")
+            output = f"Error: {str(e)}"
 
         # Clean up the script after execution
         await run_command_async(f'rm {script_path}')
+
+        return output
 

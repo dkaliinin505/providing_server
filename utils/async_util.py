@@ -8,18 +8,27 @@ from aiofiles import os
 from utils.env_util import async_get_env_variable
 
 
-async def run_command_async(command, raise_exception=True):
+async def run_command_async(command, raise_exception=True, capture_output=False):
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
+    stdout_decoded = stdout.decode()
+    stderr_decoded = stderr.decode()
+
     if process.returncode != 0:
+        error_message = f"Command '{command}' failed with error: {stderr_decoded}"
         if raise_exception:
-            raise Exception(f"Command '{command}' failed with error: {stderr.decode()}")
+            raise Exception(error_message)
+        if capture_output:
+            return stdout_decoded, stderr_decoded
         return None
-    return stdout.decode()
+
+    if capture_output:
+        return stdout_decoded, stderr_decoded
+    return stdout_decoded
 
 
 async def check_file_exists(filepath):
