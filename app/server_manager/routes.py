@@ -150,10 +150,32 @@ async def get_workers_status_route(data):
     result = await site_management_controller.get_workers_status(data)
     return jsonify(result)
 
+
 @server_manager_blueprint.route('/pull-project', methods=['POST'])
 @validate_request({'POST': PullProjectSchema})
 async def pull_project_route(data):
     result = await site_management_controller.pull_project(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/php-version-install', methods=['POST'])
+@validate_request({'POST': PhpVersionInstallSchema})
+async def php_version_install_route(data):
+    result = await server_management_controller.php_version_install(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/php-config-update', methods=['PUT'])
+@validate_request({'PUT': PhpConfigUpdateSchema})
+async def php_config_update_route(data):
+    result = await server_management_controller.php_config_update(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/php-toggle-opcache', methods=['PUT'])
+@validate_request({'PUT': PhpToggleOpcacheSchema})
+async def php_toggle_opcache_route(data):
+    result = await server_management_controller.php_toggle_opcache(data)
     return jsonify(result)
 
 

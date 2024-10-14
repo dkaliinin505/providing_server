@@ -14,6 +14,11 @@ from app.server_manager.services.server_management.commands.mysql.delete_databas
 from app.server_manager.services.server_management.commands.mysql.update_database_user_command import \
     UpdateDatabaseUserCommand
 from app.server_manager.services.invoker import CommandExecutor
+from app.server_manager.services.server_management.commands.php.php_config_update_command import PhpConfigUpdateCommand
+from app.server_manager.services.server_management.commands.php.php_toggle_opcache_command import \
+    PhpOpcacheToggleCommand
+from app.server_manager.services.server_management.commands.php.php_version_install_command import \
+    PhpVersionInstallCommand
 from app.server_manager.services.service import Service
 
 
@@ -31,6 +36,9 @@ class ServerManagementService(Service):
         self.executor.register('update_database_user', UpdateDatabaseUserCommand({'config': {}}))
         self.executor.register('delete_database', DeleteDatabaseCommand({'config': {}}))
         self.executor.register('delete_database_user', DeleteDatabaseUserCommand({'config': {}}))
+        self.executor.register('php_version_install', PhpVersionInstallCommand({'config': {}}))
+        self.executor.register('php_config_update', PhpConfigUpdateCommand({'config': {}}))
+        self.executor.register('php_toggle_opcache', PhpOpcacheToggleCommand({'config': {}}))
 
     async def generate_deploy_key(self, data):
         data = await self.executor.execute('generate_deploy_key', data)
@@ -75,4 +83,19 @@ class ServerManagementService(Service):
     async def delete_database_user(self, data):
         data = await self.executor.execute('delete_database_user', data)
         logging.info(f"Delete Database User Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def php_version_install(self, data):
+        data = await self.executor.execute('php_version_install', data)
+        logging.info(f"PHP Version Install Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def php_config_update(self, data):
+        data = await self.executor.execute('php_config_update', data)
+        logging.info(f"PHP Config Update Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def php_toggle_opcache(self, data):
+        data = await self.executor.execute('php_toggle_opcache', data)
+        logging.info(f"PHP Toggle Opcache Task in ServerManagementService started in background with task_id: {data}")
         return data
