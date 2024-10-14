@@ -186,7 +186,7 @@ async def php_update_config_file_route(data):
     return jsonify(result)
 
 
-@server_manager_blueprint.route('/php-get-config-file', methods=['GET'])
+@server_manager_blueprint.route('/php-get-config-file', methods=['POST'])
 @validate_request({'POST': PhpGetConfigFileSchema})
 async def php_get_config_file_route(data):
     result = await server_management_controller.php_get_config_file(data)
