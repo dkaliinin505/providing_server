@@ -29,6 +29,8 @@ class PhpConfigUpdateFileCommand(Command):
 
         temp_file_path = await self.write_temp_file_async(config_content)
 
+        await run_command_async(f'sudo chown root:root {temp_file_path}')
+
         await run_command_async(f'sudo mv {temp_file_path} {config_path}')
 
         await run_command_async(f'sudo service php{php_version}-fpm reload')
@@ -38,5 +40,5 @@ class PhpConfigUpdateFileCommand(Command):
 
         return {
             "message": f"PHP {php_version} configuration updated.",
-            "updated_files": bool(config_content)
+            "data": bool(config_content)
         }

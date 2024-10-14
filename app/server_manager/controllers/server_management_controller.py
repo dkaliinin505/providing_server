@@ -102,5 +102,11 @@ class ServerManagementController(Controller):
             f"PHP Get Config File Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "PHP Get Config File task started in background", "task_id": task_id}
 
+    async def php_version_delete(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.php_version_delete, data)
+        logging.info(
+            f"PHP Version Delete Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "PHP Version Delete task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])

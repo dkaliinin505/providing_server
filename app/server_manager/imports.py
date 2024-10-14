@@ -32,3 +32,4 @@ from app.server_manager.validators.schemas.server_management.php.php_config_upda
 from app.server_manager.validators.schemas.server_management.php.php_toggle_opcache_schema import PhpToggleOpcacheSchema
 from app.server_manager.validators.schemas.server_management.php.php_get_config_file_schema import PhpGetConfigFileSchema
 from app.server_manager.validators.schemas.server_management.php.php_update_config_file_schema import PhpUpdateConfigFileSchema
+from app.server_manager.validators.schemas.server_management.php.php_version_delete_schema import PhpVersionDeleteSchema

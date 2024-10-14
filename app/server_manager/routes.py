@@ -192,6 +192,11 @@ async def php_get_config_file_route(data):
     result = await server_management_controller.php_get_config_file(data)
     return jsonify(result)
 
+@server_manager_blueprint.route('/php-version-delete', methods=['POST'])
+@validate_request({'POST': PhpVersionDeleteSchema})
+async def php_version_delete_route(data):
+    result = await server_management_controller.php_version_delete(data)
+    return jsonify(result)
 
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):

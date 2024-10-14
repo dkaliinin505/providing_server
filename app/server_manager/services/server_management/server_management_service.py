@@ -21,6 +21,8 @@ from app.server_manager.services.server_management.commands.php.php_toggle_opcac
     PhpOpcacheToggleCommand
 from app.server_manager.services.server_management.commands.php.php_update_config_file_command import \
     PhpConfigUpdateFileCommand
+from app.server_manager.services.server_management.commands.php.php_version_delete_command import \
+    PhpVersionDeleteCommand
 from app.server_manager.services.server_management.commands.php.php_version_install_command import \
     PhpVersionInstallCommand
 from app.server_manager.services.service import Service
@@ -45,6 +47,7 @@ class ServerManagementService(Service):
         self.executor.register('php_toggle_opcache', PhpOpcacheToggleCommand({'config': {}}))
         self.executor.register('php_update_config_file', PhpConfigUpdateFileCommand({'config': {}}))
         self.executor.register('php_get_config_file', PhpGetConfigFileCommand({'config': {}}))
+        self.executor.register('php_version_delete', PhpVersionDeleteCommand({'config': {}}))
 
 
     async def generate_deploy_key(self, data):
@@ -115,5 +118,10 @@ class ServerManagementService(Service):
     async def php_get_config_file(self, data):
         data = await self.executor.execute('php_get_config_file', data)
         logging.info(f"PHP Get Config File Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def php_version_delete(self, data):
+        data = await self.executor.execute('php_version_delete', data)
+        logging.info(f"PHP Version Delete Task in ServerManagementService started in background with task_id: {data}")
         return data
 
