@@ -17,8 +17,8 @@ class PhpConfigUpdateFileCommand(Command):
 
     async def execute(self, data):
         php_version = data.get('php_version', '8.1')
-        config_content = data.get('config_content', None)
-        config_type = data.get('config_type', 'cli')
+        config_content = data.get('content', None)
+        config_type = data.get('type', 'cli')
 
         if config_type == 'cli':
             cli_config_path = f'/etc/php/{php_version}/cli/php.ini'
