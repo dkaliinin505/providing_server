@@ -27,3 +27,6 @@ from app.server_manager.validators.schemas.site_management.queue.get_queue_worke
 from app.server_manager.validators.schemas.site_management.queue.restart_queue_worker_schema import RestartQueueWorkerSchema
 from app.server_manager.validators.schemas.site_management.queue.get_queue_worker_info_schema import GetQueueWorkerInfoSchema
 from app.server_manager.validators.schemas.site_management.deployments.pull_project_schema import PullProjectSchema
+from app.server_manager.validators.schemas.server_management.php.php_version_install_schema import PhpVersionInstallSchema
+from app.server_manager.validators.schemas.server_management.php.php_config_update_schema import PhpConfigUpdateSchema
+from app.server_manager.validators.schemas.server_management.php.php_toggle_opcache_schema import PhpToggleOpcacheSchema
