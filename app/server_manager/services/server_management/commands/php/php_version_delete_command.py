@@ -23,5 +23,8 @@ class PhpVersionDeleteCommand(Command):
         if await self.is_default_version():
             raise Exception("Cannot delete default PHP version.")
 
+        if await self.count_installed_php_versions() <= 1:
+            raise Exception("At least one PHP version must be installed.")
+
         await run_command_async(f"sudo apt-get purge php{self.php_version}* -y")
         return {"message": f"PHP {self.php_version} successfully deleted."}
