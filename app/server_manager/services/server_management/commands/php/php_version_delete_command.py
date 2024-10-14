@@ -21,7 +21,7 @@ class PhpVersionDeleteCommand(Command):
         self.config = data
         self.php_version = self.config.get('php_version', '8.1')
         if await self.is_default_version():
-            return {"error": "You cannot delete the default PHP version."}
+            raise Exception("Cannot delete default PHP version.")
 
         await run_command_async(f"sudo apt-get purge php{self.php_version}* -y")
         return {"message": f"PHP {self.php_version} successfully deleted."}
