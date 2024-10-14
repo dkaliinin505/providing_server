@@ -10,7 +10,7 @@ class PhpConfigUpdateFileCommand(Command):
         self.config = config
 
     async def write_temp_file_async(self, content):
-        temp_file = tempfile.NamedTemporaryFile(delete=False)  # Создаем временный файл
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
         async with aiofiles.open(temp_file.name, mode='w') as file:
             await file.write(content)
         return temp_file.name
