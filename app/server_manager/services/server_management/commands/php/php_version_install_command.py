@@ -19,11 +19,16 @@ class PhpVersionInstallCommand(Command):
         await run_command_async(
             f"sudo apt-get install -y php{php_version}-common php{php_version}-curl php{php_version}-mbstring php{php_version}-xml")
 
+        # Register alternatives for PHP-FPM if not already registered
+        try:
+            await run_command_async(f"sudo update-alternatives --install /usr/sbin/php-fpm php-fpm /usr/sbin/php-fpm{php_version} 81")
+        except Exception as e:
+            print(f"Failed to register php-fpm alternative for PHP {php_version}: {e}")
+
         # Update PHP CLI to point to the CLI default version
         await run_command_async(f"sudo update-alternatives --set php /usr/bin/php{cli_default_version}")
 
         # Optionally set the default version for Sites if needed
-        # Assuming this is managed via FPM or Nginx configuration
         await run_command_async(f"sudo update-alternatives --set php-fpm /usr/sbin/php-fpm{sites_default_version}")
 
         return {
