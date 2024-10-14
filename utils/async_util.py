@@ -7,6 +7,7 @@ import re
 from aiofiles import os
 
 from utils.env_util import async_get_env_variable
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -98,3 +99,14 @@ async def remove_ansi_escape_codes(text: str) -> str:
     logger.debug(f"Cleaned text: {clean_text[:100]}...")
 
     return clean_text
+
+
+async def read_file_async(file_path: str):
+    try:
+        async with aiofiles.open(file_path, mode='r') as file:
+            content = await file.read()
+        return content
+    except FileNotFoundError:
+        return f"Error: File not found at {file_path}"
+    except Exception as e:
+        return f"Error reading file {file_path}: {str(e)}"

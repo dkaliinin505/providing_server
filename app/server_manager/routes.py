@@ -179,6 +179,20 @@ async def php_toggle_opcache_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/php-update-config-file', methods=['PUT'])
+@validate_request({'PUT': PhpUpdateConfigFileSchema})
+async def php_update_config_file_route(data):
+    result = await server_management_controller.php_update_config_file(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/php-get-config-file', methods=['GET'])
+@validate_request({'POST': PhpGetConfigFileSchema})
+async def php_get_config_file_route(data):
+    result = await server_management_controller.php_get_config_file(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

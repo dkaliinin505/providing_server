@@ -30,3 +30,5 @@ from app.server_manager.validators.schemas.site_management.deployments.pull_proj
 from app.server_manager.validators.schemas.server_management.php.php_version_install_schema import PhpVersionInstallSchema
 from app.server_manager.validators.schemas.server_management.php.php_config_update_schema import PhpConfigUpdateSchema
 from app.server_manager.validators.schemas.server_management.php.php_toggle_opcache_schema import PhpToggleOpcacheSchema
+from app.server_manager.validators.schemas.server_management.php.php_get_config_file_schema import PhpGetConfigFileSchema
+from app.server_manager.validators.schemas.server_management.php.php_update_config_file_schema import PhpUpdateConfigFileSchema

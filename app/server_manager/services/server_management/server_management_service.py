@@ -15,8 +15,12 @@ from app.server_manager.services.server_management.commands.mysql.update_databas
     UpdateDatabaseUserCommand
 from app.server_manager.services.invoker import CommandExecutor
 from app.server_manager.services.server_management.commands.php.php_config_update_command import PhpConfigUpdateCommand
+from app.server_manager.services.server_management.commands.php.php_get_config_file_command import \
+    PhpGetConfigFileCommand
 from app.server_manager.services.server_management.commands.php.php_toggle_opcache_command import \
     PhpOpcacheToggleCommand
+from app.server_manager.services.server_management.commands.php.php_update_config_file_command import \
+    PhpConfigUpdateFileCommand
 from app.server_manager.services.server_management.commands.php.php_version_install_command import \
     PhpVersionInstallCommand
 from app.server_manager.services.service import Service
@@ -39,6 +43,9 @@ class ServerManagementService(Service):
         self.executor.register('php_version_install', PhpVersionInstallCommand({'config': {}}))
         self.executor.register('php_config_update', PhpConfigUpdateCommand({'config': {}}))
         self.executor.register('php_toggle_opcache', PhpOpcacheToggleCommand({'config': {}}))
+        self.executor.register('php_update_config_file', PhpConfigUpdateFileCommand({'config': {}}))
+        self.executor.register('php_get_config_file', PhpGetConfigFileCommand({'config': {}}))
+
 
     async def generate_deploy_key(self, data):
         data = await self.executor.execute('generate_deploy_key', data)
@@ -99,3 +106,14 @@ class ServerManagementService(Service):
         data = await self.executor.execute('php_toggle_opcache', data)
         logging.info(f"PHP Toggle Opcache Task in ServerManagementService started in background with task_id: {data}")
         return data
+
+    async def php_update_config_file(self, data):
+        data = await self.executor.execute('php_update_config_file', data)
+        logging.info(f"PHP Update Config File Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def php_get_config_file(self, data):
+        data = await self.executor.execute('php_get_config_file', data)
+        logging.info(f"PHP Get Config File Task in ServerManagementService started in background with task_id: {data}")
+        return data
+

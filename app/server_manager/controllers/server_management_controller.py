@@ -90,5 +90,17 @@ class ServerManagementController(Controller):
             f"PHP Toggle Opcache Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "PHP Toggle Opcache task started in background", "task_id": task_id}
 
+    async def php_update_config_file(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.php_update_config_file, data)
+        logging.info(
+            f"PHP Update Config File Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "PHP Update Config File task started in background", "task_id": task_id}
+
+    async def php_get_config_file(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.php_get_config_file, data)
+        logging.info(
+            f"PHP Get Config File Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "PHP Get Config File task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])
