@@ -200,6 +200,27 @@ async def php_version_delete_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/create-scheduled-job', methods=['POST'])
+@validate_request({'POST': CreateSchedulerJobSchema})
+async def create_scheduled_job_route(data):
+    result = await server_management_controller.create_scheduler_job(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/update-scheduled-job', methods=['PUT'])
+@validate_request({'PUT': UpdateSchedulerJobSchema})
+async def update_scheduled_job_route(data):
+    result = await server_management_controller.update_scheduler_job(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/delete-scheduled-job', methods=['POST'])
+@validate_request({'POST': DeleteScheduledJobSchema})
+async def delete_scheduled_job_route(data):
+    result = await server_management_controller.delete_scheduler_job(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

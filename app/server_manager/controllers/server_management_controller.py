@@ -108,5 +108,35 @@ class ServerManagementController(Controller):
             f"PHP Version Delete Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "PHP Version Delete task started in background", "task_id": task_id}
 
+    async def create_scheduler_job(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.create_scheduled_job, data)
+        logging.info(
+            f"Create Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Create Scheduler Job task started in background", "task_id": task_id}
+
+    async def update_scheduler_job(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.update_scheduled_job, data)
+        logging.info(
+            f"Update Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Update Scheduler Job task started in background", "task_id": task_id}
+
+    async def delete_scheduler_job(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.delete_scheduled_job, data)
+        logging.info(
+            f"Delete Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Delete Scheduler Job task started in background", "task_id": task_id}
+
+    async def get_scheduler_job_logs(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.get_scheduler_job_logs, data)
+        logging.info(
+            f"Get Scheduler Job Logs Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Get Scheduler Job Logs task started in background", "task_id": task_id}
+
+    async def run_scheduler_job(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.run_scheduled_job, data)
+        logging.info(
+            f"Run Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Run Scheduler Job task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])
