@@ -18,18 +18,23 @@ class CreateScheduledJobCommand(Command):
         self.user = self.config.get('user')
         self.command = self.config.get('command')
         self.frequency = self.config.get('frequency')
-        job_id = str(uuid.uuid4())
+        self.job_id = str(uuid.uuid4())  # Ensure job_id is generated and stored
 
+        # Define log file path
         log_file = f"/home/super_forge/logs/{self.job_id}.log"
         os.makedirs("/home/super_forge/logs", exist_ok=True)
-        full_command = f"{self.command} >> {log_file} 2>&1"
 
+        # Generate cron expression based on frequency
         cron_expression = await self.generate_cron_expression()
 
         if not cron_expression:
             return {"error": "Invalid frequency or custom schedule"}
 
-        cron_command = f'(crontab -l -u {self.user} | grep -v "# JOB_ID={job_id}"; echo "{self.frequency} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
+        # Prepare the full command to be executed by cron, including logging
+        full_command = f"{cron_expression} {self.command} >> {log_file} 2>&1"
+
+        # Update the crontab with the new job
+        cron_command = f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; echo "{full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
 
         result = await run_command_async(cron_command, capture_output=True)
 
@@ -39,16 +44,21 @@ class CreateScheduledJobCommand(Command):
             raise Exception(f"Failed to create scheduled job")
 
     async def generate_cron_expression(self):
+        """Generate the correct cron expression based on the frequency or custom schedule."""
         if self.frequency == 'custom':
             custom_schedule = self.config.get('custom_schedule')
 
-            minute = custom_schedule['minute']
-            hour = custom_schedule['hour']
-            day_of_week = custom_schedule['day_of_week']
-            day_of_month = custom_schedule['day_of_month']
-            month = custom_schedule('month', '*')
+            # Extract custom schedule values
+            minute = custom_schedule.get('minute', '*')
+            hour = custom_schedule.get('hour', '*')
+            day_of_week = custom_schedule.get('day_of_week', '*')
+            day_of_month = custom_schedule.get('day_of_month', '*')
+            month = custom_schedule.get('month', '*')
+
+            # Return the cron expression
             return f"{minute} {hour} {day_of_month} {month} {day_of_week}"
 
+        # Predefined frequencies
         if self.frequency == 'Every Minute':
             return "* * * * *"
         elif self.frequency == 'Hourly':
