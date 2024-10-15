@@ -20,9 +20,9 @@ class CreateScheduledJobCommand(Command):
         self.frequency = self.config.get('frequency')
         job_id = str(uuid.uuid4())
 
-        log_file = f"/var/log/scheduler_logs/{self.job_id}.log"
+        log_file = f"/home/super_forge/logs/{self.job_id}.log"
+        os.makedirs("/home/super_forge/logs", exist_ok=True)
         full_command = f"{self.command} >> {log_file} 2>&1"
-        os.makedirs("/var/log/scheduler_logs", exist_ok=True)
 
         cron_expression = await self.generate_cron_expression()
 

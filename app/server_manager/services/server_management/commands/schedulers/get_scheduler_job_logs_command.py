@@ -8,7 +8,7 @@ class GetSchedulerLogCommand(Command):
 
     async def execute(self, data):
         job_id = data.get('job_id')
-        log_file_path = f"/var/log/scheduler_logs/{job_id}.log"
+        log_file_path = f"/home/super_forge/logs/{job_id}.log"
 
         log_content = await read_file_async(log_file_path)
 

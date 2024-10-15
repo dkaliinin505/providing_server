@@ -18,7 +18,7 @@ class UpdateScheduledJobCommand(Command):
         self.command = self.config.get('command')
         self.frequency = self.config.get('frequency')
 
-        log_file = f"/var/log/scheduler_logs/{self.job_id}.log"
+        log_file = f"/home/super_forge/logs/{self.job_id}.log"
         full_command = f"{self.command} >> {log_file} 2>&1"
 
         cron_expression = await self.generate_cron_expression()

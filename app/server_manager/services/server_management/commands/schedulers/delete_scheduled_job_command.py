@@ -1,3 +1,5 @@
+import os
+
 from app.server_manager.interfaces.command_interface import Command
 from utils.async_util import run_command_async
 
@@ -12,6 +14,7 @@ class DeleteScheduledJobCommand(Command):
         self.config = data
         self.user = self.config.get('user')
         self.job_id = self.config.get('job_id')
+        os.remove(f"/home/super_forge/logs/{self.job_id}.log")
         delete_command = f'crontab -l -u {self.user} | grep -v "# JOB_ID={self.job_id}" | crontab -u {self.user} -'
 
         result = await run_command_async(delete_command, capture_output=True)
