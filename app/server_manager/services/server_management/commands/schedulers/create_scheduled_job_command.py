@@ -18,11 +18,12 @@ class CreateScheduledJobCommand(Command):
         self.user = self.config.get('user')
         self.command = self.config.get('command')
         self.frequency = self.config.get('frequency')
-        self.job_id = str(uuid.uuid4())  # Ensure job_id is generated and stored
+        self.job_id = str(uuid.uuid4())  # Ensure job_id is generated and assigned correctly
 
         # Define log file path
         log_file = f"/home/super_forge/logs/{self.job_id}.log"
         os.makedirs("/home/super_forge/logs", exist_ok=True)
+        full_command = f"{self.command} >> {log_file} 2>&1"
 
         # Generate cron expression based on frequency
         cron_expression = await self.generate_cron_expression()
@@ -30,16 +31,14 @@ class CreateScheduledJobCommand(Command):
         if not cron_expression:
             return {"error": "Invalid frequency or custom schedule"}
 
-        # Prepare the full command to be executed by cron, including logging
-        full_command = f"{cron_expression} {self.command} >> {log_file} 2>&1"
+        # Use cron_expression instead of frequency in the crontab command
+        cron_command = f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; echo "{cron_expression} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
 
-        # Update the crontab with the new job
-        cron_command = f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; echo "{full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
-
+        # Execute the crontab update command
         result = await run_command_async(cron_command, capture_output=True)
 
         if result:
-            return {"message": f"Scheduled job created successfully"}
+            return {"message": f"Scheduled job created successfully", "data": self.job_id}
         else:
             raise Exception(f"Failed to create scheduled job")
 
