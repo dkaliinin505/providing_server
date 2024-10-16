@@ -1,60 +1,75 @@
-import os
+import aiofiles
+import logging
+from pathlib import Path
 import uuid
 
-import aiofiles
-
 from app.server_manager.interfaces.command_interface import Command
-from utils.async_util import run_command_async
+from utils.async_util import run_command_async, check_file_exists
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class CreateDaemonCommand(Command):
     def __init__(self, config):
         self.config = config
-        self.daemon_id = None
-        self.command = None
-        self.directory = None
-        self.user = None
-        self.num_processes = None
-        self.start_seconds = None
-        self.stop_seconds = None
-        self.stop_signal = None
 
     async def execute(self, data):
-        # Extracting config values
+        # Получение данных конфигурации
         self.config = data
         self.daemon_id = str(uuid.uuid4())
-        self.command = self.config.get('command')
-        self.directory = self.config.get('directory', '/')
-        self.user = self.config.get('user', 'root')
-        self.num_processes = self.config.get('num_processes', 1)
-        self.start_seconds = self.config.get('start_seconds', 1)
-        self.stop_seconds = self.config.get('stop_seconds', 5)
-        self.stop_signal = self.config.get('stop_signal', 'TERM')
+        await self.create_supervisor_conf()
+        await self.update_supervisor()
+        await self.start_daemon()
 
-        # Create user-writable config path
-        user_config_dir = f"/home/{self.user}/daemon_configs"
-        os.makedirs(user_config_dir, exist_ok=True)
+        return {"message": f"Daemon {self.daemon_id} started successfully.", "daemon_id": self.daemon_id}
 
-        daemon_config = f"""
-        [program:{self.daemon_id}]
-        command={self.command}
-        directory={self.directory}
-        user={self.user}
-        numprocs={self.num_processes}
-        startsecs={self.start_seconds}
-        stopwaitsecs={self.stop_seconds}
-        stopsignal={self.stop_signal}
+    async def create_supervisor_conf(self):
+        daemon_id = self.daemon_id
+        command = self.config.get('command')
+        directory = self.config.get('directory', '/')
+        user = self.config.get('user', 'root')
+        num_processes = self.config.get('num_processes', 1)
+        start_seconds = self.config.get('start_seconds', 1)
+        stop_seconds = self.config.get('stop_seconds', 5)
+        stop_signal = self.config.get('stop_signal', 'SIGTERM')
+        log_dir = Path(f"/home/{user}/.logs")
+        supervisor_conf_dir = Path("/etc/supervisor/conf.d")
+
+        if not log_dir.exists():
+            log_dir.mkdir(parents=True, exist_ok=True)
+            logging.debug(f"Log directory created at {log_dir}")
+
+        conf_content = f"""
+        [program:{daemon_id}]
+        command={command}
+        directory={directory}
+        user={user}
+        numprocs={num_processes}
+        startsecs={start_seconds}
+        stopwaitsecs={stop_seconds}
+        stopsignal={stop_signal}
+        stdout_logfile={log_dir}/{daemon_id}.log
+        stdout_logfile_maxbytes=5MB
+        stdout_logfile_backups=3
+        autostart=true
+        autorestart=true
         """
 
-        # Write the daemon config file to user directory
-        user_config_file = f"{user_config_dir}/{self.daemon_id}.conf"
-        async with aiofiles.open(user_config_file, 'w') as f:
-            await f.write(daemon_config)
+        conf_path = supervisor_conf_dir / f"{daemon_id}.conf"
 
-        # Move the config to /etc/supervisord.d/ with sudo privileges
-        await run_command_async(f'sudo mv {user_config_file} /etc/supervisord.d/{self.daemon_id}.conf')
+        async with aiofiles.open('/tmp/supervisor_daemon.conf', 'w') as temp_file:
+            await temp_file.write(conf_content)
 
-        # Reload supervisor to apply the new daemon
-        await run_command_async(f'sudo supervisorctl reread && sudo supervisorctl update')
+        await run_command_async(f'sudo mv /tmp/supervisor_daemon.conf {conf_path}')
+        logging.debug(f"Supervisor config for daemon {daemon_id} created at {conf_path}.")
 
-        return {"message": f"Daemon {self.daemon_id} created and running.", "data": self.daemon_id}
+    async def update_supervisor(self):
+        await run_command_async("sudo supervisorctl reread")
+        await run_command_async("sudo supervisorctl update")
+        logging.debug("Supervisor configuration updated.")
+
+    async def start_daemon(self):
+        daemon_id = self.daemon_id
+        await run_command_async(f"sudo supervisorctl start {daemon_id}")
+        logging.debug(f"Daemon {daemon_id} started.")
