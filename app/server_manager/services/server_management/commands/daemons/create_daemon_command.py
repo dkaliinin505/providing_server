@@ -22,7 +22,7 @@ class CreateDaemonCommand(Command):
         await self.update_supervisor()
         await self.start_daemon()
 
-        return {"message": f"Daemon {self.daemon_id} started successfully.", "daemon_id": self.daemon_id}
+        return {"message": f"Daemon {self.daemon_id} started successfully.", "data": self.daemon_id}
 
     async def create_supervisor_conf(self):
         daemon_id = self.daemon_id

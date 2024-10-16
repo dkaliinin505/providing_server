@@ -13,17 +13,25 @@ logger = logging.getLogger(__name__)
 
 
 async def run_command_async(command, raise_exception=True, capture_output=False):
+    logger.debug(f"Executing command: {command}")
+
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE
     )
+
     stdout, stderr = await process.communicate()
     stdout_decoded = stdout.decode()
     stderr_decoded = stderr.decode()
 
+    logger.debug(f"Command stdout: {stdout_decoded}")
+    logger.debug(f"Command stderr: {stderr_decoded}")
+    logger.debug(f"Command exit code: {process.returncode}")
+
     if process.returncode != 0:
         error_message = f"Command '{command}' failed with error: {stderr_decoded}"
+        logger.error(error_message)
         if raise_exception:
             raise Exception(error_message)
         if capture_output:
@@ -36,6 +44,8 @@ async def run_command_async(command, raise_exception=True, capture_output=False)
 
     if capture_output:
         return stdout_decoded, stderr_decoded
+
+    logger.debug(f"Command executed successfully: {command}")
     return stdout_decoded
 
 
