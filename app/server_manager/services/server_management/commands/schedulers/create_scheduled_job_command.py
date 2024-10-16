@@ -23,7 +23,7 @@ class CreateScheduledJobCommand(Command):
         # Define log file path
         log_file = f"/home/super_forge/logs/{self.job_id}.log"
         os.makedirs("/home/super_forge/logs", exist_ok=True)
-        full_command = f"{self.command} >> {log_file} 2>&1"
+        full_command = f"{self.command} > {log_file} 2>&1"
 
         # Generate cron expression based on frequency
         cron_expression = await self.generate_cron_expression()

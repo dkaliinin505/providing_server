@@ -221,6 +221,55 @@ async def delete_scheduled_job_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/run-scheduled-job', methods=['POST'])
+@validate_request({'POST': GetSchedulerJobSchema})
+async def run_scheduled_job_route(data):
+    result = await server_management_controller.run_scheduler_job(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/control-daemon', methods=['POST'])
+@validate_request({'POST': ControlDaemonSchema})
+async def control_daemon_route(data):
+    result = await server_management_controller.control_daemon(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/delete-daemon', methods=['DELETE'])
+@validate_request({'DELETE': DeleteDaemonSchema})
+async def delete_daemon_route(data):
+    result = await server_management_controller.delete_daemon(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/update-daemon', methods=['PUT'])
+@validate_request({'PUT': UpdateDaemonSchema})
+async def update_daemon_route(data):
+    result = await server_management_controller.update_daemon(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/create-daemon', methods=['POST'])
+@validate_request({'POST': CreateDaemonSchema})
+async def create_daemon_route(data):
+    result = await server_management_controller.create_daemon(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/get-daemon-status', methods=['GET'])
+@validate_request({'GET': GetDaemonSchema})
+async def get_daemon_status_route(data):
+    result = await server_management_controller.get_daemon_status(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/get-daemon-logs', methods=['GET'])
+@validate_request({'GET': GetDaemonSchema})
+async def get_daemon_logs_route(data):
+    result = await server_management_controller.get_daemon_logs(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

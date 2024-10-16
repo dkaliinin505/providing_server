@@ -35,6 +35,9 @@ from app.server_manager.services.server_management.commands.schedulers.run_sched
     RunScheduledJobCommand
 from app.server_manager.services.server_management.commands.schedulers.update_scheduled_job_command import \
     UpdateScheduledJobCommand
+from app.server_manager.services.server_management.commands.ssh_keys.add_ssh_key_command import AddSSHKeyCommand
+from app.server_manager.services.server_management.commands.ssh_keys.remove_ssh_key_command import RemoveSSHKeyCommand
+from app.server_manager.services.server_management.services.daemon_service import DaemonService
 from app.server_manager.services.service import Service
 
 
@@ -43,6 +46,7 @@ class ServerManagementService(Service):
     def __init__(self):
         super().__init__()
         self.task_manager = TaskManager()
+        self.daemon_service = DaemonService()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
         self.executor.register('delete_site', DeleteSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
@@ -63,6 +67,8 @@ class ServerManagementService(Service):
         self.executor.register('delete_scheduled_job', DeleteScheduledJobCommand({'config': {}}))
         self.executor.register('get_scheduler_job_logs', GetSchedulerLogCommand({'config': {}}))
         self.executor.register('run_scheduled_job', RunScheduledJobCommand({'config': {}}))
+        self.executor.register('add_ssh_key', AddSSHKeyCommand({'config': {}}))
+        self.executor.register('delete_ssh_key', RemoveSSHKeyCommand({'config': {}}))
 
     async def generate_deploy_key(self, data):
         data = await self.executor.execute('generate_deploy_key', data)
@@ -164,3 +170,42 @@ class ServerManagementService(Service):
         logging.info(f"Run Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
         return data
 
+    async def add_ssh_key(self, data):
+        data = await self.executor.execute('add_ssh_key', data)
+        logging.info(f"Add SSH Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def delete_ssh_key(self, data):
+        data = await self.executor.execute('delete_ssh_key', data)
+        logging.info(f"Delete SSH Key Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def create_daemon(self, data):
+        data = await self.daemon_service.create_daemon(data)
+        logging.info(f"Create Daemon Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def update_daemon(self, data):
+        data = await self.daemon_service.update_daemon(data)
+        logging.info(f"Update Daemon Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def delete_daemon(self, data):
+        data = await self.daemon_service.delete_daemon(data)
+        logging.info(f"Delete Daemon Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def get_daemon_status(self, data):
+        data = await self.daemon_service.get_daemon_status(data)
+        logging.info(f"Get Daemon Status Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def control_daemon(self, data):
+        data = await self.daemon_service.control_daemon(data)
+        logging.info(f"Control Daemon Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def get_daemon_logs(self, data):
+        data = await self.daemon_service.get_daemon_logs(data)
+        logging.info(f"Get Daemon Logs Task in ServerManagementService started in background with task_id: {data}")
+        return data

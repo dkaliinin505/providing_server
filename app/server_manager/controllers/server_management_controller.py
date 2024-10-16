@@ -138,5 +138,29 @@ class ServerManagementController(Controller):
             f"Run Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "Run Scheduler Job task started in background", "task_id": task_id}
 
+    async def delete_daemon(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.delete_daemon, data)
+        return {"message": "Delete Daemon Task started in background", "task_id": task_id}
+
+    async def update_daemon(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.update_daemon, data)
+        return {"message": "Update Daemon Task started in background", "task_id": task_id}
+
+    async def create_daemon(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.create_daemon, data)
+        return {"message": "Create Daemon Task started in background", "task_id": task_id}
+
+    async def control_daemon(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.control_daemon, data)
+        return {"message": "Control Daemon Task started in background", "task_id": task_id}
+
+    async def get_daemon_status(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.get_daemon_status, data)
+        return {"message": "Get Daemon Status Task started in background", "task_id": task_id}
+
+    async def get_daemon_logs(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.get_daemon_logs, data)
+        return {"message": "Get Daemon Logs Task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])

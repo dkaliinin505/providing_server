@@ -19,7 +19,7 @@ class UpdateScheduledJobCommand(Command):
         self.frequency = self.config.get('frequency')
 
         log_file = f"/home/super_forge/logs/{self.job_id}.log"
-        full_command = f"{self.command} >> {log_file} 2>&1"
+        full_command = f"{self.command} > {log_file} 2>&1"
 
         # Generate the cron expression based on the frequency or custom schedule
         cron_expression = await self.generate_cron_expression()
