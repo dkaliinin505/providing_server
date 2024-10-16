@@ -15,6 +15,6 @@ class GetDaemonLogsCommand(Command):
         log_content = await read_file_async(log_file)
 
         if log_content:
-            return {"logs": log_content}
+            return {"message": 'Daemon Logs retrieved successfully', "data": log_content}
         else:
             return {"error": f"Log file for Daemon {self.daemon_id} not found."}
