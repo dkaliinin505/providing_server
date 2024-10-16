@@ -15,4 +15,4 @@ class GetDaemonStatusCommand(Command):
         if result:
             return {"message": "Successfully retrieved daemon status", "data": result}
         else:
-            return {"error": f"Failed to retrieve status for Daemon {self.daemon_id}."}
+            raise Exception({"message": f"Failed to retrieve status for Daemon {self.daemon_id}."})
