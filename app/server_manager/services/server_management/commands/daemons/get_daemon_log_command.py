@@ -8,7 +8,8 @@ class GetDaemonLogsCommand(Command):
         self.daemon_id = None
 
     async def execute(self, data):
-        self.daemon_id = data.get('daemon_id')
+        self.config = data
+        self.daemon_id = self.config.get('daemon_id')
         log_file = f'/home/{self.config.get("user", "root")}/.logs/daemon-{self.daemon_id}.log'
 
         log_content = await read_file_async(log_file)
