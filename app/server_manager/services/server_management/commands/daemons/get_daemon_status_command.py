@@ -10,18 +10,21 @@ class GetDaemonStatusCommand(Command):
     async def execute(self, data):
         self.daemon_id = data.get('daemon_id')
 
-        result, error_output, exit_code = await run_command_async(f'sudo supervisorctl status {self.daemon_id}',
-                                                                  capture_output=True,raise_exception=False)
+        result, error_output = await run_command_async(
+            f'sudo supervisorctl status {self.daemon_id}',
+            capture_output=True,
+            raise_exception=False
+        )
 
-        if exit_code == 0:
-            return {
-                "message": "Successfully retrieved daemon status",
-                "data": result,
-                "status": "success"
-            }
-        else:
+        if error_output:
             return {
                 "message": f"Successfully retrieved daemon status.",
                 "data": error_output,
+                "status": "error"
+            }
+        else:
+            return {
+                "message": "Successfully retrieved daemon status",
+                "data": result,
                 "status": "success"
             }
