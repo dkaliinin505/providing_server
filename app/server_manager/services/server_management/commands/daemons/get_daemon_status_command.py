@@ -11,7 +11,7 @@ class GetDaemonStatusCommand(Command):
         self.daemon_id = data.get('daemon_id')
 
         result, error_output, exit_code = await run_command_async(f'sudo supervisorctl status {self.daemon_id}',
-                                                                  capture_output=True)
+                                                                  capture_output=True,raise_exception=False)
 
         if exit_code == 0:
             return {
