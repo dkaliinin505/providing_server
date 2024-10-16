@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 class CreateDaemonCommand(Command):
     def __init__(self, config):
+        self.daemon_id = None
         self.config = config
 
     async def execute(self, data):
-        # Получение данных конфигурации
         self.config = data
         self.daemon_id = str(uuid.uuid4())
         await self.create_supervisor_conf()
@@ -49,7 +49,7 @@ class CreateDaemonCommand(Command):
         startsecs={start_seconds}
         stopwaitsecs={stop_seconds}
         stopsignal={stop_signal}
-        stdout_logfile={log_dir}/{daemon_id}.log
+        stdout_logfile={log_dir}/daemon-{daemon_id}.log
         stdout_logfile_maxbytes=5MB
         stdout_logfile_backups=3
         autostart=true
