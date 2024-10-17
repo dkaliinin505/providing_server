@@ -39,6 +39,7 @@ from app.server_manager.services.server_management.commands.ssh_keys.add_ssh_key
 from app.server_manager.services.server_management.commands.ssh_keys.remove_ssh_key_command import RemoveSSHKeyCommand
 from app.server_manager.services.server_management.services.daemon_service import DaemonService
 from app.server_manager.services.server_management.services.firewall_service import FireWallService
+from app.server_manager.services.server_management.services.server_logs_service import ServerLogsService
 from app.server_manager.services.service import Service
 
 
@@ -49,6 +50,7 @@ class ServerManagementService(Service):
         self.task_manager = TaskManager()
         self.daemon_service = DaemonService()
         self.firewall_service = FireWallService()
+        self.server_logs_service = ServerLogsService()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
         self.executor.register('delete_site', DeleteSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
@@ -220,4 +222,14 @@ class ServerManagementService(Service):
     async def remove_firewall_rule(self, data):
         data = await self.firewall_service.remove_firewall_rule(data)
         logging.info(f"Remove Firewall Rule Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def get_server_logs(self, data):
+        data = await self.server_logs_service.get_server_logs(data)
+        logging.info(f"Get Server Logs Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def clear_server_logs(self, data):
+        data = await self.server_logs_service.clear_server_logs(data)
+        logging.info(f"Clear Server Logs Task in ServerManagementService started in background with task_id: {data}")
         return data

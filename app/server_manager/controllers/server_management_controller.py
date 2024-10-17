@@ -170,5 +170,13 @@ class ServerManagementController(Controller):
         task_id = await self.task_manager.submit_task(self.server_management_service.remove_firewall_rule, data)
         return {"message": "Remove Firewall Rule Task started in background", "task_id": task_id}
 
+    async def get_server_logs(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.get_server_logs, data)
+        return {"message": "Get Server Logs Task started in background", "task_id": task_id}
+
+    async def clear_server_logs(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.clear_server_logs, data)
+        return {"message": "Clear Server Logs Task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])

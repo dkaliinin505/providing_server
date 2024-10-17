@@ -284,6 +284,20 @@ async def remove_firewall_rule_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/get-server-log', methods=['POST'])
+@validate_request({'POST': ServerLogsSchema})
+async def get_server_log_route(data):
+    result = await server_management_controller.get_server_logs(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/clear-server-log', methods=['POST'])
+@validate_request({'POST': ServerLogsSchema})
+async def clear_server_log_route(data):
+    result = await server_management_controller.clear_server_logs(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

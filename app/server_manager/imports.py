@@ -45,3 +45,4 @@ from app.server_manager.validators.schemas.server_management.daemon.get_daemon_s
 from app.server_manager.services.server_management.commands.daemons.control_daemon_command import ControlDaemonCommand
 from app.server_manager.validators.schemas.server_management.network.add_firewall_schema import AddFirewallRuleSchema
 from app.server_manager.validators.schemas.server_management.network.remove_firewall_schema import RemoveFirewallRuleSchema
+from app.server_manager.validators.schemas.server_management.logs.server_logs_schema import ServerLogsSchema
