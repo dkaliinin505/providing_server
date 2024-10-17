@@ -270,6 +270,20 @@ async def get_daemon_logs_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/add-firewall-rule', methods=['POST'])
+@validate_request({'POST': AddFirewallRuleSchema})
+async def add_firewall_rule_route(data):
+    result = await server_management_controller.add_firewall_rule(data)
+    return jsonify(result)
+
+
+@server_manager_blueprint.route('/remove-firewall-rule', methods=['POST'])
+@validate_request({'POST': RemoveFirewallRuleSchema})
+async def remove_firewall_rule_route(data):
+    result = await server_management_controller.remove_firewall_rule(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)
