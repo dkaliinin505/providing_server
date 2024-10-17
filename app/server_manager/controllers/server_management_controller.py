@@ -178,5 +178,13 @@ class ServerManagementController(Controller):
         task_id = await self.task_manager.submit_task(self.server_management_service.clear_server_logs, data)
         return {"message": "Clear Server Logs Task started in background", "task_id": task_id}
 
+    async def add_ssh_key(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.add_ssh_key, data)
+        return {"message": "Add SSH Key Task started in background", "task_id": task_id}
+
+    async def remove_ssh_key(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.delete_ssh_key, data)
+        return {"message": "Remove SSH Key Task started in background", "task_id": task_id}
+
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])
