@@ -1,4 +1,4 @@
-import aiofiles
+from utils.async_util import run_command_async
 import os
 from app.server_manager.interfaces.command_interface import Command
 
@@ -12,19 +12,24 @@ class ClearServerLogsCommand(Command):
         self.log_path = data.get('log_path')
 
         if not self.log_path:
-            return {"error": "Log path not provided."}
+            return {"message": "Log path not provided."}
 
         if not os.path.exists(self.log_path):
-            return {"error": f"Log file at {self.log_path} not found."}
+            return {"message": f"Log file at {self.log_path} not found."}
 
         try:
-            async with aiofiles.open(self.log_path, mode='w') as log_file:
-                await log_file.write('')
+            command = f"sudo truncate -s 0 {self.log_path}"
+            result, error_output = await run_command_async(command, capture_output=True)
 
-            return {
-                "message": f"Log file at {self.log_path} cleared successfully."
-            }
+            if result:
+                return {
+                    "message": f"Log file at {self.log_path} cleared successfully."
+                }
+            else:
+                raise Exception({
+                    "message": f"Failed to clear logs: {error_output}"
+                })
         except Exception as e:
-            return {
-                "error": f"Failed to clear logs at {self.log_path}: {str(e)}"
-            }
+            raise Exception({
+                "message": f"Failed to clear logs at {self.log_path}: {str(e)}"
+            })
