@@ -1,6 +1,7 @@
-import aiofiles
+from utils.async_util import run_command_async
 import os
 from app.server_manager.interfaces.command_interface import Command
+
 
 class GetServerLogsCommand(Command):
     def __init__(self, config):
@@ -17,14 +18,18 @@ class GetServerLogsCommand(Command):
             return {"error": f"Log file at {self.log_path} not found."}
 
         try:
-            async with aiofiles.open(self.log_path, mode='r') as log_file:
-                logs = await log_file.readlines()
+            command = f"sudo tail -n 500 {self.log_path}"
+            logs, error_output = await run_command_async(command, capture_output=True)
 
-            last_500_lines = logs[-500:] if len(logs) > 500 else logs
-            return {
-                "message": f"Last 500 lines of logs retrieved from {self.log_path}.",
-                "data": ''.join(last_500_lines)
-            }
+            if logs:
+                return {
+                    "message": f"Last 500 lines of logs retrieved from {self.log_path}.",
+                    "data": logs
+                }
+            else:
+                return {
+                    "error": f"Failed to retrieve logs: {error_output}"
+                }
         except Exception as e:
             return {
                 "error": f"Failed to retrieve logs from {self.log_path}: {str(e)}"
