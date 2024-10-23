@@ -19,19 +19,25 @@ class PhpVersionInstallCommand(Command):
         await run_command_async(
             f"sudo apt-get install -y php{php_version}-common php{php_version}-curl php{php_version}-mbstring php{php_version}-xml")
 
-        result = await run_command_async(f"update-alternatives --display php-fpm || true")
-        if f"/usr/sbin/php-fpm{php_version}" not in result:
-            # Register alternatives for PHP-FPM if not already registered
+        # Проверка наличия php-fpm версии
+        fpm_result = await run_command_async(f"update-alternatives --display php-fpm || true")
+        if f"/usr/sbin/php-fpm{php_version}" not in fpm_result:
             try:
                 await run_command_async(f"sudo update-alternatives --install /usr/sbin/php-fpm php-fpm /usr/sbin/php-fpm{php_version} 81")
             except Exception as e:
                 raise Exception(f"Failed to register php-fpm alternative for PHP {php_version}: {e}")
 
-        # Update PHP CLI to point to the CLI default version
-        await run_command_async(f"sudo update-alternatives --set php /usr/bin/php{cli_default_version}")
+        cli_result = await run_command_async(f"update-alternatives --display php || true")
+        if f"/usr/bin/php{cli_default_version}" in cli_result:
+            # Update PHP CLI to point to the CLI default version
+            await run_command_async(f"sudo update-alternatives --set php /usr/bin/php{cli_default_version}")
+        else:
+            print(f"Warning: CLI version {cli_default_version} is not registered as an alternative.")
 
-        # Optionally set the default version for Sites if needed
-        await run_command_async(f"sudo update-alternatives --set php-fpm /usr/sbin/php-fpm{sites_default_version}")
+        if f"/usr/sbin/php-fpm{sites_default_version}" in fpm_result:
+            await run_command_async(f"sudo update-alternatives --set php-fpm /usr/sbin/php-fpm{sites_default_version}")
+        else:
+            print(f"Warning: PHP-FPM version {sites_default_version} is not registered as an alternative for sites.")
 
         return {
             "message": f"PHP {php_version} installed and configured. CLI default version set to {cli_default_version}, "
