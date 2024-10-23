@@ -95,4 +95,4 @@ class PhpCommand(Command):
         # Update PHP CLI to point to PHP 8.3
         await run_command_async("sudo update-alternatives --set php /usr/bin/php8.3")
 
-        return {"message": "PHP installed and configured"}
+        return {"message": "PHP installed and configured", "data": "8.3"}
