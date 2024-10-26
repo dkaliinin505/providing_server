@@ -19,7 +19,6 @@ class PhpVersionInstallCommand(Command):
         await run_command_async(
             f"sudo apt-get install -y php{php_version}-common php{php_version}-curl php{php_version}-mbstring php{php_version}-xml")
 
-        # Проверка наличия php-fpm версии
         fpm_result = await run_command_async(f"update-alternatives --display php-fpm || true")
         if f"/usr/sbin/php-fpm{php_version}" not in fpm_result:
             try:
