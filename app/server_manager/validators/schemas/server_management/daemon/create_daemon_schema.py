@@ -5,7 +5,7 @@ class CreateDaemonSchema(Schema):
     command = fields.Str(required=True)
     directory = fields.Str(missing='/')
     user = fields.Str(missing='root')
-    daemon_id = fields.Str(required=True)
+    id = fields.Str(required=True)
     num_processes = fields.Int(required=True,validate=validate.Range(min=1, max=100))
     start_seconds = fields.Int(required=True, validate=validate.Range(min=1, max=100))
     stop_seconds = fields.Int(required=True,validate=validate.Range(min=1, max=100))
