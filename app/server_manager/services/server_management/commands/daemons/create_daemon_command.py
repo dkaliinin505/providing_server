@@ -17,7 +17,7 @@ class CreateDaemonCommand(Command):
 
     async def execute(self, data):
         self.config = data
-        self.daemon_id = str(uuid.uuid4())
+        self.daemon_id = self.config.get('daemon_id', str(uuid.uuid4()))
         await self.create_supervisor_conf()
         await self.update_supervisor()
         await self.start_daemon()
