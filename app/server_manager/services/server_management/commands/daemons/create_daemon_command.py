@@ -20,7 +20,7 @@ class CreateDaemonCommand(Command):
         self.daemon_id = self.config.get('id', str(uuid.uuid4()))
         await self.create_supervisor_conf()
         await self.update_supervisor()
-        await self.start_daemon()
+        #await self.start_daemon()
 
         return {"message": f"Daemon {self.daemon_id} started successfully.", "data": self.daemon_id}
 
