@@ -76,5 +76,13 @@ class CreateDaemonCommand(Command):
 
     async def start_daemon(self):
         daemon_id = self.daemon_id
-        await run_command_async(f"sudo supervisorctl start {daemon_id}")
-        logging.debug(f"Daemon {daemon_id} started.")
+        num_processes = self.config.get('num_processes', 1)
+
+        if num_processes == 1:
+            await run_command_async(f"sudo supervisorctl start {daemon_id}")
+            logging.debug(f"Daemon {daemon_id} started.")
+        else:
+            for i in range(num_processes):
+                process_name = f"{daemon_id}_{i}"
+                await run_command_async(f"sudo supervisorctl start {process_name}")
+                logging.debug(f"Daemon process {process_name} started.")
