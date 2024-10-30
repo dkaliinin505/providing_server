@@ -50,6 +50,11 @@ class UpdateDaemonCommand(Command):
         autorestart=true
         """
 
+        if self.num_processes == 1:
+            daemon_config += "process_name=%(program_name)s\n"
+        else:
+            daemon_config += "process_name=%(program_name)s_%(process_num)s\n"
+
         async with aiofiles.open('/tmp/supervisor_daemon_update.conf', 'w') as temp_file:
             await temp_file.write(daemon_config)
 

@@ -56,6 +56,11 @@ class CreateDaemonCommand(Command):
         autorestart=true
         """
 
+        if num_processes == 1:
+            conf_content += "process_name=%(program_name)s\n"
+        elif num_processes > 1:
+            conf_content += "process_name=%(program_name)s_%(process_num)s\n"
+
         conf_path = supervisor_conf_dir / f"{daemon_id}.conf"
 
         async with aiofiles.open('/tmp/supervisor_daemon.conf', 'w') as temp_file:
