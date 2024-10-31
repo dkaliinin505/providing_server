@@ -1,5 +1,5 @@
 from app.server_manager.interfaces.command_interface import Command
-from utils.async_util import read_file_async
+from utils.async_util import read_file_async, read_last_lines_async
 
 
 class GetDaemonLogsCommand(Command):
@@ -12,7 +12,7 @@ class GetDaemonLogsCommand(Command):
         self.daemon_id = self.config.get('daemon_id')
         log_file = f'/home/{self.config.get("user", "root")}/.logs/daemon-{self.daemon_id}.log'
 
-        log_content = await read_file_async(log_file)
+        log_content = await read_last_lines_async(log_file, 500)
 
         if log_content:
             return {"message": 'Daemon Logs retrieved successfully', "data": log_content}

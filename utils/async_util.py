@@ -120,3 +120,23 @@ async def read_file_async(file_path: str):
         return f"Error: File not found at {file_path}"
     except Exception as e:
         return f"Error reading file {file_path}: {str(e)}"
+
+
+async def read_last_lines_async(file_path, line_count):
+    lines = []
+    async with aiofiles.open(file_path, 'r') as file:
+        await file.seek(0, 2)
+        buffer_size = 1024
+        while len(lines) <= line_count:
+            position = max(await file.tell() - buffer_size, 0)
+            await file.seek(position)
+
+            buffer = await file.read(buffer_size)
+            lines = buffer.splitlines()
+
+            if position == 0:
+                break
+
+            buffer_size *= 2
+
+    return lines[-line_count:]
