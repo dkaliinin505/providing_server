@@ -12,7 +12,7 @@ class ControlDaemonCommand(Command):
     async def execute(self, data):
         self.daemon_id = data.get('daemon_id')
         self.action = data.get('action')
-        self.num_processes = data.get('num_processes', 1)
+        self.num_processes = int(data.get('num_processes', 1))
 
         if self.num_processes > 1:
             for i in range(self.num_processes):
