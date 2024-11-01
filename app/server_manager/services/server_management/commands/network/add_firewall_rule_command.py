@@ -15,7 +15,7 @@ class AddFirewallRuleCommand(Command):
     async def execute(self, data):
         # Extract rule information from the config
         self.config = data
-        self.rule_id = str(uuid.uuid4())
+        self.rule_id = self.config.get('rule_id')
         self.name = self.config.get('name')
         self.port = self.config.get('port')
         self.from_ip = self.config.get('from_ip', None)
