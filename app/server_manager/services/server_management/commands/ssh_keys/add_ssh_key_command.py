@@ -26,7 +26,7 @@ class AddSSHKeyCommand(Command):
         key_with_id = f"# KEY_ID={self.key_id}\n{self.ssh_key}\n"
 
         # Command to append the SSH key with the unique ID to the authorized_keys file
-        add_key_command = f'sudo echo "{key_with_id}" | tee -a {authorized_keys_file}'
+        add_key_command = f'sudo echo "{key_with_id}" |sudo tee -a {authorized_keys_file}'
 
         # Execute the command
         try:
