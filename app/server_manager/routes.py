@@ -298,14 +298,14 @@ async def clear_server_log_route(data):
     return jsonify(result)
 
 
-@server_manager_blueprint.route('/add-ssh_key', methods=['POST'])
+@server_manager_blueprint.route('/add-ssh-key', methods=['POST'])
 @validate_request({'POST': AddSSHKeySchema})
 async def add_ssh_key_route(data):
     result = await server_management_controller.add_ssh_key(data)
     return jsonify(result)
 
 
-@server_manager_blueprint.route('/remove-ssh_key', methods=['POST'])
+@server_manager_blueprint.route('/remove-ssh-key', methods=['POST'])
 @validate_request({'POST': RemoveSSHKeySchema})
 async def remove_ssh_key_route(data):
     result = await server_management_controller.remove_ssh_key(data)
