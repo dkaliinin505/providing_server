@@ -9,3 +9,4 @@ from app.server_manager.validators.rules.nested_structure_rule import validate_n
 class AddSSHKeySchema(Schema):
     key_id = fields.Str(required=True, validate=validate.Length(min=1))
     user = fields.Str(required=True)
+    ssh_key = fields.Str(required=True)

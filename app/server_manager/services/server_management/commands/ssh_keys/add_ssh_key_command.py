@@ -8,11 +8,13 @@ class AddSSHKeyCommand(Command):
     def __init__(self, config):
         self.config = config
         self.user = None
+        self.ssh_key = None
         self.key_id = None
 
     async def execute(self, data):
         self.config = data
         self.user = self.config.get('user')
+        self.ssh_key = self.config.get('ssh_key')
         self.key_id = self.config.get('key_id', str(uuid.uuid4()))
 
         # Define the paths for key files
@@ -33,7 +35,7 @@ class AddSSHKeyCommand(Command):
         public_key = await read_file_async(public_key_file)
 
         # Add a comment with the unique key ID before the provided SSH key to authorized_keys
-        key_with_id = f"# KEY_ID={self.key_id}\n{self.user}"
+        key_with_id = f"# KEY_ID={self.key_id}\n{self.ssh_key}"
         add_key_command = f'echo "{key_with_id}" | tee -a {authorized_keys_file}'
         result = await run_command_async(add_key_command, capture_output=True)
 
