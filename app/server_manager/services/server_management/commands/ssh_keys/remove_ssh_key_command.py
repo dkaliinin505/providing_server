@@ -17,7 +17,7 @@ class RemoveSSHKeyCommand(Command):
         authorized_keys_file = f"/home/{self.user}/.ssh/authorized_keys"
 
         # Command to remove the SSH key with the matching key ID
-        remove_key_command = f'(grep -v "# KEY_ID={self.key_id}" {authorized_keys_file}) > {authorized_keys_file}.tmp && mv {authorized_keys_file}.tmp {authorized_keys_file}'
+        remove_key_command = f'(sudo grep -v "# KEY_ID={self.key_id}" {authorized_keys_file}) > {authorized_keys_file}.tmp && mv {authorized_keys_file}.tmp {authorized_keys_file}'
 
         # Execute the command
         result = await run_command_async(remove_key_command, capture_output=True)
