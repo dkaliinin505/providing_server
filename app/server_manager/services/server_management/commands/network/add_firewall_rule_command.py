@@ -22,11 +22,16 @@ class AddFirewallRuleCommand(Command):
         self.rule_type = self.config.get('rule_type', 'allow').lower()
 
         # Construct the ufw command
-        ufw_command = f"sudo ufw {self.rule_type} {self.port}"
+        # Start constructing the ufw command
+        ufw_command = f"sudo ufw {self.rule_type}"
 
         # Add 'from' IP if provided
         if self.from_ip:
             ufw_command += f" from {self.from_ip}"
+
+        # Add 'to' port if provided
+        if self.port:
+            ufw_command += f" to any port {self.port}"
 
         # Execute the command
         await run_command_async(ufw_command)
