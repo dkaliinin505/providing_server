@@ -18,7 +18,7 @@ class CreateScheduledJobCommand(Command):
         self.user = self.config.get('user')
         self.command = self.config.get('command')
         self.frequency = self.config.get('frequency')
-        self.job_id = str(uuid.uuid4())  # Ensure job_id is generated and assigned correctly
+        self.job_id = self.config.get('job_id')  # Ensure job_id is generated and assigned correctly
 
         # Define log file path
         log_file = f"/home/super_forge/logs/{self.job_id}.log"

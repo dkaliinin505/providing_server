@@ -9,6 +9,7 @@ class CreateSchedulerJobSchema(Schema):
     frequency = fields.Str(required=True, validate=validate.OneOf(
         ['Every Minute', 'Hourly', 'Nightly', 'Weekly', 'Monthly', 'On Reboot', 'custom']))
     custom_schedule = fields.Nested(CustomScheduleSchema, required=False)  # Only required if frequency is 'custom'
+    job_id = fields.Str(required=True, validate=validate.Length(min=1))
 
     @validates_schema
     def validate_custom_schedule(self, data, **kwargs):
