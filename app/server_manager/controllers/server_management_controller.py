@@ -188,3 +188,4 @@ class ServerManagementController(Controller):
 
     def __del__(self):
         super().cleanup(resource_types=[ServerManagementService, PackageInstallerService])
+

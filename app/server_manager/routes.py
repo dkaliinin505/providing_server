@@ -228,6 +228,13 @@ async def run_scheduled_job_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/get-scheduled-job', methods=['POST'])
+@validate_request({'POST': GetSchedulerJobSchema})
+async def get_scheduled_job_route(data):
+    result = await server_management_controller.get_scheduler_job_logs(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/control-daemon', methods=['POST'])
 @validate_request({'POST': ControlDaemonSchema})
 async def control_daemon_route(data):
