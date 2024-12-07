@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, validate, ValidationError, validates_schema
 
-from app.server_manager.validators.schemas.server_management.scheduler.custom_scheuler_schema import CustomScheduleSchema
+from app.server_manager.validators.schemas.server_management.scheduler.custom_scheduler_schema import CustomScheduleSchema
 
 
 class UpdateSchedulerJobSchema(Schema):
