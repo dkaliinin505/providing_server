@@ -39,6 +39,7 @@ from app.server_manager.services.server_management.commands.ssh_keys.add_ssh_key
 from app.server_manager.services.server_management.commands.ssh_keys.remove_ssh_key_command import RemoveSSHKeyCommand
 from app.server_manager.services.server_management.services.daemon_service import DaemonService
 from app.server_manager.services.server_management.services.firewall_service import FireWallService
+from app.server_manager.services.server_management.services.scheduler_service import SchedulerService
 from app.server_manager.services.server_management.services.server_logs_service import ServerLogsService
 from app.server_manager.services.service import Service
 
@@ -51,6 +52,7 @@ class ServerManagementService(Service):
         self.daemon_service = DaemonService()
         self.firewall_service = FireWallService()
         self.server_logs_service = ServerLogsService()
+        self.scheduler_service = SchedulerService()
         self.executor.register('create_site', CreateSiteCommand({'config': {}}))
         self.executor.register('delete_site', DeleteSiteCommand({'config': {}}))
         self.executor.register('generate_deploy_key', GenerateDeployKeyCommand({'config': {}}))
@@ -66,10 +68,6 @@ class ServerManagementService(Service):
         self.executor.register('php_update_config_file', PhpConfigUpdateFileCommand({'config': {}}))
         self.executor.register('php_get_config_file', PhpGetConfigFileCommand({'config': {}}))
         self.executor.register('php_version_delete', PhpVersionDeleteCommand({'config': {}}))
-        self.executor.register('create_scheduled_job', CreateScheduledJobCommand({'config': {}}))
-        self.executor.register('update_scheduled_job', UpdateScheduledJobCommand({'config': {}}))
-        self.executor.register('delete_scheduled_job', DeleteScheduledJobCommand({'config': {}}))
-        self.executor.register('get_scheduler_job_logs', GetSchedulerLogCommand({'config': {}}))
         self.executor.register('run_scheduled_job', RunScheduledJobCommand({'config': {}}))
         self.executor.register('add_ssh_key', AddSSHKeyCommand({'config': {}}))
         self.executor.register('delete_ssh_key', RemoveSSHKeyCommand({'config': {}}))
@@ -150,28 +148,33 @@ class ServerManagementService(Service):
         return data
 
     async def create_scheduled_job(self, data):
-        data = await self.executor.execute('create_scheduled_job', data)
+        data = await self.scheduler_service.create_scheduled_job(data)
         logging.info(f"Create Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def update_scheduled_job(self, data):
-        data = await self.executor.execute('update_scheduled_job', data)
+        data = await self.scheduler_service.update_scheduled_job(data)
         logging.info(f"Update Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def delete_scheduled_job(self, data):
-        data = await self.executor.execute('delete_scheduled_job', data)
+        data = await self.scheduler_service.delete_scheduled_job(data)
         logging.info(f"Delete Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def get_scheduler_job_logs(self, data):
-        data = await self.executor.execute('get_scheduler_job_logs', data)
+        data = await self.scheduler_service.get_scheduler_job_logs(data)
         logging.info(f"Get Scheduler Job Logs Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def run_scheduled_job(self, data):
-        data = await self.executor.execute('run_scheduled_job', data)
+        data = await self.scheduler_service.run_scheduled_job(data)
         logging.info(f"Run Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
+        return data
+
+    async def control_scheduled_job(self, data):
+        data = await self.scheduler_service.control_scheduled_job(data)
+        logging.info(f"Control Scheduled Job Task in ServerManagementService started in background with task_id: {data}")
         return data
 
     async def add_ssh_key(self, data):

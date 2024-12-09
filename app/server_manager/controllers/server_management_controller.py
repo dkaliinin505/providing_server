@@ -138,6 +138,12 @@ class ServerManagementController(Controller):
             f"Run Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
         return {"message": "Run Scheduler Job task started in background", "task_id": task_id}
 
+    async def control_scheduler_job(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.control_scheduled_job, data)
+        logging.info(
+            f"Control Scheduler Job Task in ServerManagementController started in background with task_id: {task_id}")
+        return {"message": "Control Scheduler Job task started in background", "task_id": task_id}
+
     async def delete_daemon(self, data):
         task_id = await self.task_manager.submit_task(self.server_management_service.delete_daemon, data)
         return {"message": "Delete Daemon Task started in background", "task_id": task_id}
