@@ -15,7 +15,7 @@ class ControlScheduledJobCommand(Command):
         self.config = data
         self.user = self.config.get('user')
         self.job_id = self.config.get('job_id')
-        self.action = self.config.get('action')  # 'pause' or 'resume'
+        self.action = self.config.get('action')  # 'start', 'stop'
 
         # if not self.user or not self.job_id or not self.action:
         #     return {"error": "Missing required parameters: user, job_id, action"}
@@ -23,9 +23,9 @@ class ControlScheduledJobCommand(Command):
         pause_flag = f"/home/{self.user}/paused_jobs/{self.job_id}.pause"
         os.makedirs(f"/home/{self.user}/paused_jobs", exist_ok=True)
 
-        if self.action == 'pause':
+        if self.action == 'stop':
             return await self.pause_job(pause_flag)
-        elif self.action == 'resume':
+        elif self.action == 'start':
             return await self.resume_job(pause_flag)
 
     async def pause_job(self, pause_flag):
