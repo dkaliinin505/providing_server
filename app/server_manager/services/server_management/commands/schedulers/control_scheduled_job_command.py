@@ -34,7 +34,7 @@ class ControlScheduledJobCommand(Command):
             with open(pause_flag, 'w') as f:
                 f.write('paused')
             print(f"Job {self.job_id} paused by creating flag {pause_flag}.")
-            return {"message": f"Job {self.job_id} paused successfully."}
+            return {"message": f"Scheduled job paused successfully", "data": self.job_id}
         except Exception as e:
             print(f"Error pausing job {self.job_id}: {e}")
             raise Exception(f"Failed to pause job: {e}")
@@ -44,7 +44,7 @@ class ControlScheduledJobCommand(Command):
             if os.path.exists(pause_flag):
                 os.remove(pause_flag)
                 print(f"Job {self.job_id} resumed by removing flag {pause_flag}.")
-                return {"message": f"Job {self.job_id} resumed successfully."}
+                return {"message": f"Scheduled job resumed successfully", "data": self.job_id}
             else:
                 print(f"No pause flag found for job {self.job_id}. Job is not paused.")
                 return {"message": "Job is not paused."}
