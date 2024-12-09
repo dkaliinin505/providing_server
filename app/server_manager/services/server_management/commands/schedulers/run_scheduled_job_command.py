@@ -14,6 +14,6 @@ class RunScheduledJobCommand(Command):
         result = await run_command_async(self.job_command, capture_output=True)
 
         if result:
-            return {"message": "Scheduled job executed successfully", "data": result.stdout_decoded}
+            return {"message": "Scheduled job executed successfully", "data": result[0]}
         else:
-            return {"message": "Failed to execute scheduled job", "data": result.stderr_decoded}
+            return {"message": "Failed to execute scheduled job", "data": result[1]}
