@@ -15,14 +15,13 @@ class ControlScheduledJobCommand(Command):
         self.config = data
         self.user = self.config.get('user')
         self.job_id = self.config.get('job_id')
-        self.action = self.config.get('action')  # 'pause' или 'resume'
+        self.action = self.config.get('action')  # 'pause' or 'resume'
 
         # if not self.user or not self.job_id or not self.action:
         #     return {"error": "Missing required parameters: user, job_id, action"}
 
-
         pause_flag = f"/home/{self.user}/paused_jobs/{self.job_id}.pause"
-        os.makedirs("/home/super_forge/paused_jobs", exist_ok=True)
+        os.makedirs(f"/home/{self.user}/paused_jobs", exist_ok=True)
 
         if self.action == 'pause':
             return await self.pause_job(pause_flag)
@@ -47,7 +46,7 @@ class ControlScheduledJobCommand(Command):
                 return {"message": f"Scheduled job resumed successfully", "data": self.job_id}
             else:
                 print(f"No pause flag found for job {self.job_id}. Job is not paused.")
-                return {"message": "Job is not paused."}
+                raise Exception(f"Job is not paused.")
         except Exception as e:
             print(f"Error resuming job {self.job_id}: {e}")
             raise Exception(f"Failed to resume job: {e}")
