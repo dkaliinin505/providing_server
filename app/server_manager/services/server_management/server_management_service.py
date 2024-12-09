@@ -68,7 +68,6 @@ class ServerManagementService(Service):
         self.executor.register('php_update_config_file', PhpConfigUpdateFileCommand({'config': {}}))
         self.executor.register('php_get_config_file', PhpGetConfigFileCommand({'config': {}}))
         self.executor.register('php_version_delete', PhpVersionDeleteCommand({'config': {}}))
-        self.executor.register('run_scheduled_job', RunScheduledJobCommand({'config': {}}))
         self.executor.register('add_ssh_key', AddSSHKeyCommand({'config': {}}))
         self.executor.register('delete_ssh_key', RemoveSSHKeyCommand({'config': {}}))
 
