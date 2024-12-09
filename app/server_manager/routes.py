@@ -222,7 +222,7 @@ async def delete_scheduled_job_route(data):
 
 
 @server_manager_blueprint.route('/run-scheduled-job', methods=['POST'])
-@validate_request({'POST': GetSchedulerJobSchema})
+@validate_request({'POST': RunSchedulerJobSchema})
 async def run_scheduled_job_route(data):
     result = await server_management_controller.run_scheduler_job(data)
     return jsonify(result)

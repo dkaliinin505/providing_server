@@ -49,3 +49,4 @@ from app.server_manager.validators.schemas.server_management.logs.server_logs_sc
 from app.server_manager.validators.schemas.server_management.ssh_keys.remove_ssh_key_schema import RemoveSSHKeySchema
 from app.server_manager.validators.schemas.server_management.ssh_keys.add_ssh_key_schema import AddSSHKeySchema
 from app.server_manager.validators.schemas.server_management.scheduler.control_scheduled_job_schema import ControlScheduledJobSchema
+from app.server_manager.validators.schemas.server_management.scheduler.run_scheduler_schema import RunSchedulerJobSchema
