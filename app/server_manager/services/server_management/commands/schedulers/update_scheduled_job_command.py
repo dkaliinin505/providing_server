@@ -31,7 +31,11 @@ class UpdateScheduledJobCommand(Command):
         await run_command_async(remove_old_job_command, capture_output=True)
 
         # Add the updated job with the new cron expression
-        cron_command = f'(crontab -l -u {self.user} 2>/dev/null; echo "{cron_expression} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
+        cron_command = (
+            f'sudo bash -c \''
+            f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; '
+            f'echo "{cron_expression} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -\''
+        )
         result = await run_command_async(cron_command, capture_output=True)
 
         if result:

@@ -32,7 +32,11 @@ class CreateScheduledJobCommand(Command):
             return {"error": "Invalid frequency or custom schedule"}
 
         # Use cron_expression instead of frequency in the crontab command
-        cron_command = f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; echo "{cron_expression} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -'
+        cron_command = (
+            f'sudo bash -c \''
+            f'(crontab -l -u {self.user} 2>/dev/null | grep -v "# JOB_ID={self.job_id}"; '
+            f'echo "{cron_expression} {full_command} # JOB_ID={self.job_id}") | crontab -u {self.user} -\''
+        )
 
         # Execute the crontab update command
         result = await run_command_async(cron_command, capture_output=True)
