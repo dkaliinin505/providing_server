@@ -64,4 +64,4 @@ class UpdateDaemonCommand(Command):
         await run_command_async("sudo supervisorctl reread")
         await run_command_async("sudo supervisorctl update")
 
-        return {"message": f"Daemon {self.daemon_id} updated successfully.", "data": self.daemon_id}
+        return {"message": f"Daemon updated successfully.", "data": self.daemon_id}

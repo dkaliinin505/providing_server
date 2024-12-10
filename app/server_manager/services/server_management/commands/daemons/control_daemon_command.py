@@ -22,4 +22,4 @@ class ControlDaemonCommand(Command):
         else:
             await run_command_async(f'sudo supervisorctl {self.action} {self.daemon_id}')
 
-        return {"message": f"Daemon {self.daemon_id} {self.action}ed successfully.", "data": self.daemon_id}
+        return {"message": f"Daemon {self.action}ed successfully.", "data": self.daemon_id}

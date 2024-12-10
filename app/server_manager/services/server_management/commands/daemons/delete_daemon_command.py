@@ -19,4 +19,4 @@ class DeleteDaemonCommand(Command):
         # Reload supervisor to apply changes
         await run_command_async(f'sudo supervisorctl reread && sudo supervisorctl update')
 
-        return {"message": f"Daemon {self.daemon_id} removed."}
+        return {"message": f"Daemon removed.", "data": self.daemon_id}

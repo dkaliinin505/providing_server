@@ -17,4 +17,4 @@ class GetDaemonLogsCommand(Command):
         if log_content:
             return {"message": 'Daemon Logs retrieved successfully', "data": '\n'.join(log_content)}
         else:
-            return {"error": f"Log file for Daemon {self.daemon_id} not found."}
+            raise Exception("Log file for daemon not found.")
