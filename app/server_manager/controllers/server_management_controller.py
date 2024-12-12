@@ -168,6 +168,10 @@ class ServerManagementController(Controller):
         task_id = await self.task_manager.submit_task(self.server_management_service.get_daemon_logs, data)
         return {"message": "Get Daemon Logs Task started in background", "task_id": task_id}
 
+    async def clear_daemon_logs(self, data):
+        task_id = await self.task_manager.submit_task(self.server_management_service.clear_daemon_logs, data)
+        return {"message": "Clear Daemon Logs Task started in background", "task_id": task_id}
+
     async def add_firewall_rule(self, data):
         task_id = await self.task_manager.submit_task(self.server_management_service.add_firewall_rule, data)
         return {"message": "Add Firewall Rule Task started in background", "task_id": task_id}

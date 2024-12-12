@@ -1,3 +1,5 @@
+from app.server_manager.services.server_management.commands.daemons.clear_daemon_log_command import \
+    ClearDaemonLogsCommand
 from app.server_manager.services.server_management.commands.daemons.control_daemon_command import ControlDaemonCommand
 from app.server_manager.services.server_management.commands.daemons.create_daemon_command import CreateDaemonCommand
 from app.server_manager.services.server_management.commands.daemons.delete_daemon_command import DeleteDaemonCommand
@@ -18,6 +20,7 @@ class DaemonService(Service):
         self.executor.register('get_daemon_status_command', GetDaemonStatusCommand({'config': {}}))
         self.executor.register('control_daemon_command', ControlDaemonCommand({'config': {}}))
         self.executor.register('get_daemon_logs_command', GetDaemonLogsCommand({'config': {}}))
+        self.executor.register('clear_daemon_logs_command', ClearDaemonLogsCommand({'config': {}}))
 
     async def create_daemon(self, data):
         return await self.executor.execute('create_daemon_command', data)
@@ -36,5 +39,8 @@ class DaemonService(Service):
 
     async def get_daemon_logs(self, data):
         return await self.executor.execute('get_daemon_logs_command', data)
+
+    async def clear_daemon_logs(self, data):
+        return await self.executor.execute('clear_daemon_logs_command', data)
 
 

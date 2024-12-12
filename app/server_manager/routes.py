@@ -326,6 +326,13 @@ async def remove_ssh_key_route(data):
     return jsonify(result)
 
 
+@server_manager_blueprint.route('/clear-daemon-log', methods=['POST'])
+@validate_request({'POST': GetDaemonSchema})
+async def clear_daemon_log_route(data):
+    result = await server_management_controller.clear_daemon_logs(data)
+    return jsonify(result)
+
+
 @server_manager_blueprint.route('/task-status/<task_id>', methods=['GET'])
 async def task_status_route(task_id):
     status = await task_manager.get_task_status(task_id)

@@ -140,3 +140,8 @@ async def read_last_lines_async(file_path, line_count):
             buffer_size *= 2
 
     return lines[-line_count:]
+
+
+async def write_file_async(file_path: str, content: str) -> None:
+    async with aiofiles.open(file_path, 'w') as f:
+        await f.write(content)

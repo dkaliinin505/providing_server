@@ -235,3 +235,8 @@ class ServerManagementService(Service):
         data = await self.server_logs_service.clear_server_logs(data)
         logging.info(f"Clear Server Logs Task in ServerManagementService started in background with task_id: {data}")
         return data
+
+    async def clear_daemon_logs(self, data):
+        data = await self.daemon_service.clear_daemon_logs(data)
+        logging.info(f"Clear Daemon Logs Task in ServerManagementService started in background with task_id: {data}")
+        return data
