@@ -93,17 +93,19 @@ class GetDaemonStatusCommand(Command):
         for line in lines:
             if not line.strip():
                 continue
-            parts = line.split()
+            parts = line.split(None, 2)
             if len(parts) < 2:
                 logger.warning(f"Unexpected line format: {line}")
                 continue
 
             process_name = parts[0]
             status = parts[1]
+            description = parts[2] if len(parts) > 2 else ''
 
             process_statuses.append({
                 "process_name": process_name,
-                "status": status
+                "status": status,
+                "description": description
             })
 
         return process_statuses
@@ -112,19 +114,21 @@ class GetDaemonStatusCommand(Command):
         line = result.strip()
         if not line:
             logger.warning("Empty supervisorctl status output for single process.")
-            return {"process_name": self.daemon_id, "status": "UNKNOWN"}
+            return {"process_name": self.daemon_id, "status": "UNKNOWN", "description": ""}
 
-        parts = line.split()
+        parts = line.split(None, 2)
         if len(parts) < 2:
             logger.warning(f"Unexpected line format for single process: {line}")
-            return {"process_name": self.daemon_id, "status": "UNKNOWN"}
+            return {"process_name": self.daemon_id, "status": "UNKNOWN", "description": ""}
 
         process_name = parts[0]
         status = parts[1]
+        description = parts[2] if len(parts) > 2 else ''
 
         return {
             "process_name": process_name,
-            "status": status
+            "status": status,
+            "description": description
         }
 
     def determine_overall_status(self, process_statuses):
